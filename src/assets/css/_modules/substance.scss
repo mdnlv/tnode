@@ -1,0 +1,34 @@
+/* Variables
+------------------------------------------------------------- */
+$substance-heading-color: $color-text-heading;
+$substance-body-color: $color-text-body;
+$substance-background-color: #fff;
+
+
+/* General Styles
+------------------------------------------------------------- */
+.substance {
+  position: relative;
+  background-color: $substance-background-color;
+  color: $substance-body-color;
+  @include module();
+  @include module-content();
+}
+.substance h1,
+.substance h2,
+.substance h3,
+.substance h4,
+.substance h5,
+.substance h6 {
+  color: $substance-heading-color;
+  margin-top: 3rem;
+}
+.substance-content {
+  @include module-content-media();
+}
+.substance-content > *:first-child {
+  margin-top: 0;
+}
+.substance-content > *:last-child {
+  margin-bottom: 0;
+}

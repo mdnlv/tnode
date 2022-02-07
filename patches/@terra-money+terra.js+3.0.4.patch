@@ -1,0 +1,13 @@
+diff --git a/node_modules/@terra-money/terra.js/dist/client/lcd/APIRequester.js b/node_modules/@terra-money/terra.js/dist/client/lcd/APIRequester.js
+index f6e9a09..b976404 100644
+--- a/node_modules/@terra-money/terra.js/dist/client/lcd/APIRequester.js
++++ b/node_modules/@terra-money/terra.js/dist/client/lcd/APIRequester.js
+@@ -50,7 +50,7 @@ var APIRequester = /** @class */ (function () {
+             headers: {
+                 Accept: 'application/json',
+             },
+-            timeout: 30000,
++            timeout: 1000 * 60 * 3,
+         });
+     }
+     APIRequester.prototype.getRaw = function (endpoint, params) {

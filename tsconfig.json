@@ -1,0 +1,36 @@
+{
+	"compilerOptions": {
+		"target": "es6",
+		"module": "commonjs",
+		"moduleResolution": "node",
+		"lib": [
+			"esnext",
+			"es6",
+			"esnext.asynciterable",
+			"dom"
+		],
+		"experimentalDecorators": true,
+		"esModuleInterop": true,
+		"allowJs": true,
+		"sourceMap": true,
+		"strict": true,
+		"noEmit": true,
+		"baseUrl": ".",
+		"paths": {
+			"~*": ["./src*"],
+		},
+		"types": [
+			"@types/node",
+			"@nuxt/types",
+			"@nuxtjs/axios",
+		],
+		"noImplicitAny": false,
+		"resolveJsonModule": true,
+		"noErrorTruncation": true
+	},
+	"exclude": [
+		"node_modules",
+		".nuxt",
+		"dist"
+	]
+}

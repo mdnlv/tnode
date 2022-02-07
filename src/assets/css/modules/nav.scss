@@ -1,0 +1,238 @@
+/* Navigation
+------------------------------------------------------------- */
+.nav {
+  width: 100%;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  background-color: #000;
+  padding: 10px 0;
+  transition: background-color 250ms ease-in;
+  z-index: 500;
+}
+.nav-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  @include module-container();
+}
+.nav-brand {
+  width: 5rem;
+  justify-self: start;
+  z-index: 5000;
+}
+@media (min-width: 650px) {
+  .nav {
+    padding-top: 15px;
+    padding-bottom: 15px;
+  }
+  .nav-brand {
+    width: 6.5rem;
+  }
+}
+@media (min-width: 768px) {
+  .nav-brand {
+    width: 6rem;
+  }
+}
+@media (min-width: 2400px) {
+  .nav {
+    padding: 1rem 0;
+  }
+}
+
+
+/* Nav Menu
+------------------------------------------------------------- */
+.nav-menu {
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  justify-content: space-evenly;
+  position: fixed;
+  background-color: #000;
+  text-align: center;
+  width: 0;
+  height: 100%;
+  top: 0;
+  right: 0;
+  padding: 20vh 0;
+  list-style-type: none;
+  margin: 0;
+  transition: 150ms;
+  overflow: hidden;
+  z-index: 1000;
+}
+.nav-menu.open {
+  width: 100%;
+}
+.nav-menuItem {
+  font-family: $font-family-heading;
+  font-size: 1.9rem;
+  font-weight: $font-weight-heading;
+  text-transform: uppercase;
+  text-decoration: none;
+  margin-bottom: 0;
+}
+.nav-menuItem-link {
+  text-decoration: none;
+  color: #fff;
+  opacity: 0;
+}
+.nav-menuItem-link:hover {
+  color: #fff;
+  background-color: $color-accent-2;
+  text-decoration: none;
+}
+.nav-menu.open .nav-menuItem {
+  animation-name: navItemsIn;
+  animation-duration: 150ms;
+  animation-delay: calc(50ms + (var(--animation-order) * 35ms));
+  animation-fill-mode: both;
+  animation-timing-function: ease-in-out;
+}
+.nav-menu.open .nav-menuItem-link {
+  opacity: 1;
+}
+@keyframes navItemsIn {
+  0% {
+    opacity: 0;
+    transform: translateX(150px);
+  }
+  100% {
+    opacity: 1;
+  }
+}
+@media (min-width: 768px) {
+  .nav-menuItem {
+    font-size: 1.7rem;
+  }
+}
+@media (min-width: 992px) {
+  .nav-menu {
+    flex-direction: row;
+    justify-self: end;
+    background-color: transparent;
+    position: relative;
+    height: unset;
+    width: unset;
+    padding: 0;
+    margin-left: auto;
+  }
+  .nav-menu.open {
+    width: unset;
+  }
+  .nav-menuItem {
+    font-family: $font-family-body;
+    font-size: 1rem;
+    font-weight: $font-weight-strong;
+    text-transform: none;
+    padding: 5px 0;
+  }
+  .nav-menuItem-link {
+    position: relative;
+    color: #fff;
+    transition: color 0.3s ease-out;
+    margin-left: 2rem;
+    opacity: 1;
+  }
+  .nav-menuItem-link:hover {
+    background-color: transparent;
+    color: #000;
+  }
+  .nav-menuItem-link:before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    bottom: -4px;
+    left: 0;
+    background-color: #000;
+    visibility: hidden;
+    transform: scaleX(0);
+    transition: all 50ms ease-in;
+  }
+  .nav-menuItem-link:hover:before {
+    visibility: visible;
+    transform: scaleX(1);
+  }
+  .nav-menuItem.active .nav-menuItem-link {
+    color: #000;
+  }
+  .nav-menuItem.active .nav-menuItem-link:before,
+  .nav-menuItem.active .nav-menuItem-link:hover:before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    bottom: -4px;
+    left: 0;
+    background-color: #000;
+    visibility: visible;
+    transform: scaleX(1);
+  }
+}
+
+
+/* Nav Button
+------------------------------------------------------------- */
+.nav .btn {
+  display: inline;
+}
+@media (min-width: 992px) {
+  .nav .btn {
+    display: inline-block;
+    margin-bottom: 0;
+  }
+}
+
+
+/* Mobile Menu Toggle
+------------------------------------------------------------- */
+.nav-toggle {
+  justify-self: end;
+  cursor: pointer;
+  display: block;
+  z-index: 9999;
+  margin-left: auto;
+}
+.nav-toggle:hover {
+  cursor: pointer;
+}
+@media (min-width: 992px) {
+  .nav-toggle {
+    display: none;
+    cursor: pointer;
+  }
+}
+
+
+/* Toggle Hamburger
+------------------------------------------------------------- */
+.nav-toggle .bar {
+  display: block;
+  width: 25px;
+  height: 3px;
+  background-color: #000;
+  margin: 5px auto;
+  transition: all 150ms ease-in-out;
+  z-index: 2000;
+}
+.nav-toggle .bar:nth-child(1) {
+  background-color: $color-brand;
+}
+.nav-toggle .bar:nth-child(2) {
+  background-color: $color-accent-1;
+}
+.nav-toggle .bar:nth-child(3) {
+  background-color: $color-accent-2;
+}
+.nav-toggle.open .bar:nth-child(2) {
+  opacity: 0;
+}
+.nav-toggle.open .bar:nth-child(1) {
+  transform: translateY(8px) rotate(45deg);
+}
+.nav-toggle.open .bar:nth-child(3) {
+  transform: translateY(-8px) rotate(-45deg);
+}

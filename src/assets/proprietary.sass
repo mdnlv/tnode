@@ -1,0 +1,102 @@
+.tnode-ui
+
+	button:not(.nostyle):not(.vs__clear):not(.vts-toggle__label):not(.vuecal__arrow):not(.vs__deselect),
+	.button:not(.nostyle)
+		font-weight: bold
+		padding: $unit-4 $unit1
+		&.pill
+			border-radius: $unit10
+		&.big-text
+			font-size: $unit2
+			line-height: $unit3
+			letter-spacing: $unit-10
+		&.bare
+			border: none
+			color: $fg
+		color: $color
+		background: none
+		border: 2px solid $fg
+		&.cta
+			background: unset
+			border-color: $fg2
+		&[disabled]
+			opacity: $opacity1
+
+	.vm--modal
+		background: $bg2-1
+		// @include box
+		@include rounded
+		@include box-shadow-big
+		padding: $unit7 $space-big
+
+	.modal-form
+		height: 100%
+		display: flex
+		flex-direction: column
+		justify-content: space-between
+
+	.disable
+		pointer-events: none
+
+	.light-text
+		opacity: $opacity1
+
+	.form
+		input:not(.vs__search)
+			border-radius: $unit10
+			padding: $unit-2 $unit2
+			// padding: 0.5rem $unit5
+			background: transparent
+			color: inherit
+			@include border-inline($color)
+
+	.message
+		display: flex
+		justify-content: center
+		align-items: center
+		flex-direction: column
+		text-align: center
+		padding: 2rem
+		a
+			text-decoration: underline
+			color: $fg
+	.label
+		font-family: $font
+		color: $fg3
+		letter-spacing: $unit-11
+		text-transform: uppercase
+
+	.color-fg3
+		color: $fg3
+
+	.loading-small
+		display: inline-block
+		height: $unit-2
+		margin-right: $unit-4
+	.loading-medium
+		display: inline-block
+		height: $unit2
+		margin-right: $unit-1
+		// transform: scale(1.7) translateX(-10%)
+	.loading-big-outer
+		position: relative
+		width: 100%
+		height: 100%
+		.loading-big
+			position: absolute
+			top: 50%
+			left: 50%
+			transform: translate(-50%, -50%)
+
+	.number
+		word-break: break-word
+
+	span.primary
+		color: $fg
+	span.secondary
+		color: $fg2
+
+	.icon
+		width: $unit5
+	.icon-small
+		width: $unit3

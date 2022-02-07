@@ -1,0 +1,50 @@
+/* Variables
+------------------------------------------------------------- */
+$highlight-heading-color: #fff;
+$highlight-body-color: $color-text-body-alt;
+$highlight-background-color: #000;
+$highlight-background-image: none;
+
+
+/* General Styles
+------------------------------------------------------------- */
+.highlight {
+  position: relative;
+  background-color: $highlight-background-color;
+  background-image: $highlight-background-image;
+  @include module();
+}
+.highlight h1,
+.highlight h2,
+.highlight h3,
+.highlight h4 {
+  color: $highlight-heading-color;
+}
+.highlight p {
+  color: $highlight-body-color;
+}
+.highlight-background {
+  @include module-background();
+}
+.highlight-container {
+  position: relative;
+  text-align: center;
+  @include module-container();
+  @include module-last-child();
+}
+@media (min-width: 768px) {
+  .highlight-container > * {
+    max-width: 75%;
+    @include margin-x();
+  }
+}
+@media (min-width: 992px) {
+  .highlight-container > * {
+    max-width: 65%;
+  }
+}
+@media (min-width: 1450px) {
+  .highlight-container > p {
+    max-width: 60%;
+  }
+}

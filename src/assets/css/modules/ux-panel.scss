@@ -1,0 +1,45 @@
+.app-container {
+  @include module-container();
+}
+
+.uxPanel {
+  background-color: #000;
+  border-radius: 2rem;
+  margin-top: 2rem;
+  padding: 2rem;
+}
+.uxPanel-tokenName {
+  font-size: 1rem;
+  margin-left: 0.5rem;
+  color: $color-accent-1;
+}
+.uxPanel-row {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+.uxPanel-btnPanel {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+@media (min-width: 992px) {
+  .uxPanel-row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .uxPanel-btnPanel {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 50%;
+  }
+}
+@media (min-width: 1450px) {
+  .uxPanel-btnPanel {
+    width: 40%;
+  }
+}

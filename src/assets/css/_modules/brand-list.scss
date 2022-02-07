@@ -1,0 +1,69 @@
+/* Variables
+------------------------------------------------------------- */
+$brand-list-heading-color: $color-text-heading;
+$brand-list-body-color: $color-text-body;
+$brand-list-background-color: #fff;
+$brand-list-columns: 2;
+$brand-list-columns-650: 3;
+$brand-list-columns-768: 5;
+
+
+/* General Styles
+------------------------------------------------------------- */
+.brandList {
+  background-color: $brand-list-background-color;
+  @include module();
+}
+.brandList h1,
+.brandList h2,
+.brandList h3,
+.brandList h4 {
+  color: $brand-list-heading-color;
+}
+.brandList p {
+  color: $brand-list-body-color;
+}
+.brandList-container {
+  @include module-container();
+}
+.brandList-header {
+  @include module-header();
+}
+.brandList-header > * {
+  padding-left: 0;
+  padding-right: 0;
+}
+.brandList-content {
+  max-width: 13rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  @include margin-x();
+}
+.brandList-content img {
+  width: 100% / $brand-list-columns;
+}
+@media (min-width: 650px) {
+  .brandList-content {
+    max-width: unset;
+  }
+  .brandList-content img {
+    width: 100% / $brand-list-columns-650;
+  }
+}
+@media (min-width: 768px) {
+  .brandList-content img {
+    width: 100% / $brand-list-columns-768;
+    padding: 0 0.5rem;
+  }
+}
+@media (min-width: 992px) {
+  .brandList-content img {
+    padding: 0 1rem;
+  }
+}
+@media (min-width: 1200px) {
+  .brandList-content {
+    max-width: 75%;
+  }
+}

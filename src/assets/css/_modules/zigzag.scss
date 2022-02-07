@@ -1,0 +1,142 @@
+/* Variables
+------------------------------------------------------------- */
+$zigzag-heading-color: $color-text-heading;
+$zigzag-body-color: $color-text-body;
+$zigzag-background-color: #fff;
+
+
+/* General Styles
+------------------------------------------------------------- */
+.zigzag {
+  background-color: $zigzag-background-color;
+  @include module()
+}
+.zigzag h1,
+.zigzag h2,
+.zigzag h3,
+.zigzag h4 {
+  color: $zigzag-heading-color;
+}
+.zigzag-container {
+  @include module-container();
+}
+.zigzag-img {
+  position: relative;
+  width: 100%;
+  z-index: 5;
+  margin-bottom: 1rem;
+}
+.zigzag picture {
+  position: relative;
+  z-index: 1;
+}
+.zigzag-content {
+  color: $zigzag-body-color;
+  @include module-last-child();
+}
+@media (min-width: 768px) {
+  .zigzag-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .zigzag-container,
+  .zigzag.text-left .zigzag-container {
+    flex-direction: row-reverse;
+  }
+  .zigzag.text-right .zigzag-container {
+    flex-direction: row;
+  }
+  .zigzag picture {
+    width: 50%;
+  }
+  .zigzag-img {
+    margin: 0;
+  }
+  .zigzag-content {
+    width: 50%;
+    text-align: left;
+    padding-right: 2rem;
+  }
+  .zigzag.text-right .zigzag-content {
+    padding-right: 0;
+    padding-left: 2rem;
+  }
+}
+@media (min-width: 992px) {
+  .zigzag picture {
+    width: 48%;
+  }
+  .zigzag-content {
+    width: 52%;
+    padding-right: 4rem;
+  }
+  .zigzag.text-right .zigzag-content {
+    padding-left: 4rem;
+  }
+}
+@media (min-width: 1200px) {
+  .zigzag picture {
+    width: 52%;
+  }
+  .zigzag-content {
+    width: 48%;
+    padding-right: 6rem;
+  }
+  .zigzag.text-right .zigzag-content {
+    padding-left: 6rem;
+  }
+}
+@media (min-width: 1450px) {
+  .zigzag {
+    padding-top: $pad-y-1450 + 2rem;
+    padding-bottom: $pad-y-1450 + 2rem;
+  }
+  .zigzag picture {
+    width: 48%;
+  }
+  .zigzag-content {
+    width: 52%;
+    padding-right: 10rem;
+  }
+  .zigzag.text-right .zigzag-content {
+    padding-left: 10rem;
+  }
+}
+
+
+/* Wide Alternate
+------------------------------------------------------------- */
+@media (min-width: 1450px) {
+  .zigzag.wide picture {
+    width: 54%;
+  }
+  .zigzag.wide .zigzag-content {
+    width: 46%;
+    padding-right: 8rem;
+  }
+  .zigzag.wide.text-right .zigzag-content {
+    padding-left: 8rem;
+    padding-right: 0;
+  }
+}
+
+
+/* Tall Alternate
+------------------------------------------------------------- */
+@media (min-width: 1200px) {
+  .zigzag.tall .zigzag-container {
+    justify-content: flex-start;
+  }
+  .zigzag.tall picture {
+    width: 45%;
+  }
+  .zigzag.tall .zigzag-content {
+    width: 45%;
+    padding-right: 8rem;
+  }
+  .zigzag.tall.text-right .zigzag-content {
+    padding-left: 8rem;
+    padding-right: 0;
+  }
+}

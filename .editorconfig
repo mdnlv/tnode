@@ -1,0 +1,11 @@
+root = true
+
+[*]
+insert_final_newline = true
+[.bitmap]
+insert_final_newline = false
+
+[*.{js,ts,graphql,vue,mdx,sass}]
+indent_style = tab
+[src/mock/schema/**/*.json]
+indent_style = tab

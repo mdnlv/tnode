@@ -1,0 +1,202 @@
+/* Sections
+------------------------------------------------------------- */
+.footer {
+  background-color: $color-gray-3;
+}
+.footer-container {
+  @include module-container();
+}
+.footer-section {
+  text-align: center;
+  font-size: 0.9375rem;
+  padding-bottom: $pad-y;
+}
+.footer-section:first-child {
+  padding-top: $pad-y + 1rem;
+}
+.footer-section:nth-last-child(2) {
+  padding-bottom: $pad-y + 1rem;
+}
+@media (min-width: 992px) {
+  .footer-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.5fr 1.5fr;
+    gap: 4rem;
+    justify-content: space-between;
+  }
+  .footer-section,
+  .footer-section:first-child,
+  .footer-section:nth-last-child(2) {
+    text-align: left;
+    padding: 0;
+    padding-top: $pad-y-992;
+    padding-bottom: $pad-y-992;
+  }
+  .footer-section:nth-last-child(1) {
+    text-align: right;
+  }
+}
+@media (min-width: 1200px) {
+  .footer-container {
+    grid-template-columns: 1fr 1fr 1.5fr 1.25fr;
+  }
+}
+@media (min-width: 1450px) {
+  .footer-container {
+    grid-template-columns: 1fr 1fr 1.5fr 1.25fr;
+  }
+}
+
+
+/* Typography
+------------------------------------------------------------- */
+.footer-section h4 {
+  color: $color-text-heading;
+}
+.footer-section p,
+.footer-section a {
+  color: $color-text-body;
+}
+.footer-section ul a:hover {
+  text-decoration: underline;
+  text-decoration-color: $color-accent-1;
+}
+.footer-section ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+.footer-section li {
+  display: inline-block;
+  margin-right: 0.7rem;
+  margin-bottom: 0.5rem;
+}
+.footer-section li:last-child {
+  margin-right: 0;
+}
+@media (min-width: 992px) {
+  .footer-section h4 {
+    margin-bottom: 1.3rem;
+  }
+  .footer-section li {
+    display: block;
+    margin-right: 0;
+    margin-bottom: 0.5rem;
+  }
+}
+
+
+/* Social Icons
+------------------------------------------------------------- */
+.footer-social .socialIcon {
+  background-color: #fff;
+  width: 2.5rem;
+  border-radius: 0.5rem;
+  padding: 0.25rem;
+  margin-right: 1rem;
+  margin-bottom: 1rem;
+}
+.footer-social a:last-of-type img {
+  margin-right: 0;
+}
+@media (max-width: 549px),
+(min-width: 992px) and (max-width: 1449px) {
+  .footer-social .socialIcon {
+    width: 2rem;
+  }
+}
+
+
+/* Footer Payment Logo
+------------------------------------------------------------- */
+.footer-paymentLogo {
+  display: inline-block;
+  background-color: #f1f1f1;
+  border: 1px solid #cacaca;
+  border-radius: 5px;
+  width: 40px;
+  vertical-align: top;
+  margin: 0;
+  margin-right: 3px;
+  margin-bottom: 10px;
+}
+
+
+/* Footer Email Form
+------------------------------------------------------------- */
+.footer-emailDescription {
+  font-size: 0.875rem;
+  line-height: 1.3;
+}
+.footer-emailForm {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+input.footer-emailInput,
+input.footer-emailBtn {
+  height: 40px;
+  padding: 0 15px;
+  margin-bottom: 0.875rem;
+}
+input.footer-emailInput {
+  width: unset;
+  border-color: $color-gray-1;
+  border-top-left-radius: 16px;
+  border-bottom-left-radius: 16px;
+  border-right: 0;
+}
+input.footer-emailInput:focus {
+  border-color: #333;
+}
+input.footer-emailBtn {
+  -webkit-border-radius: 0;
+  border-radius: 0;
+  border-top-right-radius: 16px;
+  border-bottom-right-radius: 16px;
+}
+p.footer-emailPrivacy {
+  color: #636669;
+  font-size: 0.7rem;
+  line-height: 1.2;
+}
+@media (min-width: 992px) {
+  input.footer-emailInput {
+    width: 100%;
+  }
+}
+@media (min-width: 1200px) {
+  .footer-emailForm {
+    justify-content: flex-end;
+  }
+  input.footer-emailInput,
+  input.footer-emailBtn {
+    height: 50px;
+  }
+  input.footer-emailInput {
+    max-width: 300px;
+  }
+}
+@media (min-width: 2400px) {
+  input.footer-emailInput,
+  input.footer-emailBtn {
+    height: 2.5rem;
+    padding: 0 1rem;
+  }
+  input.footer-emailInput {
+    max-width: 100%;
+  }
+}
+
+
+/* Footer Copyright
+------------------------------------------------------------- */
+.footer-copyright {
+  background-color: #d9d9d9;
+  padding: 1rem $pad-x;
+}
+.footer-copyright p {
+  font-size: 0.875rem;
+  text-align: center;
+  margin-bottom: 0;
+}

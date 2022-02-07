@@ -1,0 +1,8 @@
+**/.DS_Store
+**/.nuxt
+**/dist
+**/node_modules
+
+*.vue
+*.ts
+*.js

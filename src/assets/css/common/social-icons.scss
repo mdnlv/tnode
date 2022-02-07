@@ -1,0 +1,50 @@
+/* Social Icons - Colors
+------------------------------------------------------------- */
+.socialIcon.youtube,
+.socialIcon.medium,
+.socialIcon.discord,
+.socialIcon.instagram,
+.socialIcon.pinterest,
+.socialIcon.facebook,
+.socialIcon.twitter,
+.socialIcon.telegram,
+.socialIcon.tiktok {
+  background: #3b3f44;
+  background-color: #3b3f44;
+}
+.socialIcon.youtube:hover,
+.socialIcon.youtube:active {
+  background-color: #c81d1f;
+}
+.socialIcon.instagram:hover,
+.socialIcon.instagram:active {
+  background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
+}
+.socialIcon.pinterest:hover,
+.socialIcon.pinterest:active {
+  background-color: #bd081c;
+}
+.socialIcon.facebook:hover,
+.socialIcon.facebook:active {
+  background-color: #3578E5;
+}
+.socialIcon.twitter:hover,
+.socialIcon.twitter:active {
+  background-color: #1da1f2;
+}
+.socialIcon.telegram:hover,
+.socialIcon.telegram:active {
+  background-color: #0088cc;
+}
+.socialIcon.tiktok:hover,
+.socialIcon.tiktok:active {
+  background-color: #333;
+}
+.socialIcon.discord:hover,
+.socialIcon.discord:active {
+  background-color: #7289DA;
+}
+.socialIcon.medium:hover,
+.socialIcon.medium:active {
+  background-color: #000;
+}

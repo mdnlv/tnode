@@ -1,0 +1,55 @@
+@mixin svgui-base {
+  display: inline-block;
+  position: relative;
+  fill: currentColor;
+  width: 1em;
+  height: 1em;
+  margin-right: 0.3em;
+  opacity: 0.5;
+}
+
+
+/* External Link
+------------------------------------------------------------- */
+.svgui-extLink {
+  @include svgui-base;
+  top: -0.125em;
+  left: 0.25em;
+  margin-right: 0.375em;
+  width: 0.6em;
+  height: 0.6em;
+}
+.btn .svgui-extLink {
+  top: -0.0625em;
+  left: 0.3125em;
+  width: 0.8125em;
+  height: 0.8125em;
+  opacity: 0.3;
+}
+
+
+/* Download Icon
+------------------------------------------------------------- */
+.svgui-download {
+  @include svgui-base;
+  top: -0.0625em;
+  left: 0.125em;
+  opacity: 0.4;
+}
+
+
+/* Arrow Right
+------------------------------------------------------------- */
+.svgui-arrowRight {
+  @include svgui-base;
+  top: -0.0625em;
+  left: 0.3em;
+  fill: none;
+  stroke: currentColor;
+  transition: 100ms ease-out;
+}
+a:hover > .svgui-arrowRight,
+a:hover + .svgui-arrowRight {
+  left: 0.5em;
+  opacity: 1;
+}

@@ -1,0 +1,58 @@
+/* Variables
+------------------------------------------------------------- */
+$cta-heading-color: #fff;
+$cta-body-color: #fff;
+$cta-background-color: #1e2124;
+$cta-background-image: linear-gradient(180deg, #0c0d0e 0%, #1e2124 10%, #31363a 90%, #23262a 100%);
+
+
+/* General Styles
+------------------------------------------------------------- */
+.cta {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  background-color: $cta-background-color;
+  background-image: $cta-background-image;
+  @include module();
+  @include margin-x();
+  @include module-last-child();
+}
+.cta-background {
+  @include module-background();
+}
+.cta-header {
+  position: relative;
+  text-align: center;
+  max-width: 18rem;
+  margin-bottom: 2rem;
+  @include module-last-child();
+}
+.cta h1,
+.cta h2,
+.cta h3,
+.cta h4 {
+  color: $cta-heading-color;
+}
+.cta p {
+  color: $cta-body-color;
+}
+@media (min-width: 768px) {
+  .cta {
+    flex-direction: row;
+  }
+  .cta-header {
+    text-align: left;
+    margin-right: 10%;
+    margin-bottom: 0;
+  }
+}
+@media (min-width: 1200px) {
+  .cta-header {
+    width: 24rem;
+    max-width: unset;
+  }
+}

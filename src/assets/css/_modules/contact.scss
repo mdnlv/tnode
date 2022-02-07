@@ -1,0 +1,69 @@
+/* Variables
+------------------------------------------------------------- */
+$contact-heading-color: $color-text-heading;
+$contact-body-color: $color-text-body;
+$contact-background-color: #fff;
+$contact-success-color: #2fc125;
+$contact-success-strong-color: #5de750;
+$contact-success-background-color: $color-gray-1;
+
+
+/* General Styles
+------------------------------------------------------------- */
+.contact {
+  display: flex;
+  justify-content: center;
+  background-color: $contact-background-color;
+  @include module();
+  @include margin-x();
+}
+.contact h1,
+.contact h2,
+.contact h3,
+.contact h4 {
+  color: $contact-heading-color;
+}
+.contact-container {
+  @include module-content();
+}
+.contact-header {
+  color: $contact-body-color;
+  @include module-header();
+}
+.contact-content {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+.contact-success {
+  display: none;
+  width: 100%;
+  color: $contact-success-color;
+  background-color: $contact-success-background-color;
+  border: 2px solid $contact-success-color;
+  padding: 1rem;
+  margin-bottom: 2rem;
+}
+.contact-success strong {
+  color: $contact-success-strong-color;
+}
+.contact-input,
+.contact-btn {
+  width: 100%;
+}
+@media (min-width: 400px) {
+  .contact-input.half {
+    width: 48%;
+  }
+}
+@media (min-width: 992px) {
+  .contact-header > * {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+  .contact-btn {
+    width: 12.5rem;
+    margin-left: auto;
+  }
+}

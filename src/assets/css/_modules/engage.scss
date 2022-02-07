@@ -1,0 +1,48 @@
+/* Variables
+------------------------------------------------------------- */
+$engage-heading-color: #fff;
+$engage-body-color: $color-text-body-alt;
+$engage-strong-color: #fff;
+$engage-background-color: #000;
+$engage-background-image: none;
+$engage-border-radius: 0;
+
+
+/* General Styles
+------------------------------------------------------------- */
+.engage {
+  @include module();
+  padding-left: $pad-x;
+  padding-right: $pad-x;
+}
+.engage h1,
+.engage h2,
+.engage h3,
+.engage h4 {
+  color: $engage-heading-color;
+}
+.engage p {
+  color: $engage-body-color;
+  margin-bottom: $pad-y;
+}
+.engage strong {
+  color: $engage-strong-color;
+}
+.engage .btn {
+  margin-bottom: 0;
+}
+.engage-background {
+  border-radius: $engage-border-radius;
+  @include module-background();
+}
+.engage-container {
+  position: relative;
+  background-color: $engage-background-color;
+  background-image: $engage-background-image;
+  border-radius: $engage-border-radius;
+  @include module();
+  @include module-container();
+}
+.engage-content {
+  @include module-content(center);
+}

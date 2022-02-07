@@ -1,0 +1,753 @@
+.tnode-ui-html
+	font-size: $unit-base
+
+.tnode-ui
+	font-family: $font
+	font-weight: $font-weight
+	background: $body-bg
+	color: $color
+	margin: 0
+
+	.layout
+		overflow: hidden
+		position: relative
+		main
+			background: $main-bg
+			min-height: calc(100vh - #{$header-height} - #{$socket-height})
+			max-height: calc(100vh - #{$header-height})
+			overflow-x: auto
+			overflow-y: overlay
+			margin-top: $header-height
+			// @include transition(margin-left)
+			// @media not all and (min-resolution:.001dpcm) 
+			// 	@supports (-webkit-appearance:none) and (display:flow-root) 
+			// 		transition: none
+
+	section,
+	.section
+		position: relative
+
+		@include small-vert-padding-top
+		@include small-vert-padding-bottom
+
+		&.medium-padding
+			@include medium-vert-padding-top
+			@include medium-vert-padding-bottom
+		&.big-padding
+			@include big-vert-padding-top
+			@include big-vert-padding-bottom
+		&.no-padding
+			padding: 0
+
+	.container
+		position: relative
+		width: $width-default
+		max-width: 100%
+		padding: 0 $space
+		padding-right: calc(#{$space} + #{$scrollbar-width})
+		margin: 0 auto
+
+		&.narrow
+			width: $width-narrow
+		&.medium
+			width: $width-medium
+		&.wide
+			width: $width-wide
+		&.superwide
+			width: $width-superwide
+		&.full
+			width: 100%
+		&.no-padding
+			padding: 0
+		&.medium-padding
+			padding: 0 $space-medium
+		&.big-padding
+			padding: 0 $space-big
+
+	.width-nomax
+		width: fit-content
+		min-width: min($width-default, 100%)
+		max-width: unset
+	.flex
+		display: flex
+		align-items: center
+		> .grow
+			flex-grow: 1
+	.flex-column
+		flex-direction: column
+	.flex-grow
+		flex-grow: 1
+	.flex-wrap
+		flex-wrap: wrap
+		&.wrap-space
+			margin-top: -$space
+			> *
+				margin-top: $space
+	.flex-inline
+		display: inline-flex
+		align-items: center
+		> .grow
+			flex-grow: 1
+	.flex-space-between
+		display: flex
+		justify-content: space-between
+		align-items: center
+		> .grow
+			flex-grow: 1
+	.flex-end
+		display: flex
+		align-items: center
+		justify-content: flex-end
+		> .grow
+			flex-grow: 1
+	.flex-start
+		display: flex
+		align-items: flex-start
+		justify-content: flex-start
+		> .grow
+			flex-grow: 1
+	.flex-stretch
+		align-items: stretch
+
+	@mixin space($this-space)
+		> *:not(:last-child)
+			margin-bottom: $this-space
+			&.no-margin
+				margin-bottom: 0
+		> .space-before:not(:first-child)
+			margin-top: scaleUnit($this-space, 2)
+		> .space-after:not(:last-child)
+			margin-bottom: scaleUnit($this-space, 2)
+		> .space-before-big:not(:first-child)
+			margin-top: scaleUnit($this-space, 4)
+		> .space-after-big:not(:last-child)
+			margin-bottom: scaleUnit($this-space, 4)
+	.space-items
+		&:not(.grid)
+			@include space($space)
+		@media (max-width: $breakpoint-mobile)
+			&.grid
+				@include space($space)
+	.space-items-small
+		&:not(.grid)
+			@include space($space-small)
+		@media (max-width: $breakpoint-mobile)
+			&.grid
+				@include space($space-small)
+	.space-items-medium
+		&:not(.grid)
+			@include space($space-medium)
+		@media (max-width: $breakpoint-mobile)
+			&.grid
+				@include space($space-medium)
+	.space-items-big
+		&:not(.grid)
+			@include space($space-big)
+		@media (max-width: $breakpoint-mobile)
+			&.grid
+				@include space($space-big)
+	.space-items-bigger
+		&:not(.grid)
+			@include space($space-bigger)
+		@media (max-width: $breakpoint-mobile)
+			&.grid
+				@include space($space-bigger)
+
+	@mixin spaceHorz($this-space)
+		> *:not(:last-child)
+			margin-right: $this-space
+			&.no-margin
+				margin-right: 0
+		> .space-before
+			margin-left: scaleUnit($this-space, 2)
+		> .space-after
+			margin-right: scaleUnit($this-space, 2)
+		> .space-before-big
+			margin-left: scaleUnit($this-space, 4)
+		> .space-after-big
+			margin-right: scaleUnit($this-space, 4)
+	.space-items-horz
+		@include spaceHorz($space)
+	.space-items-horz-small
+		@include spaceHorz($space-small)
+	.space-items-horz-medium
+		@include spaceHorz($space-medium)
+	.space-items-horz-big
+		@include spaceHorz($space-big)
+
+	// grids
+
+	.grid,
+	.grid-column
+		display: flex
+		&.not-on-tablet
+			@media (max-width: $breakpoint-tablet)
+				display: block
+		@media (max-width: $breakpoint-mobile)
+			display: block
+		justify-content: center
+		align-items: center
+		&.start
+			align-items: flex-start
+		&.end
+			align-items: flex-end
+		> .grow
+			flex-grow: 1
+
+	.grid
+		@include space-equal-padding-horz($space)
+		&.small-padding
+			@include space-equal-padding-horz($space-small)
+		&.medium-padding
+			@include space-equal-padding-horz($space-medium)
+		&.big-padding
+			@include space-equal-padding-horz($space-big)
+		.half
+			width: 50%
+		.two-thirds
+			width: 66.66%
+		.third
+			width: 33.33%
+		.quarter
+			width: 25%
+		.three-quarters
+			width: 75%
+		.fifth
+			width: 20%
+		.sixth
+			width: 16.66%
+		.three-fifths
+			width: 60%
+		.four-fifths
+			width: 80%
+		.two-fifths
+			width: 40%
+		.five-sixths
+			width: 83.33%
+		&.not-on-tablet
+			@media (max-width: $breakpoint-tablet)
+				@include space($space)
+				&.small-padding
+					@include space($space-small)
+				&.medium-padding
+					@include space($space-medium)
+				&.big-padding
+					@include space($space-big)
+				.half,
+				.two-thirds,
+				.third,
+				.quarter,
+				.three-quarters,
+				.fifth,
+				.sixth,
+				.three-fifths,
+				.four-fifths,
+				.two-fifths,
+				.five-sixths
+					width: 100%
+		@media (max-width: $breakpoint-mobile)
+			@include space($space)
+			&.small-padding
+				@include space($space-small)
+			&.medium-padding
+				@include space($space-medium)
+			&.big-padding
+				@include space($space-big)
+			.half,
+			.two-thirds,
+			.third,
+			.quarter,
+			.three-quarters,
+			.fifth,
+			.sixth,
+			.three-fifths,
+			.four-fifths,
+			.two-fifths,
+			.five-sixths
+				width: 100%
+
+	.grid-column
+		flex-direction: column
+		@include space-equal-padding($space)
+		&.small-padding
+			@include space-equal-padding($space-small)
+		&.medium-padding
+			@include space-equal-padding($space-medium)
+		&.big-padding
+			@include space-equal-padding($space-big)
+		.half
+			height: 50%
+		.two-thirds
+			height: 66.66%
+		.third
+			height: 33.33%
+		.quarter
+			height: 25%
+		.three-quarters
+			height: 75%
+		.fifth
+			width: 20%
+		.three-fifths
+			width: 60%
+		.four-fifths
+			width: 80%
+		.two-fifths
+			width: 40%
+
+	.left-text
+		text-align: left
+	// center
+	.center
+		display: flex
+		flex-direction: column
+		justify-content: space-around
+		align-items: center
+	.center-text
+		text-align: center
+	.right:not(.tooltip)
+		display: flex
+		flex-direction: row-reverse
+	.right-text
+		text-align: right
+
+	// z-indexes
+
+	header
+		z-index: $z-index-header
+	nav
+		z-index: $z-index-nav
+
+	// elements
+
+	.panel
+		background: $bg
+		padding: $panel-padding
+		@include rounded
+		@include box-shadow
+
+		.panel-title
+			margin: -$panel-padding
+			margin-bottom: $panel-padding
+			border-radius: $border-radius $border-radius 0 0
+			padding: $unit1 $panel-padding
+			background: $fg
+			color: $bg
+			font-size: $unit3
+			line-height: $unit4
+
+	.box
+		@include rounded
+		padding: $unit-4 $unit2
+		border: $border
+
+	hr,
+	.hr
+		border: none
+		border-top: $border
+		max-width: 100%
+
+	img
+		&.float-right
+			float: right
+		&.inline
+			display: inline-block
+		&.small
+			max-height: $unit8
+		&.medium
+			max-height: $unit12
+		&.big
+			max-height: $unit16
+
+	.mobile
+		display: none
+		@media (max-width: $breakpoint-mobile)
+			display: initial
+	.no-mobile
+		@media (max-width: $breakpoint-mobile)
+			display: none
+	.no-tablet
+		@media (max-width: $breakpoint-tablet)
+			display: none
+
+	// type
+
+	h1, h2, h3, h4, h5, h6,
+	.h1, .h2, .h3, .h4, .h5, .h6,
+	p:not(.br)
+		white-space: pre-line
+		margin-top: 0
+		margin-bottom: 0
+	h1, h2, h3, h4, h5, h6,
+	.h1, .h2, .h3, .h4, .h5, .h6
+		font-family: $font-header
+		font-weight: $font-weight-header
+		.pre
+			font-size: 0.65em
+	h1, h2, h3, h4, h5, h6,
+	.h1, .h2, .h3, .h4, .h5, .h6,
+	p, span, a
+		&.highlight
+			@include highlight
+		&.right
+			text-align: right
+
+	h1:not(.nostyle), .h1
+		font-size: $unit6
+		line-height: $unit7
+	h2:not(.nostyle), .h2
+		font-size: $unit4
+		line-height: $unit5
+	h3:not(.nostyle), .h3
+		font-size: $unit2
+		line-height: $unit3
+	h4:not(.nostyle), .h4
+		font-size: $unit1
+		line-height: $unit2
+		font-weight: $font-weight-bold
+	h5:not(.nostyle), .h5
+		font-size: $unit1
+		line-height: $unit2
+	h6:not(.nostyle), .h6
+		font-size: $unit1
+		line-height: $unit2
+		font-weight: $font-weight
+
+	.small
+		font-size: $font-size-small
+	.smaller
+		font-size: $font-size-smaller
+
+	.light-text
+		@include light-text
+
+	strong,
+	b,
+	.bold
+		font-weight: $font-weight-bold
+
+	a.link,
+	span.link	
+		cursor: pointer
+		text-decoration: underline
+		color: $fg
+		@include hover-opacity
+
+	p,
+	ul.list,
+	ol.list
+		line-height: $line-height
+		letter-spacing: 0.05em
+		word-wrap: break-word
+
+	ul.list
+		list-style: circle
+		list-style-position: outside
+		padding-left: 1em
+
+	ol.list
+		list-style: decimal
+		list-style-position: outside
+		padding-left: 1em
+
+	h1, h2, h3, h4, h5, h6,
+	.h1, .h2, .h3, .h4, .h5, .h6,
+	span, p:not(.br), *
+		&.nowrap
+			white-space: nowrap
+
+	// resets and compatibility
+
+	*,
+	*:before,
+	*:after
+		box-sizing: border-box
+	main
+		display: block
+		max-width: 100%
+		max-height: 100%
+	img
+		display: block
+		max-width: 100%
+		max-height: 100%
+		height: auto
+		width: auto
+		-ms-interpolation-mode: bicubic
+	a
+		text-decoration: none
+		color: inherit
+	ul,
+	ol
+		margin: 0
+		padding: 0
+		list-style: none
+	table
+		border-collapse: collapse
+		th
+			font-weight: inherit
+			text-align: inherit
+	button
+		background: none
+	input,
+	pre
+		margin: 0
+
+	// prevent unnecessary whitespace after element
+	// https://stackoverflow.com/a/7144960
+	textarea
+		vertical-align: top
+
+	// buttons
+	// TODO: update code link in Storybook
+	button:not(.nostyle):not(.vs__clear):not(.vts-toggle__label):not(.vuecal__arrow):not(.vs__deselect),
+	.button:not(.nostyle)
+		cursor: pointer
+		display: inline-block
+		font-family: inherit
+		font-weight: inherit
+		padding: $unit-1 $unit6
+		&.small-padding
+			padding: $unit-5 $unit-2
+		border: none
+		text-align: center
+		background: $fg
+		color: $bg
+		max-width: 100%
+		&:not(.nohover):not([disabled])
+			@include hover-scale-opacity
+		@include rounded
+		&.full
+			width: 100%
+			text-align: center
+		&.medium
+			width: $unit12
+			text-align: center
+		&.wide
+			width: $unit16
+			text-align: center
+		&.exec
+			background: $fg-accent
+		&.inverted
+			background: $bg
+			color: $fg
+		&.concise
+			background: none
+			color: $color
+		&.secondary
+			&:not(.concise)
+				background: $bg--3
+			&.concise
+				opacity: $opacity1
+		&[disabled]
+			&:not(.concise)
+				background: none
+			&.concise
+				opacity: $opacity1
+			pointer-events: none
+
+	// forms
+	form:not(.nostyle),
+	.form
+		input:not(.vs__search),
+		select,
+		textarea
+			max-width: 100%
+			width: $unit18
+			display: inline-block
+			background: $bg
+			font-family: inherit
+			font-size: inherit
+			font-weight: inherit
+			padding: $unit-4 $unit2
+			border: none
+			@include border-inline
+			outline: none
+			@include rounded
+			&.small
+				width: $unit8
+				padding: $unit-4 $unit-1
+			&:not(.no-focus-style):not([readonly]):not([disabled])
+				&:focus,
+				&:active
+					@include border-inline($fg-accent)
+					background: $bg-1
+			&[readonly]
+				cursor: default
+			&[type="radio"],
+			&[type="checkbox"]
+				margin-top: 0
+				margin-left: 0
+				width: 20px // closest to $unit3
+				height: 20px // closest to $unit3
+				padding: 0
+				-webkit-appearance: none
+				&:hover:not([readonly]):not([disabled])
+					@include border-inline($fg-accent)
+					background: $fg-accent-2
+			&[type="radio"]
+				border-radius: $unit3
+				&:checked
+					position: relative
+					@include overlay
+					&:after
+						background: $fg
+						border-radius: $unit3
+						width: $unit-2
+						height: $unit-2
+						left: 50%
+						top: 50%
+						transform: translate(-50%, -50%)
+			&[type="checkbox"]
+				border-radius: $unit-6
+				&:checked
+					position: relative
+					@include overlay
+					&:after
+						background: $fg
+						border-radius: $unit-9
+						width: 10px // closest to $unit-2
+						height: 10px // closest to $unit-2
+						left: 50%
+						top: 50%
+						transform: translate(-50%, -50%)
+					&.mixed
+						&:after
+							height: $unit-7
+							width: $unit-1
+			&[type="number"]
+				padding-right: $unit-4
+			&::placeholder,
+			&.placeholder
+				color: $color
+				opacity: $opacity1
+			&.full
+				width: 100%
+			&.error
+				@include border-inline($red)
+			&[disabled]
+				background: $bg--1
+				@include border-inline($bg--1)
+		.required,
+		.optional
+			&::after
+				font-size: 0.8em
+				white-space: nowrap
+				vertical-align: middle
+				padding: 0.1em $unit-4
+				margin-left: $unit1
+				@include rounded
+		.required
+			&::after
+				content: "必須"
+				@include border-inline($red-transparent)
+				color: $red
+		.optional
+			&::after
+				content: "任意"
+				@include border-inline($fg-accent-2)
+				color: $fg2
+
+	// tables
+	$table-border: 1px solid $bg--2
+	table
+		// workaround for issue with setting cell contents height: 100%
+		// https://stackoverflow.com/a/34781198/6373873
+		height: 0px
+		&.concise
+			tr
+				td:not(:last-child)
+					padding-right: $unit3
+			tr:not(:last-child)
+				td
+					padding-bottom: $unit-4
+		&.list
+			width: 100%
+			border-spacing: 0
+			border-collapse: separate
+			font-size: $font-size-small
+			tr
+				td,
+				th
+					font-weight: inherit
+					&.no-padding
+						padding: 0
+				th
+					background: $bg--1
+					padding: $unit-3 $unit1
+				td
+					padding: $unit-1 $unit1
+				&.wide
+					td
+						padding: $unit1 $unit1
+			tr:not(:last-child), tbody:not(:last-child)
+				td
+					border-bottom: $border-width solid $bg--1
+			tr td,
+			tr th
+				text-align: left
+			&.center-text tr td,
+			&.center-text tr th
+				text-align: center
+			&.right-text tr td,
+			&.right-text tr th
+				text-align: right
+	.scroll-x
+		overflow-x: auto
+
+	dl.borders
+		display: table
+		border-spacing: 0
+		border-collapse: separate
+
+		.row
+			display: table-row
+			dt,
+			dd
+				display: table-cell
+				border-left: $table-border
+				border-bottom: $table-border
+				padding: $unit-7 $unit-4
+			dd
+				border-right: $table-border
+			dt
+				color: $bg
+				background: $fg
+				border-right: none
+				border-color: $fg
+
+		.row:first-child
+			dt,
+			dd
+				border-top: $table-border
+
+		.row:not(:last-child)
+			dt
+				border-bottom-color: $fg-2
+
+		.row:first-child
+			dt
+				border-top-left-radius: $border-radius
+			dd
+				border-top-right-radius: $border-radius
+		.row:last-child
+			dt
+				border-bottom-left-radius: $border-radius
+			dd
+				border-bottom-right-radius: $border-radius
+
+	// cursors
+
+	.cursor-default
+		cursor: default
+	.cursor-text
+		cursor: text
+	.cursor-pointer
+		cursor: pointer
+	.cursor-grab
+		cursor: grab
+	.cursor-grabbing
+		cursor: grabbing
+
+	// print
+
+	.print-break-before
+		page-break-before: always

@@ -1,0 +1,90 @@
+/* Variables
+------------------------------------------------------------- */
+$quote-content-color: #fff;
+$quote-content-font-weight: normal;
+$quote-title-color: $color-text-body-alt;
+$quote-title-font-weight: normal;
+$quote-background-color: #000;
+$quote-background-image: linear-gradient(180deg, #0c0d0e 0%, #1e2124 10%, #31363a 90%, #23262a 100%);
+
+
+/* General Styles
+------------------------------------------------------------- */
+.quote {
+  position: relative;
+  background-color: $quote-background-color;
+  background-image: $quote-background-image;
+  @include module();
+}
+.quote-background {
+  @include module-background();
+}
+.quote-container {
+  text-align: center;
+  position: relative;
+  @include module-container();
+  @include module-last-child();
+}
+.quote-content,
+.quote-name,
+.quote-title {
+  color: $quote-content-color;
+}
+.quote-content {
+  font-family: $font-family-heading;
+  font-weight: $quote-content-font-weight;
+  line-height: 1.3;
+}
+.quote-content::before {
+  content: '\201C';
+}
+.quote-content::after {
+  content: '\201D';
+}
+.quote-name {
+  font-size: 1.125rem;
+  margin-bottom: 0;
+}
+.quote-name::before {
+  content: '\2014';
+}
+.quote-title {
+  color: $quote-title-color;
+  font-family: $font-family-heading;
+  font-size: 0.9375rem;
+  font-weight: $quote-title-font-weight;
+  text-transform: uppercase;
+}
+@media (min-width: 768px) {
+  .quote-content {
+    max-width: 75%;
+    @include margin-x();
+  }
+  .quote-title {
+    font-size: 1.0rem;
+  }
+}
+@media (min-width: 992px) {
+  .quote-content {
+    max-width: 65%;
+  }
+}
+@media (min-width: 1200px) {
+  .quote-name {
+    font-size: 1.25rem;
+  }
+}
+
+
+/* Variation made to flow with the text
+------------------------------------------------------------- */
+.quote.no-bg {
+  background-color: unset;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.quote.no-bg .quote-content,
+.quote.no-bg .quote-name,
+.quote.no-bg .quote-title {
+  color: $color-text-heading;
+}

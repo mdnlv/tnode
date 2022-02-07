@@ -1,0 +1,105 @@
+/* Variables
+------------------------------------------------------------- */
+$faqs-heading-color: $color-text-heading;
+$faqs-body-color: $color-text-body;
+$faqs-background-color: #fff;
+
+$faqs-card-background-color: $color-gray-1;
+$faqs-card-color: $color-text-body;
+$faqs-card-accent-color: #26DE81;
+$faqs-card-active-color: #000;
+
+
+/* Container Styles
+--------------------------------------------*/
+.faqs {
+  background-color: $faqs-background-color;
+  @include module();
+}
+.faqs h1,
+.faqs h2,
+.faqs h3,
+.faqs h4 {
+  color: $faqs-heading-color;
+}
+.faqs-header {
+  @include module-header();
+}
+.faqs-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  justify-content: center;
+  gap: 2rem;
+  @include module-container();
+}
+.faqsBlock {
+  background-color: $faqs-card-background-color;
+  color: $faqs-card-color;
+  width: 100%;
+  padding: 1rem 2rem;
+  @include margin-x();
+}
+@media (min-width: 650px) {
+  .faqsBlock {
+    padding: 2rem;
+  }
+}
+@media (min-width: 768px) {
+  .faqs-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (min-width: 992px) {
+  .faqs-container {
+    gap: 3rem;
+  }
+}
+@media (min-width: 1200px) {
+  .faqs-container {
+    grid-template-columns: repeat(2, 40%);
+  }
+}
+
+
+/* Text Styles
+--------------------------------------------*/
+.faqs-q,
+.faqs-a {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.5rem;
+  @include module-last-child();
+}
+.faqs-q::before,
+.faqs-a::before {
+  color: $faqs-card-accent-color;
+  font-weight: $font-weight-strong;
+}
+.faqs-q::before {
+  content: "Q:";
+}
+.faqs-a::before {
+  content: "A:";
+}
+.faqs-q {
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+}
+.faqs-q.active {
+  color: $faqs-card-active-color;
+}
+.faqs-q:hover p {
+  text-decoration: underline;
+}
+.faqs-q.active p {
+  text-decoration: underline;
+}
+.faqs-a p {
+  padding-bottom: 1.5rem;
+}
+.faqs-a {
+  display: none;
+}
+.faqs-q.active + .faqs-a {
+  display: grid;
+}
