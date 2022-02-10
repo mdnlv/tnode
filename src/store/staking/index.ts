@@ -34,6 +34,7 @@ const defaultState = {
 			userDelegated: null,
 			loadingPersonalInfo: false,
 			userRewards: null,
+			promotion: false,
 		},
 		{
 			name: "Sentinel",
@@ -58,6 +59,7 @@ const defaultState = {
 			userDelegated: null,
 			loadingPersonalInfo: false,
 			userRewards: null,
+			promotion: true,
 		},
 		{
 			name: "Regen",
@@ -82,6 +84,7 @@ const defaultState = {
 			userDelegated: null,
 			loadingPersonalInfo: false,
 			userRewards: null,
+			promotion: true,
 		},
 		{
 			name: "Persistence",
@@ -106,6 +109,7 @@ const defaultState = {
 			userDelegated: null,
 			loadingPersonalInfo: false,
 			userRewards: null,
+			promotion: true,
 		},
 		{
 			name: "Iris",
@@ -130,6 +134,7 @@ const defaultState = {
 			userDelegated: null,
 			loadingPersonalInfo: false,
 			userRewards: null,
+			promotion: true,
 		},
 		{
 			name: "Cosmos",
@@ -154,6 +159,7 @@ const defaultState = {
 			userDelegated: null,
 			loadingPersonalInfo: false,
 			userRewards: null,
+			promotion: true,
 		},
 		{
 			name: "Terra",
@@ -178,6 +184,7 @@ const defaultState = {
 			userDelegated: null,
 			loadingPersonalInfo: false,
 			userRewards: null,
+			promotion: false,
 		},
 		{
 			name: "Sifchain",
@@ -201,6 +208,7 @@ const defaultState = {
 			userDelegated: null,
 			loadingPersonalInfo: false,
 			userRewards: null,
+			promotion: true,
 		},
 	] as (Omit<Validator, "denom"> & { denomId: string })[],
 	validatorsComingSoon: [

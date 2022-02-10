@@ -1,17 +1,20 @@
 <template lang="pug">
 	#validator(:class="{ active }")
-		#header
+		#header.flex-wrap
 			#name.flex.space-items-horz
 				img.icon(:src="validator.denom.icon")
 				div
 					h2 {{ validator.name }}
 					h5.denom.label {{ validator.denom.symbol }}
-			#apr
-				span.label.small APR
-				.flex
-					LoadingValue(:value="validator.apr" #default="{ value }")
-						.h3 {{ value | floorToDP(1) }}
-					.h3 %
+			#apr.flex.space-items-horz
+				div
+					span.label.small APR
+					.flex
+						LoadingValue(:value="validator.apr" #default="{ value }")
+							.h3 {{ value | floorToDP(1) }}
+						.h3 %
+				a.hover-opacity(href="https://trustednode.medium.com/1-million-tnode-airdrop-alert-f44310d7818" target="_blank")
+					img.small(v-if="validator.promotion" src="~/assets/img/tiger-node.png")
 			#menu-toggle.mobile.cursor-pointer(type="button" @click="toggleActive" v-html="menuIcon")
 		#contents.grow(:class="{ active }")
 			.css-grid
@@ -558,6 +561,10 @@ export default Vue.extend({
 					margin-bottom: $space-big
 			#apr
 				margin-left: $space
+				a
+					@include hover-scale-opacity
+					img.small
+						transform: scale(0.8)
 		@media (max-width: $breakpoint-mobile)
 			border-bottom-left-radius: 0
 			border-bottom-right-radius: 0

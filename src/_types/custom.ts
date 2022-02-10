@@ -100,6 +100,7 @@ export type Validator = {
 	userDelegated: bn | null
 	loadingPersonalInfo: boolean
 	userRewards: bn | null
+	promotion: boolean
 }
 
 export type ValidatorComingSoon = {
