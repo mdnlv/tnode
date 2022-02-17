@@ -16,6 +16,7 @@ import {
 	ETHProvider,
 	Network,
 	UserActionResponse,
+	SupportedNetworks,
 } from "~/_types"
 import { RootState } from "~/store"
 import { times10toPow, divBy10toPow } from "~/_utils"
@@ -103,6 +104,15 @@ export const state = () => ({
 			price: null,
 			icon: require("~/assets/img/polkadot-icon.png"),
 		},
+		{
+			id: "matic",
+			symbol: "MATIC",
+			min: "matic",
+			decimals: 18,
+			coinGeckoId: "matic-network",
+			price: null,
+			icon: require("~/assets/img/polygon-inverted-icon.webp"),
+		},
 	] as NativeDenom[],
 	erc20: [
 		{
@@ -113,7 +123,7 @@ export const state = () => ({
 			stable: true,
 			icon: require("~/assets/img/busd-icon.png"),
 			contractAddress: "0xe9e7cea3dedca5984780bafc599bd69add087d56",
-			networkName: "Binance Smart Chain Mainnet",
+			networkName: SupportedNetworks.BSC_MAINNET,
 			userBalance: null,
 		},
 		{
@@ -124,10 +134,32 @@ export const state = () => ({
 			stable: false,
 			icon: require("~/assets/img/tnode-icon-2.png"),
 			contractAddress: "0x7f12a37b6921ffac11fab16338b3ae67ee0c462b",
-			networkName: "Binance Smart Chain Mainnet",
+			networkName: SupportedNetworks.BSC_MAINNET,
 			lpId: "tnode-busd",
 			userBalance: null,
 		},
+		// {
+		// 	id: "ftm-busd-tnode",
+		// 	symbol: "LP",
+		// 	decimals: 18,
+		// 	price: bn(1),
+		// 	stable: true,
+		// 	icon: require("~/assets/img/busd-icon.png"),
+		// 	contractAddress: "0xC0Fb1ee924b59c3D371473eBC715E5D1356E9521",
+		// 	networkName: SupportedNetworks.FTM_MAINNET,
+		// 	userBalance: null,
+		// },
+		// {
+		// 	id: "ftm-tnode",
+		// 	symbol: "TNODE",
+		// 	decimals: 18,
+		// 	price: bn(0.1),
+		// 	stable: true,
+		// 	icon: require("~/assets/img/tnode-icon-2.png"),
+		// 	contractAddress: "0xE68A4f3BdFfEe49604B6dae9e973ee86fedC42dD",
+		// 	networkName: SupportedNetworks.FTM_MAINNET,
+		// 	userBalance: null,
+		// },
 	] as ERC20Denom[],
 	lp: [
 		{
@@ -136,7 +168,7 @@ export const state = () => ({
 			price: null as bn | null,
 			icon: require("~/assets/img/busd-icon.png"),
 			contractAddress: "0x562C0c707984D40b98cCba889C6847DE274E5d57", // LP token
-			networkName: "Binance Smart Chain Mainnet",
+			networkName: SupportedNetworks.BSC_MAINNET,
 			decimals: 18,
 			denomIds: [
 				"busd",
@@ -325,38 +357,27 @@ export const actions: ActionTree<LocalState, RootState> = {
 		const network = networks.find(n => n.chainName === networkName)!
 		return network.gasConfig
 	},
-	async _getTokenContract({ rootGetters }, { denom }: { denom: ERC20Denom | LPDenom }): Promise<ETHContract> {
+	async _getTokenContract(_, { denom }: { denom: ERC20Denom | LPDenom }): Promise<ETHContract> {
 		const tokenAbi = [
 			"function approve(address, uint) returns (bool)",
 			"function balanceOf(address owner) view returns (uint256)",
 			"function allowance(address, address) view returns(uint256)",
 			"function totalSupply() view returns (uint256)",
 		]
-		const walletId = rootGetters["web3/connectingWalletId"]
-		const offlineSigner = await this.dispatch("web3/getOfflineSigner", { walletId, networkName: denom.networkName }) as ethers.providers.JsonRpcSigner
-		const tokenContract = new ethers.Contract(denom.contractAddress, tokenAbi, offlineSigner)
-		return tokenContract.connect(offlineSigner)
-	},
-	async getUniswapContract({ rootGetters }, { networkName }: {networkName: string}): Promise<ETHContract> {
-		const walletId = rootGetters["web3/connectingWalletId"]
-		const offlineSigner = await this.dispatch("web3/getOfflineSigner", { walletId, networkName }) as ethers.providers.JsonRpcSigner
-		const poolImmutablesAbi = [
-			"function addLiquidity(address tokenA, address tokenB, uint256 amountADesired, uint256 amountBDesired, uint256 amountAMin, uint256 amountBMin, address to, uint256 deadline)",
-		]
-		const poolContract = new ethers.Contract(
-			poolAddress,
-			poolImmutablesAbi,
-			offlineSigner,
+		const provider = await this.dispatch("vaults/_getViewProvider", denom.networkName) as ETHProvider
+		return new ethers.Contract(
+			denom.contractAddress,
+			tokenAbi,
+			provider,
 		)
-		return poolContract
 	},
 	async addLiquidity({ dispatch, rootGetters }, { tokenA, tokenB, amountA, amountB }: AddLiquidityPayload): Promise<UserActionResponse> {
-		const swapContract = await dispatch("getUniswapContract", { networkName: tokenA.networkName }) as ETHContract
+		const uniswapContractSigner = await dispatch("_getUniswapContractSigner", { networkName: tokenA.networkName }) as ETHContract
 		const account = rootGetters["web3/account"] as EVMAccount
-		await dispatch("approveUsage", { account, token: tokenA })
-		await dispatch("approveUsage", { account, token: tokenB })
+		await dispatch("_approveUsage", { account, token: tokenA })
+		await dispatch("_approveUsage", { account, token: tokenB })
 		const deadline = Math.floor(addMinutes(new Date(), 20).getTime() / 1000)
-		const swapResult = await swapContract.addLiquidity(
+		const swapResult = await uniswapContractSigner.addLiquidity(
 			tokenA.contractAddress,
 			tokenB.contractAddress,
 			times10toPow(amountA, tokenA.decimals, true),
@@ -386,13 +407,26 @@ export const actions: ActionTree<LocalState, RootState> = {
 			status: "pending",
 		}
 	},
-	async approveUsage({ dispatch }, { account, token }: {account: EVMAccount, token: ERC20Denom}) {
+	async _getUniswapContractSigner(_, { networkName }: {networkName: string}): Promise<ETHContract> {
+		const poolImmutablesAbi = [
+			"function addLiquidity(address tokenA, address tokenB, uint256 amountADesired, uint256 amountBDesired, uint256 amountAMin, uint256 amountBMin, address to, uint256 deadline)",
+		]
+		const offlineSigner = await this.dispatch("web3/getOfflineSigner", { networkName, switchNetwork: true }) as ethers.providers.JsonRpcSigner
+		return new ethers.Contract(
+			poolAddress,
+			poolImmutablesAbi,
+			offlineSigner,
+		)
+	},
+	async _approveUsage({ dispatch }, { account, token }: {account: EVMAccount, token: ERC20Denom}) {
 		const tokenContract = await dispatch("_getTokenContract", { denom: token }) as ETHContract
-		const allowance = await tokenContract.allowance(account.address, poolAddress) as { toString: () => string }
-		const totalSupply = await tokenContract.totalSupply() as { toString: () => string }
+		const offlineSigner = await this.dispatch("web3/getOfflineSigner", { networkName: token.networkName, switchNetwork: true }) as ethers.providers.JsonRpcSigner
+		const tokenContractSigner = tokenContract.connect(offlineSigner)
+		const allowance = await tokenContractSigner.allowance(account.address, poolAddress) as { toString: () => string }
+		const totalSupply = await tokenContractSigner.totalSupply() as { toString: () => string }
 		if (bn(totalSupply.toString()).gt(allowance.toString())) {
 			const gasConfig = await dispatch("_getGasConfig", token.networkName) as Network["gasConfig"]
-			await tokenContract.approve(
+			await tokenContractSigner.approve(
 				poolAddress,
 				utils.parseUnits(
 					totalSupply.toString(),

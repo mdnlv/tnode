@@ -1,12 +1,12 @@
 import type { GetterTree, ActionTree, MutationTree } from "vuex"
 import { RootState } from "~/store"
-import { Account, Validator, WalletModule } from "~/_types"
+import { Account, WalletModule, Validator } from "~/_types"
 
 const defaultState = {
-	id: "keplr",
-	name: "Keplr",
-	icon: require("~/assets/img/keplr-icon.png"),
-	link: "https://chrome.google.com/webstore/detail/keplr/dmkamcknogkgcdfhhbddcghachkejeap/related?hl=en",
+	id: "metamask",
+	name: "Metamask",
+	icon: require("~/assets/img/metamask-icon.png"),
+	link: "https://metamask.io/download.html",
 	accounts: [] as Account[],
 }
 
@@ -37,7 +37,7 @@ export const mutations: MutationTree<LocalState> = {
 }
 
 export const actions: ActionTree<LocalState, RootState> = {
-	installed: () => new Promise(resolve => resolve(!!window.getOfflineSigner && !!window.keplr)), // used by component
+	installed: () => !!window.ethereum,
 	_getChainIds({ state, rootGetters }) {
 		const validators: Validator[] = rootGetters["staking/validators"]
 		return validators
@@ -64,28 +64,21 @@ export const actions: ActionTree<LocalState, RootState> = {
 		}
 
 		try {
-			const offlineSigner = await dispatch("getOfflineSigner", chainId)
-			const [account] = await offlineSigner.getAccounts()
+			await this.dispatch("web3/getAccount", { walletId: "metamask" })
+			const account = rootGetters["web3/account"]
 			commit("_addAccount", {
-				chainId,
 				address: account.address,
-			} as Account)
+				chainId,
+			})
 			localStorage.setItem(`${lsKey}-${chainId}-unlocked`, "true")
 		}
 		catch (e) {
-			if (e.message === "key doesn't exist") {
-				commit("staking/connectingWalletError", "accountNotFound", { root: true })
-			}
-			if (e.message === "Request rejected") {
-				commit("staking/connectingWalletError", "requestRejected", { root: true })
-			}
 			// eslint-disable-next-line no-console
 			console.error(e)
 			localStorage.removeItem(`${lsKey}-${chainId}-unlocked`)
 		}
 	},
 	async getOfflineSigner(_, chainId: string) {
-		await window.keplr!.enable(chainId)
-		return window.getOfflineSigner!(chainId)
+		return await this.dispatch("web3/getOfflineSigner", { walletId: "metamask", networkName: chainId, switchNetwork: true })
 	},
-} as WalletModule["actions"]
+}

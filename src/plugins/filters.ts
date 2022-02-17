@@ -1,7 +1,7 @@
 import Vue from "vue"
 import bn, { BigSource } from "big.js"
 import cn from "comma-number"
-import { preventSciNotation } from "~/_utils"
+import { preventSciNotation, toLink } from "~/_utils"
 
 export const floorToDP = (value: BigSource, dp: number): bn => {
 	preventSciNotation(value)
@@ -72,4 +72,9 @@ Vue.filter(
 		address.substr(0, 6),
 		address.substr(-6),
 	].join("..."),
+)
+
+Vue.filter(
+	"toLink",
+	toLink,
 )

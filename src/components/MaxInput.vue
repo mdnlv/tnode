@@ -64,7 +64,7 @@ export default Vue.extend({
 	methods: {
 		async setMaxWithoutFee() {
 			if (this.fees === null) {
-				this.$emit("input", this.max.toString())
+				this.$emit("input", (this.max ?? bn(0)).toString())
 			}
 			else {
 				const withoutFee = bn(this.max ?? 0).minus(this.fees)

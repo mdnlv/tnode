@@ -1,5 +1,9 @@
 <template lang="pug">
-	#vault(:class="{ promotional: vault.promotional }")
+	#vault.space-items-small(:class="{ promotional: vault.promotional }")
+		.network.flex
+			span Chain:
+			.icon.center(v-html="network.icon")
+			span {{ network.label }}
 		.space-items
 			.content.space-items
 				header.flex-space-between.flex-wrap.wrap-space.space-items-horz
@@ -14,7 +18,7 @@
 						h2 {{ name[0] }}
 							br
 							span.secondary {{ name[1] }}
-					.audit-link
+					.audit-link(v-if="vault.auditLink")
 						a.space-items-horz-small.small.flex(:href="vault.auditLink" target="_blank")
 							.center(v-html="auditIcon")
 							span AUDITED
@@ -148,7 +152,12 @@
 					.label.small TRANSACTION ID
 					.wrap.space-items-horz-small
 						span {{ transactionHash }}
-						a.explorer-link(:href="transactionExplorerLink" target="_blank" v-html="linkIcon")
+						a.explorer-link(
+							v-if="transactionHash"
+							:href="toLink(transactionHash, txLinkTemplate)"
+							target="_blank"
+							v-html="linkIcon"
+						)
 					p(v-if="transactionStatus === 'pending'") (please allow time for transaction confirmation)
 				#buttons
 					button.bare.big-text(@click="closeTransactionModal") CLOSE
@@ -166,7 +175,8 @@ import { differenceInSeconds } from "date-fns"
 import cn from "comma-number"
 import bn from "big.js"
 import { isEqual } from "lodash"
-import { Vault, EVMAccount } from "~/_types"
+import { Vault, EVMAccount, Network, DropdownOption } from "~/_types"
+import { toLink } from "~/_utils"
 import LoadingValue from "~/components/LoadingValue.vue"
 import Modal from "~/components/Modal.vue"
 import MaxInput from "~/components/MaxInput.vue"
@@ -202,6 +212,10 @@ export default Vue.extend({
 	props: {
 		vault: {
 			type: Object as Vue.PropType<Vault>,
+			required: true,
+		},
+		networks: {
+			type: Array as Vue.PropType<DropdownOption[]>,
 			required: true,
 		},
 	},
@@ -240,12 +254,10 @@ export default Vue.extend({
 			return this.$store.getters.loaded
 		},
 		name(): string[] {
-			const splitName = this.vault.name.split(" ")
-			const halfIndex = Math.floor(splitName.length / 2)
-			return [
-				splitName.slice(0, halfIndex).join(" "),
-				splitName.slice((splitName.length - halfIndex) * -1).join(" "),
-			].flat()
+			return this.vault.name.split("\n")
+		},
+		network(): DropdownOption {
+			return this.networks.find(n => n.value === this.vault.networkName)!
 		},
 		wallet(): any {
 			return this.$store.getters[
@@ -254,12 +266,6 @@ export default Vue.extend({
 		},
 		account(): EVMAccount | null {
 			return this.$store.getters[this.walletModuleName("account")] as EVMAccount
-		},
-		transactionExplorerLink(): string {
-			if (!this.transactionHash) {
-				return ""
-			}
-			return this.vault.explorerLink.replace("###", this.transactionHash)
 		},
 		tvl(): bn | null {
 			if (this.vault.tvl === null) {
@@ -297,6 +303,11 @@ export default Vue.extend({
 				addLiquidity: "denoms" in this.vault.stakeDenom ? this.vault.stakeDenom.denoms.map(d => d.symbol) : [],
 			}[this.transactionType]
 		},
+		txLinkTemplate(): string {
+			const networks = this.$store.getters["networks/all"] as Network[]
+			const network = networks.find(n => n.chainName === this.vault.networkName)
+			return network!.txLinkTemplate
+		},
 	},
 	watch: {
 		account: {
@@ -313,7 +324,7 @@ export default Vue.extend({
 			this.setTimeUntilClose()
 		},
 		"vault.userStaked"(newVal, oldVal) {
-			if (bn(newVal).eq(0)) {
+			if (!newVal || bn(newVal).eq(0)) {
 				if (this.rewardsSetter !== null) {
 					clearInterval(this.rewardsSetter)
 				}
@@ -384,6 +395,7 @@ export default Vue.extend({
 		}
 	},
 	methods: {
+		toLink,
 		async setClosesAt() {
 			await this.$store.dispatch("vaults/setClosesAt", this.vault)
 		},
@@ -426,7 +438,6 @@ export default Vue.extend({
 			await this.$store.dispatch("vaults/setStaked", this.vault)
 		},
 		monitorStake() {
-			this.userStakedLoading = true
 			if (this.stakedSetter !== null) {
 				clearInterval(this.stakedSetter)
 			}
@@ -595,19 +606,23 @@ export default Vue.extend({
 		flex-direction: column
 		justify-content: space-between
 	&.promotional
-		position: relative
-		&:after
-			content: "PROMOTIONAL VAULT"
-			position: absolute
-			background: $fg2
-			padding: $unit-6 $unit3
-			top: -$unit1
-			right: -$unit1
-			border-radius: $unit10
-			color: $bg-1
-		.button
-			opacity: $opacity1
-			pointer-events: none
+		> .space-items
+			position: relative
+			&:after
+				content: "PROMOTIONAL VAULT"
+				position: absolute
+				background: $fg2
+				padding: $unit-6 $unit3
+				top: -$unit-2
+				right: -$unit1
+				border-radius: $unit10
+				color: $bg-1
+			.button
+				opacity: $opacity1
+				pointer-events: none
+	.network
+		.icon
+			transform: scale(0.7)
 	header
 		.title
 			.image

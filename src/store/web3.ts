@@ -138,14 +138,10 @@ export const actions: ActionTree<LocalState, RootState> = {
 
 		async function commitAccount() {
 			const offlineSigner = await dispatch("getOfflineSigner", { walletId, networkName }) as ethers.providers.JsonRpcSigner
-			if (networkName) {
-				await dispatch("_setNetwork", networkName)
-			}
 			const address = await offlineSigner.getAddress()
 			commit("account", {
 				walletId,
 				address,
-				networkName,
 			} as EVMAccount)
 			dispatch("denoms/setBalance", undefined, { root: true })
 		}
@@ -170,7 +166,7 @@ export const actions: ActionTree<LocalState, RootState> = {
 			dispatch("disconnect")
 		}
 	},
-	async getOfflineSigner({ dispatch }, { walletId, networkName }: { walletId: string, networkName?: string }): Promise<ethers.providers.JsonRpcSigner> {
+	async getOfflineSigner({ dispatch }, { walletId, networkName, switchNetwork }: { walletId?: string, networkName?: string, switchNetwork?: boolean }): Promise<ethers.providers.JsonRpcSigner> {
 		const providerOptions = {
 			walletconnect: {
 				package: this.$wallets.walletconnect,
@@ -200,7 +196,7 @@ export const actions: ActionTree<LocalState, RootState> = {
 		if (!customProvider) {
 			throw new Error("couldn't connect to wallet")
 		}
-		if (networkName) {
+		if (networkName && switchNetwork) {
 			await dispatch("_setNetwork", networkName)
 		}
 		const provider = new ethers.providers.Web3Provider(customProvider)

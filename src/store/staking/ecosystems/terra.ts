@@ -6,10 +6,13 @@ import {
 	LCDClient,
 	Dec,
 	Coin,
+	Coins,
 	Delegation,
 	MsgDelegate,
 	MsgUndelegate,
 	MsgWithdrawDelegatorReward,
+	MsgBeginRedelegate,
+	Fee,
 } from "@terra-money/terra.js"
 import { RootState } from "~/store"
 import {
@@ -17,11 +20,13 @@ import {
 	UserActionResponse,
 	Account,
 	Validator,
+	Delegation as _Delegation,
 } from "~/_types"
 import {
 	times10toPow,
 	divBy10toPow,
 } from "~/_utils"
+import { getGasPrices, getEstimatedGasPrice } from "~/_utils/terra-api"
 
 const defaultState = {
 	id: "terra",
@@ -48,7 +53,7 @@ export const actions: ActionTree<LocalState, RootState> = {
 		const delegations: Delegation[] = []
 		let nextKey
 		do {
-			const [delegationsData, pagination] = await client.staking.delegations(undefined, validator.validatorAddress, {
+			const [delegationsData, pagination] = await client.staking.delegations(undefined, validator.address, {
 				"pagination.limit": "100",
 				"pagination.key": nextKey,
 			})
@@ -83,10 +88,12 @@ export const actions: ActionTree<LocalState, RootState> = {
 		const client = await dispatch("_getClient", validator) as LCDClient
 		const account: Account = await dispatch("_getAccount", validator)
 		const [delegations] = await client.staking.delegations(account.address)
-		const delegation = delegations.find(del => del.validator_address === validator.validatorAddress)
-		const userDelegated = delegation
-			? divBy10toPow(delegation.balance.amount.toString(), validator.denom.decimals)
-			: bn(0)
+		const userDelegated = divBy10toPow(
+			delegations
+				.filter(del => del.validator_address === validator.address)
+				.reduce((acc, del) => acc.add(del.balance.amount.toString()), bn(0)),
+			validator.denom.decimals,
+		)
 		commit("staking/userDelegated", { ...validator, userDelegated }, { root: true })
 	},
 	async getRewards({ dispatch, commit }, validator: Validator) {
@@ -94,7 +101,7 @@ export const actions: ActionTree<LocalState, RootState> = {
 		const account: Account = await dispatch("_getAccount", validator)
 		try {
 			const { rewards } = await client.distribution.rewards(account.address)
-			const validatorRewards = Object.entries(rewards).find(([validatorAddress, _coins]) => validatorAddress === validator.validatorAddress)
+			const validatorRewards = Object.entries(rewards).find(([validatorAddress, _coins]) => validatorAddress === validator.address)
 			if (!validatorRewards) {
 				return bn(0)
 			}
@@ -105,7 +112,7 @@ export const actions: ActionTree<LocalState, RootState> = {
 				: bn(0)
 			commit("staking/userRewards", { ...validator, userRewards }, { root: true })
 		}
-		catch (e) {
+		catch (e: any) {
 			// user has no delegation
 			if (e.message === "Cannot read properties of null (reading 'length')") {
 				commit("staking/userRewards", { ...validator, userRewards: bn(0) }, { root: true })
@@ -113,18 +120,32 @@ export const actions: ActionTree<LocalState, RootState> = {
 			throw e
 		}
 	},
+	async getDelegations({ dispatch }, validator: Validator): Promise<_Delegation[] | null> {
+		const client = await dispatch("_getClient", validator) as LCDClient
+		const account: Account = await dispatch("_getAccount", validator)
+		const [delegations] = await client.staking.delegations(account.address)
+		return delegations
+			.filter(del => del.validator_address !== validator.address)
+			.map(del => ({
+				address: del.validator_address,
+				amount: divBy10toPow(
+					del.balance.amount.toString(),
+					validator.denom.decimals,
+				),
+			}))
+	},
 	async delegate({ dispatch }, { amount, validator }: {amount: bn, validator: Validator}) {
 		try {
-			const signer = await dispatch("_getSigner", validator)
 			const account: Account = await dispatch("_getAccount", validator)
 			const delegate = new MsgDelegate(
 				account.address,
-				validator.validatorAddress,
+				validator.address,
 				new Coin(validator.denom.min, times10toPow(amount, validator.denom.decimals, true)),
 			)
-			const response = await signer.post({
-				msgs: [delegate],
+			const response = await dispatch("postTransaction", {
+				msg: delegate,
 				memo: `delegating ${validator.denom.symbol} via trustednode.io`,
+				validator,
 			})
 			return {
 				hash: response.result.txhash,
@@ -137,16 +158,16 @@ export const actions: ActionTree<LocalState, RootState> = {
 	},
 	async undelegate({ dispatch }, { amount, validator }: {amount: bn, validator: Validator}) {
 		try {
-			const signer = await dispatch("_getSigner", validator)
 			const account: Account = await dispatch("_getAccount", validator)
 			const undelegate = new MsgUndelegate(
 				account.address,
-				validator.validatorAddress,
+				validator.address,
 				new Coin(validator.denom.min, times10toPow(amount, validator.denom.decimals, true)),
 			)
-			const response = await signer.post({
-				msgs: [undelegate],
+			const response = await dispatch("postTransaction", {
+				msg: undelegate,
 				memo: `undelegating ${validator.denom.symbol} via trustednode.io`,
+				validator,
 			})
 			return {
 				hash: response.result.txhash,
@@ -159,15 +180,15 @@ export const actions: ActionTree<LocalState, RootState> = {
 	},
 	async claimRewards({ dispatch }, validator: Validator) {
 		try {
-			const signer = await dispatch("_getSigner", validator)
 			const account: Account = await dispatch("_getAccount", validator)
 			const withdrawDelegation = new MsgWithdrawDelegatorReward(
 				account.address,
-				validator.validatorAddress,
+				validator.address,
 			)
-			const response = await signer.post({
-				msgs: [withdrawDelegation],
+			const response = await dispatch("postTransaction", {
+				msg: withdrawDelegation,
 				memo: `claiming ${validator.denom.symbol} rewards via trustednode.io`,
+				validator,
 			})
 			return {
 				hash: response.result.txhash,
@@ -177,6 +198,50 @@ export const actions: ActionTree<LocalState, RootState> = {
 		catch (error) {
 			return dispatch("_handleError", { error, statusPrefix: "REWARDS CLAIM" })
 		}
+	},
+	async redelegate({ dispatch }, { amount, validator, delegation }: { amount: bn, validator: Validator, delegation: _Delegation }) {
+		try {
+			const account: Account = await dispatch("_getAccount", validator)
+			const redelegate = new MsgBeginRedelegate(
+				account.address,
+				delegation.address,
+				validator.address,
+				new Coin(validator.denom.min, times10toPow(amount, validator.denom.decimals, true)),
+			)
+			const response = await dispatch("postTransaction", {
+				msg: redelegate,
+				memo: `Redelegating ${validator.denom.symbol} via trustednode.io`,
+				validator,
+			})
+			return {
+				hash: response.result.txhash,
+				status: "REDELEGATION IN PROGRESS",
+			}
+		}
+		catch (error) {
+			return dispatch("_handleError", { error, statusPrefix: "REDELEGATION" })
+		}
+	},
+	async postTransaction({ dispatch }, { msg, memo, validator }: { msg: any, memo: string, validator: Validator }) {
+		const account: Account = await dispatch("_getAccount", validator)
+		const gasPrices = await getGasPrices()
+		const gasPrice = gasPrices[validator.denom.min]
+		const estimatedGas = await getEstimatedGasPrice(msg, account.address, gasPrice)
+		const gasFee = {
+			amount: bn(estimatedGas)
+				.times(gasPrice)
+				.round(0, bn.roundUp)
+				.toString(),
+			denom: validator.denom.min,
+		}
+		const gasCoins = new Coins([Coin.fromData(gasFee)])
+		const fee = new Fee(estimatedGas, gasCoins)
+		const signer = await dispatch("_getSigner", validator)
+		return await signer.post({
+			msgs: [msg],
+			memo,
+			fee,
+		})
 	},
 	async _getSigner(_, validator: Validator) {
 		return await this.dispatch(`staking/wallets/${validator.walletId}/getSigner`)

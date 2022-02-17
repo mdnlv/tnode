@@ -41,7 +41,7 @@ export const actions: ActionTree<LocalState, RootState> = {
 			...electedInfo.info,
 			...waitingInfo.info,
 		].find(
-			(info: DeriveStakingQuery) => info.accountId.toString().toLowerCase() === validator.validatorAddress.toLowerCase(),
+			(info: DeriveStakingQuery) => info.accountId.toString().toLowerCase() === validator.address.toLowerCase(),
 		)
 
 		commit("staking/setTotalDelegated", {
@@ -122,6 +122,9 @@ export const actions: ActionTree<LocalState, RootState> = {
 		const userRewards = divBy10toPow(rewardTotal.toString(), validator.denom.decimals)
 		commit("staking/userRewards", { ...validator, userRewards }, { root: true })
 	},
+	async getDelegations(_) {
+		return await null
+	},
 	async delegate({ dispatch }, { amount, validator }: {amount: number, validator: Validator}) {
 		try {
 			const account : Account = await dispatch("_getAccount", validator)
@@ -136,7 +139,7 @@ export const actions: ActionTree<LocalState, RootState> = {
 			const uAmount = new BN(times10toPow(amount, validator.denom.decimals, true))
 			if (isChilled) {
 				const bondExtraTx = client.tx.staking.bondExtra(uAmount)
-				const nominatorTx = client.tx.staking.nominate([validator.validatorAddress])
+				const nominatorTx = client.tx.staking.nominate([validator.address])
 				const Txs = [bondExtraTx, nominatorTx]
 				// eslint-disable-next-line promise/param-names
 				const TxHash = await new Promise((resolve, _reject) => {
@@ -154,7 +157,7 @@ export const actions: ActionTree<LocalState, RootState> = {
 
 			if (isNotBondedAndNotNominating) {
 				const bondTx = client.tx.staking.bond(account.address, uAmount, "Stash")
-				const nominatorTx = client.tx.staking.nominate([validator.validatorAddress])
+				const nominatorTx = client.tx.staking.nominate([validator.address])
 				const Txs = [bondTx, nominatorTx]
 				// eslint-disable-next-line promise/param-names
 				const TxHash = await new Promise((resolve, _reject) => {
@@ -232,7 +235,7 @@ export const actions: ActionTree<LocalState, RootState> = {
 			const rewardTxs = allEras
 				.filter(era => !bonded.stakingLedger.claimedRewards.includes(era))
 				.slice(1)
-				.map(era => client!.tx.staking.payoutStakers(validator.validatorAddress, era))
+				.map(era => client!.tx.staking.payoutStakers(validator.address, era))
 
 			// eslint-disable-next-line promise/param-names
 			const TxHash = await new Promise((resolve, _reject) => {
@@ -251,6 +254,9 @@ export const actions: ActionTree<LocalState, RootState> = {
 		catch (error) {
 			return dispatch("_handleError", { error, statusPrefix: "REWARDS CLAIM" })
 		}
+	},
+	async redelegate() {
+		return await { message: "not implemented" }
 	},
 	async _getTotalDelegated({ dispatch }, validator: Validator): Promise<BN | null> {
 		const client = await dispatch("_getClient", validator)

@@ -15,6 +15,7 @@ export type Network = {
 		gasPrice: string
 		gasLimit: number
 	}
+	txLinkTemplate: string
 }
 
 export type Account = {
@@ -24,7 +25,6 @@ export type Account = {
 
 export type EVMAccount = {
 	walletId: string
-	networkName: string
 	address: string
 }
 
@@ -75,17 +75,14 @@ export type EVMWallet = {
 	link: string
 }
 
-export type Operator = {
-	name: string
-	link: string
-}
-
 export type Validator = {
-	name: string
+	chainName: string
 	chainId: string
 	rpcEndpoint: string
-	explorerLink: string
-	validatorAddress: string
+	linkTemplate: string
+	txLinkTemplate: string
+	address: string
+	operatorName: string
 	totalDelegated: bn | null
 	apr: bn | null
 	denom: NativeDenom
@@ -96,7 +93,6 @@ export type Validator = {
 	ecosystemId: string
 	disclaimer: string | null
 	unstakingDays: number
-	operator: Operator
 	userDelegated: bn | null
 	loadingPersonalInfo: boolean
 	userRewards: bn | null
@@ -104,7 +100,7 @@ export type Validator = {
 }
 
 export type ValidatorComingSoon = {
-	name: string
+	chainName: string
 	icon: any
 	denomName: string
 }
@@ -119,8 +115,7 @@ export type Vault = {
 	address: string
 	networkName: string
 	icon: any
-	explorerLink: string
-	auditLink: string
+	auditLink: string | null
 	apr: bn | null,
 	tvl: bn | null,
 	closesAt?: Date | null,
@@ -143,6 +138,11 @@ export type UserActionResponse = {
 	message: string
 }
 
+export type Delegation = {
+	address: string
+	amount: bn
+}
+
 export type EcosystemModule = {
 	getters: AnyOtherProps<{
 		id: (any) => string
@@ -153,9 +153,11 @@ export type EcosystemModule = {
 		getBalance: (ctx: any, validator: Validator) => Promise<bn>
 		getDelegated: (ctx: any, validator: Validator) => Promise<void>
 		getRewards: (ctx: any, validator: Validator) => Promise<void>
+		getDelegations: (ctx: any, validator: Validator) => Promise<Delegation[] | null>
 		delegate: (ctx: any, { amount: number, validator: Validator }) => Promise<UserActionResponse>
 		undelegate: (ctx: any, { amount: number, validator: Validator }) => Promise<UserActionResponse>
 		claimRewards: (ctx: any, validator: Validator) => Promise<UserActionResponse>
+		redelegate: (ctx: any, { amount: bn, validator: Validator, delegation: Delegation }) => Promise<UserActionResponse>
 		_handleError: (ctx: any, { error: Error, statusPrefix: string }) => UserActionResponse
 	}>
 }
@@ -174,3 +176,18 @@ export type WalletModule = {
 
 export type ETHProvider = ethers.providers.JsonRpcProvider
 export type ETHContract = ethers.Contract
+
+export enum SupportedNetworks {
+	BSC_MAINNET = "Binance Smart Chain Mainnet",
+	BSC_TESTNET = "Binance Smart Chain Testnet",
+	ETH_MAINNET = "Ethereum Mainnet",
+	ETH_RINKEBY = "Ethereum Testnet Rinkeby",
+	ETH_GOERLI = "Ethereum Testnet Görli",
+	FTM_MAINNET = "Fantom Opera",
+}
+
+export type DropdownOption = {
+	icon: string,
+	label: string,
+	value: SupportedNetworks,
+}

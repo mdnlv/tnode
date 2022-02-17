@@ -30,7 +30,7 @@
 				.spacer
 			template(v-for="validator of matchingValidatorsComingSoon")
 				ValidatorComingSoon(
-					:key="validator.name"
+					:key="validator.chainName"
 					:validator="validator"
 				)
 				.spacer
@@ -80,13 +80,13 @@ export default Vue.extend({
 		matchingValidators(): tValidator[] {
 			return this.validators.filter(item => {
 				const regex = new RegExp(this.searchValue, "i")
-				return regex.test(item.name) || regex.test(item.denom.symbol)
+				return regex.test(item.chainName) || regex.test(item.denom.symbol)
 			})
 		},
 		matchingValidatorsComingSoon(): tValidatorComingSoon[] {
 			return this.validatorsComingSoon.filter(item => {
 				const regex = new RegExp(this.searchValue, "i")
-				return regex.test(item.name) || regex.test(item.denomName)
+				return regex.test(item.chainName) || regex.test(item.denomName)
 			})
 		},
 		totalAssetsDelegated(): string {

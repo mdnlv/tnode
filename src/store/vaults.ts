@@ -13,17 +13,17 @@ import {
 	ERC20Denom,
 	LPDenom,
 	Network,
+	SupportedNetworks,
 } from "~/_types"
-import { divBy10toPow, times10toPow, max } from "~/_utils"
+import { divBy10toPow, max, times10toPow } from "~/_utils"
 
 const defaultState = {
 	all: [
 		{
-			name: "TNODE VAULT",
+			name: "TNODE\nVAULT",
 			address: "0x98386F210af731ECbeE7cbbA12C47A8E65bC8856",
-			networkName: "Binance Smart Chain Mainnet",
+			networkName: SupportedNetworks.BSC_MAINNET,
 			icon: require("~/assets/svg/vaults/maxi-vault.svg?raw"),
-			explorerLink: "https://bscscan.com/tx/###",
 			auditLink: "/obelisk-tnode-vaults-audit.pdf",
 			apr: null,
 			tvl: null,
@@ -37,11 +37,10 @@ const defaultState = {
 			properties: [],
 		},
 		{
-			name: "TNODE/BUSD LIQUIDITY VAULT",
+			name: "BSC LIQUIDITY VAULT\nTNODE/BUSD",
 			address: "0x44dC7FE8e51076De1B9f863138107148b441853C",
-			networkName: "Binance Smart Chain Mainnet",
+			networkName: SupportedNetworks.BSC_MAINNET,
 			icon: null,
-			explorerLink: "https://bscscan.com/tx/###",
 			auditLink: "/obelisk-tnode-vaults-audit.pdf",
 			apr: null,
 			tvl: null,
@@ -54,13 +53,29 @@ const defaultState = {
 			rewardDenomId: "tnode",
 			properties: [],
 		},
+		// {
+		// 	name: "FTM LIQUIDITY VAULT\nTNODE/USDC",
+		// 	address: "0x91c61868234ec6D1ff6d8b7D9774064B0dCE9341",
+		// 	networkName: SupportedNetworks.FTM_MAINNET,
+		// 	icon: null,
+		// 	auditLink: null,
+		// 	apr: null,
+		// 	tvl: null,
+		// 	lockup: null,
+		// 	promotional: false,
+		// 	userStaked: null,
+		// 	userBalance: null,
+		// 	userRewards: null,
+		// 	stakeDenomId: "ftm-busd-tnode",
+		// 	rewardDenomId: "ftm-tnode",
+		// 	properties: [],
+		// },
 	] as {
 		name: string
 		address: string
 		networkName: string
 		icon: any | null
-		explorerLink: string
-		auditLink: string
+		auditLink: string | null
 		apr: bn | null
 		tvl: bn | null
 		closesAt?: Date | null
@@ -117,16 +132,15 @@ export const mutations: MutationTree<LocalState> = {
 }
 
 export const actions: ActionTree<LocalState, RootState> = {
-	async _getTokenContract(_, { vault, denom }: { vault: Vault, denom: ERC20Denom | LPDenom }): Promise<ETHContract> {
+	async _getTokenContract({ dispatch }, { vault, denom }: { vault: Vault, denom: ERC20Denom | LPDenom }): Promise<ETHContract> {
 		const tokenAbi = [
 			"function approve(address, uint) returns (bool)",
 			"function balanceOf(address owner) view returns (uint256)",
 			"function allowance(address, address) view returns(uint256)",
 			"function totalSupply() view returns (uint256)",
 		]
-		const offlineSigner = await this.dispatch("web3/getOfflineSigner", vault.networkName) as ethers.providers.JsonRpcSigner
-		const tokenContract = new ethers.Contract(denom.contractAddress, tokenAbi, offlineSigner)
-		return tokenContract.connect(offlineSigner)
+		const provider = await dispatch("_getViewProvider", vault.networkName) as ETHProvider
+		return new ethers.Contract(denom.contractAddress, tokenAbi, provider)
 	},
 	_getGasConfig({ rootGetters }, vault: Vault): Network["gasConfig"] {
 		const networks = rootGetters["networks/all"] as Network[]
@@ -225,7 +239,7 @@ export const actions: ActionTree<LocalState, RootState> = {
 			},
 		)
 	},
-	async _getStakingRewardsContract(_, vault: Vault): Promise<ETHContract> {
+	async _getStakingRewardsContract({ dispatch }, vault: Vault): Promise<ETHContract> {
 		const stakingRewardsAbi = [
 			"function stake(uint)",
 			"function stakeTransferWithBalance(uint, uint)",
@@ -241,11 +255,11 @@ export const actions: ActionTree<LocalState, RootState> = {
 			"function viewLockingTimeStamp() view returns (uint)",
 			"function periodFinish() view returns (uint)",
 		]
-		const offlineSigner = await this.dispatch("web3/getOfflineSigner", vault.networkName) as ethers.providers.JsonRpcSigner
+		const provider = await dispatch("_getViewProvider", vault.networkName) as ETHProvider
 		return new ethers.Contract(
 			vault.address,
 			stakingRewardsAbi,
-			offlineSigner,
+			provider,
 		)
 	},
 	async setBalance({ dispatch, commit }, vault: Vault): Promise<void> {
@@ -279,13 +293,15 @@ export const actions: ActionTree<LocalState, RootState> = {
 		try {
 			const stakingRewardsContract = await dispatch("_getStakingRewardsContract", vault)
 			const tokenContract = await dispatch("_getTokenContract", { vault, denom: vault.stakeDenom }) as ETHContract
+			const offlineSigner = await this.dispatch("web3/getOfflineSigner", { networkName: vault.networkName, switchNetwork: true }) as ethers.providers.JsonRpcSigner
 			const gasConfig = await dispatch("_getGasConfig", vault) as Network["gasConfig"]
 
 			const account = await dispatch("_getAccount", vault) as EVMAccount
 			const allowance = await tokenContract.allowance(account.address, vault.address) as { toString: () => string }
 			const totalSupply = await tokenContract.totalSupply() as { toString: () => string }
 			if (bn(totalSupply.toString()).gt(allowance.toString())) {
-				const approved = await tokenContract.approve(
+				const tokenContractSigner = tokenContract.connect(offlineSigner)
+				const approved = await tokenContractSigner.approve(
 					vault.address,
 					utils.parseUnits(
 						totalSupply.toString(),
@@ -296,7 +312,8 @@ export const actions: ActionTree<LocalState, RootState> = {
 				console.log({ approved })
 			}
 
-			const response = await stakingRewardsContract.stake(utils.parseUnits(
+			const stakingRewardsContractSigner = await stakingRewardsContract.connect(offlineSigner)
+			const response = await stakingRewardsContractSigner.stake(utils.parseUnits(
 				amount.toString(),
 			), gasConfig)
 			return {
@@ -311,16 +328,18 @@ export const actions: ActionTree<LocalState, RootState> = {
 	async unstake({ dispatch }, { vault, amount }: {vault: Vault, amount: number}): Promise<UserActionResponse> {
 		try {
 			const stakingRewardsContract = await dispatch("_getStakingRewardsContract", vault)
+			const offlineSigner = await this.dispatch("web3/getOfflineSigner", { networkName: vault.networkName, switchNetwork: true }) as ethers.providers.JsonRpcSigner
 
 			// if user is withdrawing whole balance, call quit()
 			const account = await dispatch("_getAccount", vault) as EVMAccount
 			const balance = await stakingRewardsContract.balanceOf(account.address) as { toString: () => string }
 			let response
+			const stakingRewardsContractSigner = await stakingRewardsContract.connect(offlineSigner)
 			if (divBy10toPow(balance.toString(), vault.stakeDenom.decimals).eq(amount)) {
-				response = await stakingRewardsContract.quit()
+				response = await stakingRewardsContractSigner.quit()
 			}
 			else {
-				response = await stakingRewardsContract.withdraw(utils.parseUnits(
+				response = await stakingRewardsContractSigner.withdraw(utils.parseUnits(
 					amount.toString(),
 				))
 			}
@@ -336,7 +355,9 @@ export const actions: ActionTree<LocalState, RootState> = {
 	async claimRewards({ dispatch }, vault: Vault): Promise<UserActionResponse> {
 		try {
 			const stakingRewardsContract = await dispatch("_getStakingRewardsContract", vault)
-			const response = await stakingRewardsContract.getReward()
+			const offlineSigner = await this.dispatch("web3/getOfflineSigner", { networkName: vault.networkName, switchNetwork: true }) as ethers.providers.JsonRpcSigner
+			const stakingRewardsContractSigner = await stakingRewardsContract.connect(offlineSigner)
+			const response = await stakingRewardsContractSigner.getReward()
 			return {
 				hash: response.hash,
 				status: "REWARDS CLAIM IN PROGRESS",

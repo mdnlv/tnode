@@ -1908,6 +1908,11 @@
   dependencies:
     "@open-web3/orml-type-definitions" "^0.8.2-9"
 
+"@maticnetwork/meta@^2.4.29":
+  version "2.4.29"
+  resolved "https://registry.yarnpkg.com/@maticnetwork/meta/-/meta-2.4.29.tgz#11cf9f9265bbe549055508fba1b8cf5553da0727"
+  integrity sha512-K35YkDOziEWgMAljeGYoVuvejY9ZA2JoJDvDgfrsSWJclfNy1/+HL3VPJ/AlV3nUUs2u4UkMenOoj4pRZd1KOQ==
+
 "@metamask/safe-event-emitter@^2.0.0":
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/@metamask/safe-event-emitter/-/safe-event-emitter-2.0.0.tgz#af577b477c683fad17c619a78208cede06f9605c"
@@ -3832,6 +3837,11 @@
     vue-template-es2015-compiler "^1.9.0"
   optionalDependencies:
     prettier "^1.18.2"
+
+"@vue/composition-api@^1.4.5":
+  version "1.4.6"
+  resolved "https://registry.yarnpkg.com/@vue/composition-api/-/composition-api-1.4.6.tgz#886c35221cd7c6f55272543a121240e8d3a1306c"
+  integrity sha512-UP359OJ0G0Zli603/i9fhXFmNtZUSrypSFyqClMxizp8ezlaMK2GCmHgy3qyrRnO/xjcDAx09vvXPwNFtxHPtQ==
 
 "@walletconnect/browser-utils@^1.7.1":
   version "1.7.1"
@@ -16092,6 +16102,11 @@ vue-client-only@^2.0.0:
   resolved "https://registry.yarnpkg.com/vue-client-only/-/vue-client-only-2.1.0.tgz#1a67a47b8ecacfa86d75830173fffee3bf8a4ee3"
   integrity sha512-vKl1skEKn8EK9f8P2ZzhRnuaRHLHrlt1sbRmazlvsx6EiC3A8oWF8YCBrMJzoN+W3OnElwIGbVjsx6/xelY1AA==
 
+vue-demi@^0.12.1:
+  version "0.12.1"
+  resolved "https://registry.yarnpkg.com/vue-demi/-/vue-demi-0.12.1.tgz#f7e18efbecffd11ab069d1472d7a06e319b4174c"
+  integrity sha512-QL3ny+wX8c6Xm1/EZylbgzdoDolye+VpCXRhI2hug9dJTP3OUJ3lmiKN3CsVV3mOJKwFi0nsstbgob0vG7aoIw==
+
 vue-eslint-parser@^7.1.1, vue-eslint-parser@^7.10.0:
   version "7.11.0"
   resolved "https://registry.yarnpkg.com/vue-eslint-parser/-/vue-eslint-parser-7.11.0.tgz#214b5dea961007fcffb2ee65b8912307628d0daf"
@@ -16192,6 +16207,13 @@ vue@^2.6.12:
   version "2.6.14"
   resolved "https://registry.yarnpkg.com/vue/-/vue-2.6.14.tgz#e51aa5250250d569a3fbad3a8a5a687d6036e235"
   integrity sha512-x2284lgYvjOMj3Za7kqzRcUSxBboHqtgRE2zlos1qWaOye5yUmHn42LB1250NJBLRwEcdrB0JRwyPTEPhfQjiQ==
+
+vuetensils@^0.10.4:
+  version "0.10.4"
+  resolved "https://registry.yarnpkg.com/vuetensils/-/vuetensils-0.10.4.tgz#70fcce5ebb56b4c19187b5ec5518617b5d313d4f"
+  integrity sha512-rnO2b3oYyqQio2ohH3tLOQ+4baIFwjpjfTL4Am9SHXSlRXrBdTVCdzvqbgiKO0hXfbPAKXRh7/IryWtsgfZmww==
+  dependencies:
+    vue-demi "^0.12.1"
 
 vuex@^3.6.2:
   version "3.6.2"

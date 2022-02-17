@@ -25,6 +25,7 @@
 		"@cosmjs/tendermint-rpc": "^0.26.5",
 		"@ethersproject/contracts": "^5.5.0",
 		"@ethersproject/providers": "^5.5.0",
+		"@maticnetwork/meta": "^2.4.29",
 		"@nuxtjs/style-resources": "^1.2.1",
 		"@polkadot/api": "^6.6.1",
 		"@polkadot/apps-config": "^0.98.1",
@@ -35,6 +36,7 @@
 		"@terra-money/wallet-provider": "^3.7.1",
 		"@uniswap/sdk-core": "^3.0.1",
 		"@uniswap/v2-sdk": "^3.0.1",
+		"@vue/composition-api": "^1.4.5",
 		"@walletconnect/web3-provider": "^1.7.0",
 		"await-sleep": "^0.0.1",
 		"axios": "^0.21.4",
@@ -50,6 +52,7 @@
 		"patch-package": "^6.4.7",
 		"postinstall-postinstall": "^2.1.0",
 		"vue-js-modal": "^2.0.1",
+		"vuetensils": "^0.10.4",
 		"web3modal": "^1.9.4"
 	},
 	"devDependencies": {

@@ -24,6 +24,8 @@ import {
 import {
 	QueryClientImpl,
 } from "cosmjs-types/cosmos/mint/v1beta1/query"
+import { DelegationResponse } from "cosmjs-types/cosmos/staking/v1beta1/staking"
+import { QueryValidatorDelegationsResponse } from "cosmjs-types/cosmos/staking/v1beta1/query"
 import {
 	times10toPow,
 	divBy10toPow,
@@ -86,8 +88,16 @@ export const mutations: MutationTree<LocalState> = {
 export const actions: ActionTree<LocalState, RootState> = {
 	async setTotalDelegated({ dispatch, commit }, validator: Validator): Promise<void> {
 		const tmClient = await dispatch("_getTmClient", validator) as TMClient
-		const { delegationResponses } = await tmClient.staking.validatorDelegations(validator.validatorAddress)
-		const totalDelegated = delegationResponses.reduce((acc, delegation) => acc + (Number(delegation.balance?.amount) || 0), 0)
+		const delegations: DelegationResponse[] = []
+		let paginationKey: Uint8Array | undefined = new Uint8Array()
+		do {
+			const { delegationResponses, pagination }: QueryValidatorDelegationsResponse
+				= await tmClient.staking.validatorDelegations(validator.address, paginationKey)
+			delegations.push(...delegationResponses)
+			paginationKey = pagination?.nextKey
+		}
+		while (paginationKey?.length)
+		const totalDelegated = delegations.reduce((acc, delegation) => acc + (Number(delegation.balance?.amount) || 0), 0)
 		commit("staking/setTotalDelegated", {
 			chainId: validator.chainId,
 			totalDelegated: divBy10toPow(totalDelegated, validator.denom.decimals),
@@ -122,7 +132,7 @@ export const actions: ActionTree<LocalState, RootState> = {
 		const account: Account = await dispatch("_getAccount", validator)
 		const delegation: BalanceCoin | null = await signer.getDelegation(
 			account.address,
-			validator.validatorAddress,
+			validator.address,
 		)
 		const userDelegated = delegation
 			? divBy10toPow(delegation.amount, validator.denom.decimals)
@@ -134,12 +144,15 @@ export const actions: ActionTree<LocalState, RootState> = {
 		const account: Account = await dispatch("_getAccount", validator)
 		const { rewards } = await tmClient!.distribution.delegationRewards(
 			account.address,
-			validator.validatorAddress,
+			validator.address,
 		)
 		const userRewards = rewards.length
 			? divBy10toPow(rewards[0].amount, 18 + validator.denom.decimals)
 			: null
 		commit("staking/userRewards", { ...validator, userRewards }, { root: true })
+	},
+	async getDelegations(_) {
+		return await null
 	},
 	async delegate({ dispatch }, { amount, validator }: {amount: number, validator: Validator}) {
 		try {
@@ -147,7 +160,7 @@ export const actions: ActionTree<LocalState, RootState> = {
 			const account: Account = await dispatch("_getAccount", validator)
 			const response = await signer.delegateTokens(
 				account.address,
-				validator.validatorAddress,
+				validator.address,
 				coin(
 					times10toPow(amount, validator.denom.decimals, true),
 					validator.denom.min,
@@ -170,7 +183,7 @@ export const actions: ActionTree<LocalState, RootState> = {
 			const account: Account = await dispatch("_getAccount", validator)
 			const response = await signer.undelegateTokens(
 				account.address,
-				validator.validatorAddress,
+				validator.address,
 				coin(
 					times10toPow(amount, validator.denom.decimals, true),
 					validator.denom.min,
@@ -193,7 +206,7 @@ export const actions: ActionTree<LocalState, RootState> = {
 			const account: Account = await dispatch("_getAccount", validator)
 			const response = await signer.withdrawRewards(
 				account.address,
-				validator.validatorAddress,
+				validator.address,
 				await dispatch("_sendFee", validator),
 				`claiming ${validator.denom.symbol} rewards via trustednode.io`,
 			)
@@ -205,6 +218,9 @@ export const actions: ActionTree<LocalState, RootState> = {
 		catch (error) {
 			return dispatch("_handleError", { error, statusPrefix: "REWARDS CLAIM" })
 		}
+	},
+	async redelegate() {
+		return await { message: "not implemented" }
 	},
 	async _getSigner(_, validator: Validator) {
 		const offlineSigner = await this.dispatch(`staking/wallets/${validator.walletId}/getOfflineSigner`, validator.chainId)

@@ -4,13 +4,14 @@
 		:name="name"
 		:height="height"
 		:width="width"
+		@close="close"
 	)
 		.center.loading-big-outer(v-if="loading")
 			img.loading-big(src="~/assets/gif/loading-5.gif")
 		#contents(v-else)
 			#header.flex-space-between
 				h2 {{ title }}
-				#close-button.cursor-pointer(@click="_close" v-html="crossIcon")
+				#close-button.cursor-pointer(@click="$modal.hide(name)" v-html="crossIcon")
 			#slot
 				slot
 </template>
@@ -40,10 +41,6 @@ export default Vue.extend({
 			type: String as Vue.PropType<string>,
 			required: true,
 		},
-		onClose: {
-			type: Function as Vue.PropType<Function>,
-			default: null,
-		},
 	},
 	data() {
 		return {
@@ -51,11 +48,8 @@ export default Vue.extend({
 		}
 	},
 	methods: {
-		_close() {
-			if (this.onClose) {
-				this.onClose()
-			}
-			this.$modal.hide(this.name)
+		close() {
+			this.$emit("close")
 		},
 	},
 })

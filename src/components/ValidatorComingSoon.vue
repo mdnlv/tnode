@@ -4,7 +4,7 @@
 			.flex.space-items-horz
 				img.icon(:src="validator.icon")
 				div
-					h2 {{ validator.name }}
+					h2 {{ validator.chainName }}
 					h5.denom.label {{ validator.denomName }}
 		#contents
 			p Coming Soon...

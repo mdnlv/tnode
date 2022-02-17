@@ -3,7 +3,7 @@
 		:name="`addLiquidity-${vaultAddress}`"
 		title="Add Liquidity"
 		height="auto"
-		:onClose="close"
+		@close="close"
 	)
 		.form.flex.flex-column.flex-stretch
 			.space-items-bigger
@@ -35,10 +35,10 @@
 						table
 							tbody
 								tr
-									td.bare.right-text {{ busdDenom.price | floorToDPorE(5) }}
+									td.bare.right-text {{ ratio2 }}
 									td TNODE per BUSD
 								tr
-									td.bare.right-text {{ tnodeDenom.price | floorToDPorE(5) }}
+									td.bare.right-text {{ ratio1 }}
 									td BUSD per TNODE
 				StatusMessage(:message="status")
 				.flex-end.space-before
@@ -85,6 +85,18 @@ export default Vue.extend({
 		},
 		tnodeDenom(): ERC20Denom {
 			return this.$store.getters["denoms/erc20"].find(e => e.id === "tnode")
+		},
+		ratio1(): string {
+			if (!this.tnodeDenom.price) {
+				return ""
+			}
+			return this.tnodeDenom.price.toFixed(DECIMAL)
+		},
+		ratio2(): string {
+			if (!this.tnodeDenom.price) {
+				return ""
+			}
+			return bn(1).div(this.tnodeDenom.price).toFixed(DECIMAL)
 		},
 	},
 	methods: {

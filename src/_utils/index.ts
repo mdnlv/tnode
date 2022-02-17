@@ -59,3 +59,7 @@ export function preventSciNotation(value: BigSource) {
 		bn(value).e + 1, // prevent sci notation
 	)
 }
+
+export function toLink(addressOrHash: string, linkTemplate: string) {
+	return linkTemplate.replace("###", addressOrHash)
+}

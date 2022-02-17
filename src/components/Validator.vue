@@ -4,7 +4,7 @@
 			#name.flex.space-items-horz
 				img.icon(:src="validator.denom.icon")
 				div
-					h2 {{ validator.name }}
+					h2 {{ validator.chainName }}
 					h5.denom.label {{ validator.denom.symbol }}
 			#apr.flex.space-items-horz
 				div
@@ -61,13 +61,14 @@
 			:name="`delegate-${validator.chainId}`"
 			:loading="!modalLoaded"
 			:title="`Stake ${validator.denom.symbol}`"
+			:height="700"
 		)
 			.modal-form.space-items-big.form
 				.flex.space-items-horz
 					img.icon(:src="validator.denom.icon")
 					.balance
 						.label.small balance
-						.h2 {{ balance | floorToDP(6) }} {{ validator.denom.symbol }}
+						.h2 {{ balance | floorToDP(validator.denom.decimals) }} {{ validator.denom.symbol }}
 						p ${{ balance | realValue(validator.denom.price) | floorToDP(2) }}
 				MaxInput(
 					v-model="amount"
@@ -79,15 +80,23 @@
 				#alert.flex.space-items-horz
 					.icon-small(v-html="infoIcon")
 					p This node is operated by&nbsp;
-						a(:href="validator.operator.link" target="_blank") {{ validator.operator.name }}
+						a(:href="toLink(validator.address, validator.linkTemplate)" target="_blank") {{ validator.operatorName }}
 						br
 						|Unbonding period: {{ validator.unstakingDays }} days
 						template(v-if="validator.disclaimer")
 							br
 							span {{ validator.disclaimer }}
-				#buttons
+				.buttons
 					p.status-message {{ statusMessage }}
 					button.bare.big-text(@click="delegate") STAKE
+				.redelegation-form.space-items(v-if="totalDelegation.gt(0)")
+					.h2 Redelegate assets
+					p.color-fg3
+						|You have a total of {{ totalDelegation | floorToDPorE(6) }} {{ validator.denom.symbol }} currently staked with other validator nodes
+					.buttons
+						button.bare.big-text(@click="openModal('redelegate')")
+							span.icon(v-html="refreshIcon")
+							| RESTAKE
 		Modal(
 			v-if="loaded"
 			:name="`undelegate-${validator.chainId}`"
@@ -108,7 +117,7 @@
 					placeholder="Amount to unstake"
 				)
 				div
-				#buttons
+				.buttons
 					p.status-message {{ statusMessage }}
 					button.bare.big-text(@click="undelegate") UNSTAKE
 		Modal(
@@ -120,6 +129,50 @@
 		)
 			#claim-rewards-error.center
 				p.status-message {{ statusMessage }}
+		Modal(
+			v-if="loaded"
+			:name="`redelegate-${validator.chainId}`"
+			:title="`Restake ${this.validator.denom.symbol}`"
+			:loading="!modalLoaded"
+		)
+			.modal-form.space-items-big.form
+				template(v-if="srcDelegation === null")
+					.color-fg3 Already staked assets can be restaked from other validators to Trusted Node’s validator
+					div
+						template(v-for="(delegation, index) in delegations")
+							StakeRow(
+								:validator="validator"
+								:address="delegation.address"
+								:amount="delegation.amount"
+								:symbol="validator.denom.symbol"
+								@setSrcDelegation="srcDelegation = delegation"
+								:class="{highlight: !(index % 2)}"
+							)
+					div
+					.buttons
+						button.bare.big-text(@click="openModal('delegate')")
+							.color-fg2 CANCEL
+				template(v-else)
+					.flex.space-items-horz.flex-start
+						img.icon(:src="validator.denom.icon")
+						.balance
+							.label.small Your stake to {{ srcDelegation.address | accountAddress }}
+							.h2 {{ srcDelegation.amount | floorToDPorE(6) }} {{ validator.denom.symbol }}
+							p ${{ srcDelegation.amount | realValue(validator.denom.price) | floorToDP(2) }}
+					MaxInput(
+						v-model="amount"
+						:max="srcDelegation.amount"
+						:symbol="validator.denom.symbol"
+						placeholder="Amount to stake"
+					)
+					.center-text.status-message(v-if="statusMessage") {{ statusMessage }}
+					div
+					.buttons
+						button.bare.big-text(@click="srcDelegation = null")
+							.color-fg2 CANCEL
+						button.bare.big-text(@click="redelegate")
+							span.icon(v-html="refreshIcon")
+							| RESTAKE
 		Modal(
 			v-if="loaded"
 			:name="`transaction-${validator.chainId}`"
@@ -138,9 +191,14 @@
 					.label.small TRANSACTION ID
 					.wrap.space-items-horz-small
 						span {{ transactionHash }}
-						a.explorer-link(:href="transactionExplorerLink" target="_blank" v-html="linkIcon")
+						a.explorer-link(
+							v-if="transactionHash"
+							:href="toLink(transactionHash, validator.txLinkTemplate)"
+							target="_blank"
+							v-html="linkIcon"
+						)
 					p(v-if="transactionStatus === 'pending'") (please allow time for transaction confirmation)
-				#buttons
+				.buttons
 					button.bare.big-text(@click="closeTransactionModal") CLOSE
 </template>
 
@@ -148,24 +206,23 @@
 import Vue from "vue"
 import bn from "big.js"
 
-import { max } from "~/_utils"
-import { Validator, Account } from "~/_types"
+import { max, toLink } from "~/_utils"
+import { Validator, Account, Delegation } from "~/_types"
 import LoadingValue from "~/components/LoadingValue.vue"
 import Modal from "~/components/Modal.vue"
 import MaxInput from "~/components/MaxInput.vue"
+import StakeRow from "~/components/common/StakeRow.vue"
 
-type TransactionType = "delegate" | "undelegate" | "claimRewards"
+type TransactionType = "delegate" | "undelegate" | "claimRewards" | "redelegate"
 
 export default Vue.extend({
 	components: {
 		LoadingValue,
 		Modal,
 		MaxInput,
+		StakeRow,
 	},
 	filters: {
-		explorerLink(hash, link) {
-			return link.replace("###", hash)
-		},
 		realValue(amount: bn | null, price: bn | null) {
 			return amount === null || price === null
 				? null
@@ -190,11 +247,14 @@ export default Vue.extend({
 			arrowRightIcon: require("~/assets/svg/ui/arrow-right.svg?raw"),
 			linkIcon: require("~/assets/svg/ui/link.svg?raw"),
 			infoIcon: require("~/assets/svg/ui/info-icon.svg?raw"),
+			refreshIcon: require("~/assets/svg/ui/refresh.svg?raw"),
 			active: false,
 			modalLoaded: false,
 			statusMessage: null as string | null,
 			amount: null as string | null,
 			balance: null as bn | null,
+			delegations: [] as Delegation[],
+			srcDelegation: null as Delegation | null,
 			usingMax: false,
 			claimingRewards: false,
 			transactionType: "delegate" as TransactionType | null,
@@ -227,18 +287,13 @@ export default Vue.extend({
 		connectingWalletError() {
 			return this.$store.getters["staking/connectingWalletError"]
 		},
-		transactionExplorerLink(): string {
-			if (!this.transactionHash) {
-				return ""
-			}
-			return this.validator.explorerLink.replace("###", this.transactionHash)
-		},
 		transactionTitle(): string {
 			if (!this.transactionType) {
 				return ""
 			}
 			return {
 				delegate: `Stake ${this.validator.denom.symbol}`,
+				redelegate: `Restake ${this.validator.denom.symbol}`,
 				undelegate: `Unstake ${this.validator.denom.symbol}`,
 				claimRewards: `Claim ${this.validator.denom.symbol} rewards`,
 			}[this.transactionType]
@@ -251,6 +306,14 @@ export default Vue.extend({
 		},
 		userRewards(): bn | null {
 			return this.$store.getters["staking/userRewards"](this.validator)
+		},
+		totalDelegation(): bn {
+			if (this.delegations && this.delegations.length > 0) {
+				return this.delegations.reduce((acc, del) =>
+					del.amount.add(acc)
+				, bn(0))
+			}
+			return bn(0)
 		},
 	},
 	watch: {
@@ -291,6 +354,7 @@ export default Vue.extend({
 		}
 	},
 	methods: {
+		toLink,
 		async loadPersonalInfo() {
 			try {
 				this.$store.commit("staking/loadingPersonalInfo", { chainId: this.validator.chainId, loadingPersonalInfo: true })
@@ -331,11 +395,11 @@ export default Vue.extend({
 			}
 		},
 		async openModal(type: TransactionType) {
+			this.modalLoaded = false
 			await this.connectWallet()
 			if (!this.account) {
 				return
 			}
-			this.modalLoaded = false
 			this.usingMax = false
 			this.statusMessage = null
 			this.amount = null
@@ -346,7 +410,9 @@ export default Vue.extend({
 			try {
 				switch (type) {
 					case "delegate": {
+						this.$modal.hide(`redelegate-${this.validator.chainId}`)
 						this.balance = await this.$store.dispatch(`staking/ecosystems/${this.validator.ecosystemId}/getBalance`, this.validator) as bn
+						this.delegations = await this.$store.dispatch(`staking/ecosystems/${this.validator.ecosystemId}/getDelegations`, this.validator) as Delegation[]
 						break
 					}
 					case "undelegate": {
@@ -363,6 +429,11 @@ export default Vue.extend({
 							? userRewards.toString()
 							: null
 						await this.claimRewards()
+						break
+					}
+					case "redelegate": {
+						this.srcDelegation = null
+						this.$modal.hide(`delegate-${this.validator.chainId}`)
 						break
 					}
 				}
@@ -424,6 +495,31 @@ export default Vue.extend({
 			)
 			this.handleResponse("delegate", response)
 			this.monitorDelegation()
+		},
+		async redelegate() {
+			if (!this.validate(this.amount) || this.amount === null || this.srcDelegation === null) {
+				return
+			}
+			if (this.balance !== null) {
+				if (this.srcDelegation!.amount.lt(this.amount)) {
+					this.statusMessage = "insufficient delegation"
+					return
+				}
+			}
+			else {
+				this.statusMessage = "no balance for fees"
+				return
+			}
+			this.statusMessage = "restaking..."
+			const response = await this.$store.dispatch(
+				`staking/ecosystems/${this.validator.ecosystemId}/redelegate`,
+				{
+					amount: this.amount,
+					validator: this.validator,
+					delegation: this.srcDelegation,
+				},
+			)
+			this.handleResponse("redelegate", response)
 		},
 		async undelegate() {
 			if (!this.validate(this.amount) || this.amount === null) {
@@ -663,17 +759,18 @@ export default Vue.extend({
 			height: 100%
 			padding-bottom: $unit6
 		.form
-			svg
-				path
-					fill: $fg3
 			#alert
 				color: $fg3
 				align-items: flex-start
 				a
 					@include hover-opacity
 					text-decoration: underline
-
-		#buttons
+		.redelegation-form
+			background-color: $bg2
+			margin-left: -$space-big
+			margin-right: -$space-big
+			padding: $unit1 $space-big
+		.buttons
 			display: flex
 			justify-content: flex-end
 			align-items: center

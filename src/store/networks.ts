@@ -1,13 +1,16 @@
 import type { GetterTree, ActionTree, MutationTree } from "vuex"
 import { RootState } from "~/store"
-import { Network } from "~/_types"
+import {
+	Network,
+	SupportedNetworks,
+} from "~/_types"
 import { times10toPow } from "~/_utils"
 
 export const state = () => ({
 	all: [
 		{
 			chainId: `0x${Number(56).toString(16)}`,
-			chainName: "Binance Smart Chain Mainnet",
+			chainName: SupportedNetworks.BSC_MAINNET,
 			rpcUrls: [
 				// "https://bsc-node.hydrogenx.tk/",
 				"https://withered-delicate-glade.bsc.quiknode.pro/04e9d09f53688b9dbb9e94c9aebb926e981bcc88/",
@@ -37,10 +40,11 @@ export const state = () => ({
 				gasPrice: times10toPow(0.000000007, 18, true),
 				gasLimit: 200000,
 			},
+			txLinkTemplate: "https://bscscan.com/tx/###",
 		},
 		{
 			chainId: `0x${Number(97).toString(16)}`,
-			chainName: "Binance Smart Chain Testnet",
+			chainName: SupportedNetworks.BSC_TESTNET,
 			rpcUrls: [
 				"https://data-seed-prebsc-2-s3.binance.org:8545/",
 				"https://data-seed-prebsc-1-s3.binance.org:8545/",
@@ -61,10 +65,11 @@ export const state = () => ({
 				gasPrice: times10toPow(0.00000001, 18, true),
 				gasLimit: 200000,
 			},
+			txLinkTemplate: "https://testnet.bscscan.com/tx/###",
 		},
 		{
 			chainId: `0x${Number(4).toString(16)}`,
-			chainName: "Ethereum Testnet Rinkeby",
+			chainName: SupportedNetworks.ETH_RINKEBY,
 			rpcUrls: [
 				"https://rinkeby-light.eth.linkpool.io/",
 			],
@@ -80,6 +85,55 @@ export const state = () => ({
 				gasPrice: times10toPow(0.00000015, 18, true),
 				gasLimit: 1000000,
 			},
+			txLinkTemplate: "https://rinkeby.etherscan.io/tx/###",
+		},
+		{
+			chainId: `0x${Number(5).toString(16)}`,
+			chainName: SupportedNetworks.ETH_GOERLI,
+			rpcUrls: [
+				"https://rpc.goerli.mudit.blog/",
+				"https://rpc.slock.it/goerli ",
+				"https://goerli.prylabs.net/",
+			],
+			nativeCurrency: {
+				name: "Görli Ether",
+				symbol: "GOR",
+				decimals: 18,
+			},
+			blockExplorerUrls: [
+				"https://goerli.etherscan.io",
+			],
+			gasConfig: {
+				gasPrice: times10toPow(0.00000015, 18, true),
+				gasLimit: 1000000,
+			},
+			txLinkTemplate: "https://goerli.etherscan.io/tx/###",
+		},
+		{
+			chainId: `0x${Number(250).toString(16)}`,
+			chainName: SupportedNetworks.FTM_MAINNET,
+			rpcUrls: [
+				"https://rpc.ftm.tools",
+				"https://rpc.fantom.network",
+				"https://rpcapi.fantom.network",
+				"https://rpc2.fantom.network",
+				"https://rpc3.fantom.network",
+				"https://rpc.fantom.network",
+				"https://fantomscan.io/rpc",
+			],
+			nativeCurrency: {
+				name: "Fantom",
+				symbol: "FTM",
+				decimals: 18,
+			},
+			blockExplorerUrls: [
+				"https://ftmscan.com",
+			],
+			gasConfig: {
+				gasPrice: times10toPow(0.00000015, 18, true),
+				gasLimit: 1000000,
+			},
+			txLinkTemplate: "https://ftmscan.com/tx/###",
 		},
 	] as Network[],
 })
