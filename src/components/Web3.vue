@@ -1,52 +1,49 @@
 <template lang="pug">
-	#web3
-		VueModal(
-			v-if="loaded"
-			name="connecting-web3-wallet"
-			:adaptive="true"
-			height="auto"
-			@before-open="startConnecting"
-			@closed="doneConnecting"
-		)
-			.message
-				.space-items-big(v-if="!connectingWalletId")
-					h3 Choose your wallet:
-					.center
-						.wallet-choices.flex.flex-start.space-items-horz-big
-							.wallet-choice.space-items-small.center(
-								v-for="wallet of wallets"
-								@click="connectWallet(wallet.id)"
-							)
-								.img-outer.center
-									img(:src="wallet.icon")
-								p {{ wallet.name }}
-				.space-items(v-else)
-					template(v-if="!installed")
-						h3 {{ name }} Not Found
-						p Please install the <a :href="link" target="_blank"> {{ name }} browser extension</a> and create an account to get started.
-						p (Note: you may have to reload this page)
-					template(v-else-if="connectingWalletError === 'accountNotFound'")
-						h3 Account Not Found
-						p Make sure you have created an account in {{ name }} first. If still unsuccessful, try reinstalling {{ name }}.
-					template(v-else-if="connectingWalletError === 'requestRejected'")
-						h3 Request Rejected
-						p It seems that you've refused to connect your {{ name }} wallet. If unintentional, please click the connect button to try again.
-					template(v-else-if="connectingWalletError === 'metamaskConnectionError'")
-						h3 Unsupported Browser
-						p If you are trying to connect using MetaMask on your mobile device then please try using MetaMask's internal browser.
-					template(v-else)
-						h3 Connecting...
-						p Stuck connecting? Make sure you have created an account in {{ name }} first. If still unsuccessful, try reinstalling {{ name }}.
+#web3
+	.message
+		.space-items-big(v-if="!connectingWalletId")
+			#header.flex-space-between
+				h3 Choose your wallet:
+				#close-button.cursor-pointer(@click="_close" v-html="crossIcon")
+			.wallet-choices.flex-column.flex-start
+				.wallet-choice.space-items(
+					v-for="wallet of wallets"
+					@click="connectWallet(wallet.id)"
+				)
+					.button.flex.pill.space-items-horz(v-if="!account")
+						img.img-outer(:src="wallet.icon")
+						span Connect {{ wallet.name }}
+					.button.pill.flex.space-items-horz(v-else)
+						img.img-outer(:src="wallet.icon")
+						span {{ account.address | accountAddress }}
+		.space-items(v-else)
+			template(v-if="!installed")
+				h3 {{ name }} Not Found
+				p Please install the <a :href="link" target="_blank"> {{ name }} browser extension</a> and create an account to get started.
+				p (Note: you may have to reload this page)
+			template(v-else-if="connectingWalletError === 'accountNotFound'")
+				h3 Account Not Found
+				p Make sure you have created an account in {{ name }} first. If still unsuccessful, try reinstalling {{ name }}.
+			template(v-else-if="connectingWalletError === 'requestRejected'")
+				h3 Request Rejected
+				p It seems that you've refused to connect your {{ name }} wallet. If unintentional, please click the connect button to try again.
+			template(v-else-if="connectingWalletError === 'metamaskConnectionError'")
+				h3 Unsupported Browser
+				p If you are trying to connect using MetaMask on your mobile device then please try using MetaMask's internal browser.
+			template(v-else)
+				h3 Connecting...
+				p Stuck connecting? Make sure you have created an account in {{ name }} first. If still unsuccessful, try reinstalling {{ name }}.
 </template>
 
 <script lang="ts">
 import Vue from "vue"
-import { Wallet } from "~/_types"
+import { Wallet, EVMAccount } from "~/_types"
 
 export default Vue.extend({
 	data() {
 		return {
 			installed: false,
+			crossIcon: require("~/assets/svg/ui/cross.svg?raw"),
 		}
 	},
 	computed: {
@@ -67,6 +64,9 @@ export default Vue.extend({
 		},
 		name(): string | null {
 			return this.$store.getters["web3/name"]
+		},
+		account(): EVMAccount | null {
+			return this.$store.getters["web3/account"] as EVMAccount
 		},
 	},
 	watch: {
@@ -89,29 +89,28 @@ export default Vue.extend({
 				this.$modal.hide("connecting-web3-wallet")
 			}
 		},
-		startConnecting() {
-			this.$store.commit("web3/connectingWalletId", null)
-			this.$store.commit("web3/connectingWalletError", null)
-		},
-		doneConnecting() {
-			this.$store.commit("web3/connectingWalletId", null)
-			this.$store.commit("web3/connectingWalletError", null)
+		_close() {
+			this.$modal.hide("connecting-web3-wallet")
 		},
 	},
 })
 </script>
 
 <style lang="sass">
-#web3
+#connect-modal, #web3
+	.space-items-big
+		width: 100%
 	.wallet-choices
 		align-items: stretch
+		width: 100%
 		.wallet-choice
+			width: 100%
 			cursor: pointer
+			margin-bottom: 1em
 			@include hover-scale-opacity
 			justify-content: space-between
 			.img-outer
-				flex-grow: 1
-				width: $unit8
+				height: $unit6
 	.divider
 		position: relative
 		color: $fg-1
@@ -129,7 +128,7 @@ export default Vue.extend({
 			top: 50%
 			left: 50%
 			transform: translate(-50%, -50%)
-	.connected-wallet
-		img
-			width: $unit4
+	.flex
+		display: flex
+		width: 100%
 </style>

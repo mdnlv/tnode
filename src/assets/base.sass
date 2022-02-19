@@ -543,7 +543,12 @@
 			&.concise
 				opacity: $opacity1
 			pointer-events: none
-
+		&.no-mobile
+			@media (max-width: $breakpoint-mobile)
+				display: none
+		&.vts-dropdown__trigger
+			border: 0
+				
 	// forms
 	form:not(.nostyle),
 	.form
