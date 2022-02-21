@@ -8,6 +8,9 @@
 			@before-open="startConnecting"
 			@closed="doneConnecting"
 		)
+			.header.flex-space-between
+				h3 Connect your wallet Trusted Node
+				#close-button.cursor-pointer(@click="_close" v-html="crossIcon")
 			Web3
 </template>
 
@@ -23,6 +26,7 @@ export default Vue.extend({
 	data() {
 		return {
 			installed: false,
+			crossIcon: require("~/assets/svg/ui/cross.svg?raw"),
 		}
 	},
 	computed: {
@@ -73,6 +77,14 @@ export default Vue.extend({
 			this.$store.commit("web3/connectingWalletId", null)
 			this.$store.commit("web3/connectingWalletError", null)
 		},
+		_close() {
+			this.$modal.hide("connecting-web3-wallet")
+		},
 	},
 })
 </script>
+
+<style lang="sass" scoped>
+	.header
+		padding-bottom: 2.4em
+</style>

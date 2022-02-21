@@ -2,20 +2,23 @@
 #web3
 	.message
 		.space-items-big(v-if="!connectingWalletId")
-			#header.flex-space-between
-				h3 Choose your wallet:
-				#close-button.cursor-pointer(@click="_close" v-html="crossIcon")
-			.wallet-choices.flex-column.flex-start
+			.wallet-choices.flex-start
 				.wallet-choice.space-items(
 					v-for="wallet of wallets"
 					@click="connectWallet(wallet.id)"
 				)
-					.button.flex.pill.space-items-horz(v-if="!account")
+					.flex-column.center.space-items-horz(v-if="!account")
 						img.img-outer(:src="wallet.icon")
-						span Connect {{ wallet.name }}
-					.button.pill.flex.space-items-horz(v-else)
+						span {{ wallet.name }}
+					.flex-column.center.space-items-horz(v-else)
 						img.img-outer(:src="wallet.icon")
 						span {{ account.address | accountAddress }}
+			.gray-line.flex-column.flex-space-between
+				a.buy-tnode(href="https://pancakeswap.finance/swap?inputCurrency=0xe9e7cea3dedca5984780bafc599bd69add087d56&outputCurrency=0x7f12a37b6921ffac11fab16338b3ae67ee0c462b" target="_blank")
+					button
+						.flex.space-items-horz-small
+							img.img-outer(src="~/assets/img/tnode-icon-2.png")
+							span BUY TNODE NOW
 		.space-items(v-else)
 			template(v-if="!installed")
 				h3 {{ name }} Not Found
@@ -97,6 +100,12 @@ export default Vue.extend({
 </script>
 
 <style lang="sass">
+#web3
+	.message
+		padding: 0
+	background-color: $bg2-1
+	@media (max-width: $breakpoint-mobile)
+		height: 100%
 #connect-modal, #web3
 	.space-items-big
 		width: 100%
@@ -111,6 +120,8 @@ export default Vue.extend({
 			justify-content: space-between
 			.img-outer
 				height: $unit6
+				margin-bottom: 1em
+				margin-right: 0
 	.divider
 		position: relative
 		color: $fg-1
@@ -131,4 +142,17 @@ export default Vue.extend({
 	.flex
 		display: flex
 		width: 100%
+	.gray-line
+		width: 100%
+		height: 100px
+		background: $bg2
+		line-height: auto
+		justify-content: center
+		a
+			text-decoration: none
+	.buy-tnode
+		align-self: center
+		img
+			border-radius: $unit10
+			width: $unit2
 </style>

@@ -24,19 +24,26 @@
 					template(v-slot:trigger)
 						.flex.space-items-horz
 							.connect-wallet
-								button.no-mobile.pill CONNECT WALLET
+								button.no-mobile.pill
+									.flex.space-items-horz
+										img(src="~/assets/svg/wallet.svg")
+										span CONNECT WALLET
+										.flex
+											.flex.dropdown-icon-expand(v-html="dropDownIconExpand")
+											.flex.dropdown-icon-collapse(v-html="dropDownIconCollapse")
 								.mobile(style="cursor: pointer")
-									img(src="~/assets/svg/wallet.svg")
-							.flex
-								.flex.dropdown-icon-expand(v-html="dropDownIconExpand")
-								.flex.dropdown-icon-collapse(v-html="dropDownIconCollapse")
+									.flex.space-items-horz
+										img(src="~/assets/svg/wallet.svg")
+										.flex
+											.flex.dropdown-icon-expand(v-html="dropDownIconExpand")
+											.flex.dropdown-icon-collapse(v-html="dropDownIconCollapse")
 					template(v-slot:default)
+						.opacity-line
+						.no-opacity
+							h3 Connect your wallet Trusted Node
 						Web3
-						a.center.buy-tnode(href="https://pancakeswap.finance/swap?inputCurrency=0xe9e7cea3dedca5984780bafc599bd69add087d56&outputCurrency=0x7f12a37b6921ffac11fab16338b3ae67ee0c462b" target="_blank")
-							button
-								.flex.space-items-horz-small
-									img(src="~/assets/img/tnode-icon-2.png")
-									span BUY TNODE NOW
+						.no-opacity
+
 		Wallets
 		ConnectModal
 </template>
@@ -100,6 +107,19 @@ export default Vue.extend({
 .logo-link
 	display: flex
 	align-items: center
+
+.tnode-ui >>> .flex
+	/deep/
+	.mobile
+		display: none
+		@media (max-width: $breakpoint-mobile)
+			display: flex
+	.no-mobile
+		@media (max-width: $breakpoint-mobile)
+			display: none
+	.no-tablet
+		@media (max-width: $breakpoint-tablet)
+			display: none
 
 #header
 	header
@@ -191,7 +211,7 @@ export default Vue.extend({
 		min-height: 50px
 		border: none
 		color: $white
-		padding: 0 $unit3
+		padding: 0 $unit1
 		font-size: $unit2
 		font-family: $font
 		font-weight: $font-weight-header
@@ -215,29 +235,32 @@ export default Vue.extend({
 		.dropdown-icon-collapse
 			display: block
 	.vts-dropdown__content
-		width: 500px
-		heigt: 800px
-		transform: translateX(-228px)
-		background-color: $bg-1
+		width: 440px
+		height: 1200px
+		transform: translateX(-160px)
 		@include box-shadow
-		.dropdown-item
-			padding: $unit-5 $unit3
-			cursor: pointer
-			.icon svg
-				width: 24px
-		.dropdown-item:last-child
-			border-radius: 0 0 20px 20px
-		.dropdown-item:hover
-			background: $fg
 		@media (max-width: $breakpoint-mobile)
-			transform: translateX(-380px)
+			transform: translateX(0px)
+			position: fixed
+			top: 70px
+			left: 0
+			width: 100%
+			height: calc(100% - 72px)
 		a.buy-tnode
 			align-self: center
-			margin-bottom: 1em
 			width: 100%
-	.vts-dropdown__content:not(:hover)
-		.dropdown-item.selected
-			background: $fg
+	.vts-dropdown
+		@media (max-width: $breakpoint-mobile)
+			display: block
+	.opacity-line
+		background-color: (0,0,0,0)
+		width: 100%;
+		height: 16px;
+		@media (max-width: $breakpoint-mobile)
+			height: 28px;
+	.no-opacity
+		padding: 3em
+		background-color: $bg2-1
 
 //TODO: Handle tablet size
 // @media (max-width: $breakpoint-tablet)
