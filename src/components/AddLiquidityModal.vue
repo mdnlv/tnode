@@ -1,6 +1,6 @@
 <template lang="pug">
 	Modal(
-		:name="`addLiquidity-${vaultAddress}`"
+		:name="`addLiquidity-${vault.address}`"
 		title="Add Liquidity"
 		height="auto"
 		@close="close"
@@ -10,36 +10,36 @@
 				p Add liquidity to receive LP tokens
 				.space-items-medium
 					MaxInput(
-						v-model="busdAmount"
+						v-model="tokenAAmount"
 						@input="onBusdChange"
-						:max="busdDenom.userBalance"
-						:symbol="busdDenom.symbol"
-						:symbolIcon="busdDenom.icon"
+						:max="tokenA.userBalance"
+						:symbol="tokenA.symbol"
+						:symbolIcon="tokenA.icon"
 						placeholder="Enter amount"
 						:showUsingMax="false"
 					)
-						span balance: {{ busdDenom.userBalance | floorToDP(6) }} {{ busdDenom.symbol }}
+						span balance: {{ tokenA.userBalance | floorToDP(6) }} {{ tokenA.symbol }}
 					.center(v-html="plusIcon")
 					MaxInput(
-						v-model="tnodeAmount"
+						v-model="tokenBAmount"
 						@input="onTNodeChange"
-						:max="tnodeDenom.userBalance"
-						:symbol="tnodeDenom.symbol"
-						:symbolIcon="tnodeDenom.icon"
+						:max="tokenB.userBalance"
+						:symbol="tokenB.symbol"
+						:symbolIcon="tokenB.icon"
 						placeholder="Enter amount"
 						:showUsingMax="false"
 					)
-						span balance: {{ tnodeDenom.userBalance | floorToDP(6) }} {{ tnodeDenom.symbol }}
+						span balance: {{ tokenB.userBalance | floorToDP(6) }} {{ tokenB.symbol }}
 				.prices.space-before
 					.container.center
 						table
 							tbody
 								tr
-									td.bare.right-text {{ ratio2 }}
-									td TNODE per BUSD
+									td.bare.right-text {{ ratio2 | floorToDP(6) }}
+									td {{ tokenB.symbol }} per {{ tokenA.symbol }}
 								tr
-									td.bare.right-text {{ ratio1 }}
-									td BUSD per TNODE
+									td.bare.right-text {{ ratio1 | floorToDP(6) }}
+									td {{ tokenA.symbol }} per {{ tokenB.symbol }}
 				StatusMessage(:message="status")
 				.flex-end.space-before
 					button.bare.big-text(@click="addLiquidity") ADD LIQUIDITY
@@ -51,7 +51,7 @@ import bn from "big.js"
 import Modal from "~/components/Modal.vue"
 import MaxInput from "~/components/MaxInput.vue"
 import StatusMessage from "~/components/StatusMessage.vue"
-import { ERC20Denom, EVMAccount } from "~/_types"
+import { ERC20Denom, EVMAccount, Vault, LPDenom } from "~/_types"
 
 const DECIMAL = 5
 
@@ -62,15 +62,15 @@ export default Vue.extend({
 		StatusMessage,
 	},
 	props: {
-		vaultAddress: {
-			type: String as Vue.PropType<string>,
+		vault: {
+			type: Object as Vue.PropType<Vault>,
 			required: true,
 		},
 	},
 	data() {
 		return {
-			busdAmount: "",
-			tnodeAmount: "",
+			tokenAAmount: "",
+			tokenBAmount: "",
 			status: null as string | null,
 			plusIcon: require("~/assets/svg/ui/plus-circle.svg?raw"),
 			errorIcon: require("~/assets/svg/ui/error_accent.svg?raw"),
@@ -80,95 +80,95 @@ export default Vue.extend({
 		account(): EVMAccount | null {
 			return this.$store.getters["web3/account"] as EVMAccount
 		},
-		busdDenom(): ERC20Denom {
-			return this.$store.getters["denoms/erc20"].find(e => e.id === "busd")
+		tokenA(): ERC20Denom | undefined {
+			return this.$store.getters["denoms/erc20"].find(e => e.id === (this.vault.stakeDenom as LPDenom).denoms![0].id)
 		},
-		tnodeDenom(): ERC20Denom {
-			return this.$store.getters["denoms/erc20"].find(e => e.id === "tnode")
+		tokenB(): ERC20Denom {
+			return this.$store.getters["denoms/erc20"].find(e => e.id === (this.vault.stakeDenom as LPDenom).denoms![1].id)
 		},
-		ratio1(): string {
-			if (!this.tnodeDenom.price) {
-				return ""
+		ratio1(): bn {
+			if (!this.tokenB.price) {
+				return bn(0)
 			}
-			return this.tnodeDenom.price.toFixed(DECIMAL)
+			return this.tokenB.price
 		},
-		ratio2(): string {
-			if (!this.tnodeDenom.price) {
-				return ""
+		ratio2(): bn {
+			if (!this.tokenB.price) {
+				return bn(0)
 			}
-			return bn(1).div(this.tnodeDenom.price).toFixed(DECIMAL)
+			return bn(1).div(this.tokenB.price)
 		},
 	},
 	methods: {
 		reset() {
-			this.busdAmount = ""
-			this.tnodeAmount = ""
+			this.tokenAAmount = ""
+			this.tokenBAmount = ""
 			this.status = null
 		},
 		close() {
-			this.$modal.show(`stake-${this.vaultAddress}`)
+			this.$modal.show(`stake-${this.vault.address}`)
 		},
 		onBusdChange(value: string) {
-			if (!this.tnodeDenom.price) {
+			if (!this.tokenB.price) {
 				return
 			}
 			try {
 				const amount = parseFloat(value)
-				this.tnodeAmount = bn(amount).div(this.tnodeDenom.price).toFixed(DECIMAL)
+				this.tokenBAmount = bn(amount).div(this.tokenB.price).toFixed(DECIMAL)
 				this.status = ""
 			}
 			catch {
-				this.tnodeAmount = "0"
+				this.tokenBAmount = "0"
 			}
 		},
 		onTNodeChange(value: string) {
-			if (!this.tnodeDenom.price) {
+			if (!this.tokenB.price) {
 				return
 			}
 			try {
 				const amount = parseFloat(value)
-				this.busdAmount = this.tnodeDenom.price.times(amount).toFixed(DECIMAL)
+				this.tokenAAmount = this.tokenB.price.times(amount).toFixed(DECIMAL)
 				this.status = ""
 			}
 			catch {
-				this.busdAmount = "0"
+				this.tokenAAmount = "0"
 			}
 		},
 		async addLiquidity() {
-			if (!this.busdDenom || !this.busdDenom.userBalance || !this.tnodeDenom || !this.tnodeDenom.userBalance) {
+			if (!this.tokenA || !this.tokenA.userBalance || !this.tokenB || !this.tokenB.userBalance) {
 				this.status = "could not find balance"
 				return
 			}
-			let busdValue = bn(0)
-			let tnodeValue = bn(0)
+			let tokenAValue = bn(0)
+			let tokenBValue = bn(0)
 			try {
-				busdValue = bn(this.busdAmount)
-				tnodeValue = bn(this.tnodeAmount)
+				tokenAValue = bn(this.tokenAAmount)
+				tokenBValue = bn(this.tokenBAmount)
 			}
 			catch (e) {
 				this.status = "please enter valid amounts"
 				return
 			}
-			if (this.busdDenom.userBalance.lt(busdValue)) {
-				this.status = "insufficient BUSD"
+			if (this.tokenA.userBalance.lt(tokenAValue)) {
+				this.status = `insufficient ${this.tokenA.symbol}`
 				return
 			}
-			if (this.tnodeDenom.userBalance.lt(tnodeValue)) {
-				this.status = "insufficient TNODE"
+			if (this.tokenB.userBalance.lt(tokenBValue)) {
+				this.status = `insufficient ${this.tokenB.symbol}`
 				return
 			}
 			try {
 				const response = await this.$store.dispatch("denoms/addLiquidity", {
-					tokenA: this.busdDenom,
-					tokenB: this.tnodeDenom,
-					amountA: this.busdAmount,
-					amountB: this.tnodeAmount,
+					tokenA: this.tokenA,
+					tokenB: this.tokenB,
+					amountA: this.tokenAAmount,
+					amountB: this.tokenBAmount,
 				})
 				this.$emit("response", {
 					response,
 					amounts: [
-						this.busdAmount,
-						this.tnodeAmount,
+						this.tokenAAmount,
+						this.tokenBAmount,
 					],
 				})
 			}

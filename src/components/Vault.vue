@@ -162,8 +162,8 @@
 				#buttons
 					button.bare.big-text(@click="closeTransactionModal") CLOSE
 		AddLiquidityModal(
-			v-if="loaded"
-			:vaultAddress="vault.address"
+			v-if="loaded && vault.stakeDenom.denoms"
+			:vault="vault"
 			@response="handleResponse('addLiquidity', $event.response, $event.amounts)"
 			ref="addLiquidityModal"
 		)

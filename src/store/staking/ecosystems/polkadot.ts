@@ -198,9 +198,8 @@ export const actions: ActionTree<LocalState, RootState> = {
 			const client = await dispatch("_getClient", validator)
 
 			const uAmount = new BN(times10toPow(amount, validator.denom.decimals).toString())
-			const chillTx = await client.tx.staking.chill()
 			const unbondTx = await client.tx.staking.unbond(uAmount)
-			const Txs = [chillTx, unbondTx]
+			const Txs = [unbondTx]
 			// eslint-disable-next-line promise/param-names
 			const TxHash = await new Promise((resolve, _reject) => {
 				client.tx.utility

@@ -16,6 +16,7 @@ export type Network = {
 		gasLimit: number
 	}
 	txLinkTemplate: string
+	swapRouterAddress: string
 }
 
 export type Account = {

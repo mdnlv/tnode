@@ -79,6 +79,9 @@ export const actions: ActionTree<LocalState, RootState> = {
 		const userRewards = divBy10toPow(rewardTotal, validator.denom.decimals)
 		commit("staking/userRewards", { ...validator, userRewards }, { root: true })
 	},
+	async getDelegations(_) {
+		return await null
+	},
 	async delegate({ dispatch, rootGetters }, { amount, validator }: {amount: number, validator: Validator}) {
 		try {
 			const [account] = rootGetters["staking/wallets/metamask/accounts"]
@@ -161,6 +164,9 @@ export const actions: ActionTree<LocalState, RootState> = {
 		catch (e) {
 			return await dispatch("_handleError", { error: e })
 		}
+	},
+	async redelegate() {
+		return await { message: "not implemented" }
 	},
 	_getProvider(_, validator: Validator) {
 		return new ethers.providers.JsonRpcProvider(validator.rpcEndpoint)

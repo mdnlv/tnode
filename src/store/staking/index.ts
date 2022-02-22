@@ -7,10 +7,13 @@ import {
 	Validator,
 	ValidatorComingSoon,
 	NativeDenom,
-	// SupportedNetworks,
+	SupportedNetworks,
 } from "~/_types"
 
 import { divBy10toPow } from "~/_utils"
+
+// for dev: set this to match the chainName of a validator to show only that validator
+const onlyValidator = null
 
 const defaultState = {
 	connectingWalletId: null as string | null,
@@ -42,7 +45,7 @@ const defaultState = {
 		{
 			chainName: "Sentinel",
 			chainId: "sentinelhub-2",
-			rpcEndpoint: "https://sentinel-rpc.trustednode.io",
+			rpcEndpoint: "https://dvpn-rpc.hydrogenx.tk",
 			linkTemplate: "https://www.mintscan.io/sentinel/validators/###",
 			txLinkTemplate: "https://www.mintscan.io/sentinel/txs/###",
 			address: "sentvaloper1tc35afn4xpem9cp97rc5lfu22efnx0y8fa7hlr",
@@ -88,7 +91,7 @@ const defaultState = {
 		{
 			chainName: "Persistence",
 			chainId: "core-1",
-			rpcEndpoint: "https://persistence-rpc.trustednode.io",
+			rpcEndpoint: "https://persistence-rpc.hydrogenx.tk",
 			linkTemplate: "https://www.mintscan.io/persistence/validators/###",
 			txLinkTemplate: "https://www.mintscan.io/persistence/txs/###",
 			address: "persistencevaloper155e333y5pvv3q7h2c9cf620lsc04m2vmvh2wtx",
@@ -180,7 +183,7 @@ const defaultState = {
 		{
 			chainName: "Sifchain",
 			chainId: "sifchain-1",
-			rpcEndpoint: "https://sifchain-rpc.trustednode.io",
+			rpcEndpoint: "https://sifchain-rpc.hydrogenx.tk",
 			linkTemplate: "https://www.mintscan.io/sifchain/validators/###",
 			txLinkTemplate: "https://www.mintscan.io/sifchain/txs/###",
 			address: "sifvaloper1wa8fykgshxkf3u5jh3mnfhd0lx0rzf4tthpph3",
@@ -194,59 +197,58 @@ const defaultState = {
 			walletId: "keplr",
 			disclaimer: "(Note: Keplr with Ledger Nano is not currently supported)",
 			unstakingDays: 21,
+			minimumStakingAmount: null,
 			userDelegated: null,
 			loadingPersonalInfo: false,
 			userRewards: null,
 			promotion: true,
 		},
-		// {
-		// 	name: "Polygon",
-		// 	chainId: SupportedNetworks.ETH_MAINNET,
-		// 	rpcEndpoint: "https://rpc.ankr.com/eth/486f6d938d85e35aeacf83a59afd95c4fab739093c8f919adb258799d81d51bf",
-		// 	explorerLink: "https://etherscan.io/tx/###",
-		// 	validatorAddress: "0x8735a1a9c44118b4957e4dd36478438795e74a38",
-		// 	ecosystemId: "polygon",
-		// 	totalDelegated: null,
-		// 	apr: bn(10),
-		// 	denomId: "matic",
-		// 	gas: 2500000000,
-		// 	transactionFee: 60,
-		// 	walletId: "metamask",
-		// 	disclaimer: null,
-		// 	unstakingDays: 1,
-		// 	minimumStakingAmount: null,
-		// 	operator: {
-		// 		name: "Trusted Node",
-		// 		link: "https://www.mintscan.io/sifchain/validators/sifvaloper1wa8fykgshxkf3u5jh3mnfhd0lx0rzf4tthpph3",
-		// 	},
-		// 	userDelegated: null,
-		// 	loadingPersonalInfo: false,
-		// 	userRewards: null,
-		// },
-		// {
-		// 	name: "Polygon Test",
-		// 	chainId: SupportedNetworks.ETH_GOERLI,
-		// 	rpcEndpoint: "https://rpc.goerli.mudit.blog/",
-		// 	explorerLink: "https://goerli.etherscan.io/tx/###",
-		// 	validatorAddress: "0xbe188d6641e8b680743a4815dfa0f6208038960f",
-		// 	ecosystemId: "polygon",
-		// 	totalDelegated: null,
-		// 	apr: bn(10),
-		// 	denomId: "matic",
-		// 	gas: 2500000000,
-		// 	transactionFee: 60,
-		// 	walletId: "metamask",
-		// 	disclaimer: null,
-		// 	unstakingDays: 1,
-		// 	minimumStakingAmount: null,
-		// 	operator: {
-		// 		name: "Trusted Node",
-		// 		link: "https://www.mintscan.io/sifchain/validators/sifvaloper1wa8fykgshxkf3u5jh3mnfhd0lx0rzf4tthpph3",
-		// 	},
-		// 	userDelegated: null,
-		// 	loadingPersonalInfo: false,
-		// 	userRewards: null,
-		// },
+		{
+			chainName: "Polygon",
+			chainId: SupportedNetworks.ETH_MAINNET,
+			rpcEndpoint: "https://rpc.ankr.com/eth/486f6d938d85e35aeacf83a59afd95c4fab739093c8f919adb258799d81d51bf",
+			linkTemplate: "https://etherscan.io/address/###",
+			txLinkTemplate: "https://etherscan.io/tx/###",
+			address: "0x8735a1a9c44118b4957e4dd36478438795e74a38",
+			operatorName: "MANTRA DAO",
+			ecosystemId: "polygon",
+			totalDelegated: null,
+			apr: bn(9.6),
+			denomId: "matic",
+			gas: 2500000000,
+			transactionFee: 60,
+			walletId: "metamask",
+			disclaimer: null,
+			unstakingDays: 1,
+			minimumStakingAmount: null,
+			userDelegated: null,
+			loadingPersonalInfo: false,
+			userRewards: null,
+			promotion: false,
+		},
+		{
+			chainName: "Polygon Test",
+			chainId: SupportedNetworks.ETH_GOERLI,
+			rpcEndpoint: "https://rpc.goerli.mudit.blog/",
+			linkTemplate: "https://goerli.etherscan.io/address/###",
+			txLinkTemplate: "https://goerli.etherscan.io/tx/###",
+			address: "0xbe188d6641e8b680743a4815dfa0f6208038960f",
+			operatorName: "MANTRA DAO",
+			ecosystemId: "polygon",
+			totalDelegated: null,
+			apr: bn(9.6),
+			denomId: "matic",
+			gas: 2500000000,
+			transactionFee: 60,
+			walletId: "metamask",
+			disclaimer: null,
+			unstakingDays: 1,
+			minimumStakingAmount: null,
+			userDelegated: null,
+			loadingPersonalInfo: false,
+			userRewards: null,
+			promotion: false,
+		},
 	] as (Omit<Validator, "denom"> & { denomId: string })[],
 	validatorsComingSoon: [
 		{ chainName: "Polygon", denomName: "MATIC", icon: require("~/assets/img/polygon-inverted-icon.webp") },
@@ -284,11 +286,13 @@ export const getters: GetterTree<LocalState, RootState> = {
 	connectingWalletError: state => state.connectingWalletError,
 	validators(state, _getters, _rootState, rootGetters): Validator[] {
 		const denoms = rootGetters["denoms/native"] as NativeDenom[]
-		return state.validators.map(v => ({
-			...v,
-			denomId: undefined,
-			denom: denoms.find(d => d.id === v.denomId)!,
-		}))
+		return state.validators
+			.filter(v => !onlyValidator || onlyValidator === v.chainName)
+			.map(v => ({
+				...v,
+				denomId: undefined,
+				denom: denoms.find(d => d.id === v.denomId)!,
+			}))
 	},
 	validatorsComingSoon: state => state.validatorsComingSoon,
 	walletIds: state => uniq(state.validators.map(v => v.walletId)),
@@ -332,9 +336,10 @@ export const mutations: MutationTree<LocalState> = {
 
 export const actions: ActionTree<LocalState, RootState> = {
 	async getAllValidatorInfo({ commit, getters }) {
+		const apiURL = this.app.$config.backendUrl || "http://localhost:8080/api"
+		const validatorInfoURL = `${apiURL}/validator-info/`
 		try {
-			const apiURL = this.app.$config.backendUrl || "http://localhost:8080/api"
-			const { data } = await axios.get(`${apiURL}/validator-info/`)
+			const { data } = await axios.get(validatorInfoURL)
 			const aprResults = data?.latestAprValues || []
 			const totalStakedResults = data?.latestTotalStakedValues || []
 
@@ -353,9 +358,11 @@ export const actions: ActionTree<LocalState, RootState> = {
 				}
 			}
 		}
-		catch (e) {
-			// eslint-disable-next-line no-console
-			console.error(e)
+		catch (e: any) {
+			if (e.message !== "Network Error" || e.config.url !== validatorInfoURL) {
+				// eslint-disable-next-line no-console
+				console.error(e)
+			}
 		}
 		// for any values that were not gotten from the backend, fetch manually
 		const validators = getters.validators

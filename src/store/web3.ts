@@ -77,7 +77,10 @@ export const actions: ActionTree<LocalState, RootState> = {
 				params: [
 					omit(
 						networks.find(n => n.chainName === networkName),
-						["gasConfig"],
+						[
+							"gasConfig",
+							"swapRouterAddress",
+						],
 					),
 				],
 			})
