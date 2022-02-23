@@ -20,21 +20,21 @@
 							img(src="~/assets/img/tnode-icon-2.png")
 							span BUY TNODE NOW
 				.divider
-				VDropdown.nostyle.dropdown(:classes="classes")
+				HeaderDropdown.nostyle.dropdown(:classes="classes")
 					template(v-slot:trigger)
 						.flex.space-items-horz
 							.connect-wallet
+								.mobile(style="cursor: pointer")
+									.flex.space-items-horz
+										img(src="~/assets/svg/wallet.svg")
+										.flex.dropdown-icons
+											.flex.dropdown-icon-expand(v-html="dropDownIconExpand")
+											.flex.dropdown-icon-collapse(v-html="dropDownIconCollapse")
 								button.no-mobile.pill
 									.flex.space-items-horz
 										img(src="~/assets/svg/wallet.svg")
 										span CONNECT WALLET
-										.flex
-											.flex.dropdown-icon-expand(v-html="dropDownIconExpand")
-											.flex.dropdown-icon-collapse(v-html="dropDownIconCollapse")
-								.mobile(style="cursor: pointer")
-									.flex.space-items-horz
-										img(src="~/assets/svg/wallet.svg")
-										.flex
+										.flex.dropdown-icons
 											.flex.dropdown-icon-expand(v-html="dropDownIconExpand")
 											.flex.dropdown-icon-collapse(v-html="dropDownIconCollapse")
 					template(v-slot:default)
@@ -43,14 +43,13 @@
 							h3 Connect your wallet Trusted Node
 						Web3
 						.no-opacity
-
 		Wallets
 		ConnectModal
 </template>
 
 <script lang="ts">
 import Vue from "vue"
-import { VDropdown } from "vuetensils/src/components"
+import HeaderDropdown from "~/components/HeaderDropdown.vue"
 import Wallets from "~/components/Wallets.vue"
 import Web3 from "~/components/Web3.vue"
 import Hamburger from "~/components/Hamburger.vue"
@@ -65,7 +64,7 @@ export default Vue.extend({
 		Web3,
 		Hamburger,
 		LoadingValue,
-		VDropdown,
+		HeaderDropdown,
 		ConnectModal,
 	},
 	data() {
@@ -108,6 +107,9 @@ export default Vue.extend({
 	display: flex
 	align-items: center
 
+tnode-ui >>> .space-items-horz-big >>> :not(:last-child)
+	margin-right: 0
+
 .tnode-ui >>> .flex
 	/deep/
 	.mobile
@@ -127,9 +129,6 @@ export default Vue.extend({
 		width: 100%
 		background: $header-bg
 		padding: $header-padding 0
-		// padding-right: $space-medium
-		// @media (max-width: $breakpoint-mobile)
-		// 	padding-left: 0
 		.buttons
 			padding-left: $unit2
 		> .flex
@@ -144,7 +143,7 @@ export default Vue.extend({
 			> *:last-child
 				padding-right: $space-big
 				@media (max-width: $breakpoint-mobile)
-					padding-right: $space-medium
+					padding: 0
 			.logo
 				// height: $header-height
 				position: relative
@@ -171,12 +170,13 @@ export default Vue.extend({
 				@include hover-scale-opacity
 				--price-mr: #{$space-big}
 				margin-right: var(--price-mr)
+				font-size: 0.9rem
 				img
 					--price-img-mr: #{$unit1}
 					border-radius: $unit10
 					width: $unit4
-					margin-right: var(--price-img-mr)
 				@media (max-width: $breakpoint-mobile)
+					--price-mr: #{$space}
 					flex-direction: column
 					.price-icon
 						margin-right: 0
@@ -197,6 +197,8 @@ export default Vue.extend({
 			.divider
 				border-left: 1px solid $color
 				height: $unit5
+				@media (max-width: $breakpoint-mobile)
+					margin-right: 0
 
 			.connect-wallet
 				.button
@@ -206,7 +208,6 @@ export default Vue.extend({
 					span
 						transform: translateY(1px)
 
-	/deep/
 	.vts-dropdown__trigger
 		min-height: 50px
 		border: none
@@ -261,6 +262,9 @@ export default Vue.extend({
 	.no-opacity
 		padding: 3em
 		background-color: $bg2-1
+	.dropdown-icons
+		width: 28px
+		overflow: hidden
 
 //TODO: Handle tablet size
 // @media (max-width: $breakpoint-tablet)
