@@ -5,12 +5,11 @@
 			.wallet-choices.flex-start
 				.wallet-choice.space-items(
 					v-for="wallet of wallets"
-					@click="connectWallet(wallet.id)"
 				)
-					.flex-column.center.space-items-horz(v-if="!account")
+					.flex-column.center.space-items-horz(v-if="!account || wallet.id !== account.walletId" @click="connectWallet(wallet.id)")
 						img.img-outer(:src="wallet.icon")
 						span {{ wallet.name }}
-					.flex-column.center.space-items-horz(v-else)
+					.flex-column.center.space-items-horz(v-else @click="disconnect()")
 						img.img-outer(:src="wallet.icon")
 						span {{ account.address | accountAddress }}
 			.gray-line.flex-column.flex-space-between
@@ -90,10 +89,14 @@ export default Vue.extend({
 			})
 			if (!this.connectingWalletError) {
 				this.$modal.hide("connecting-web3-wallet")
+				this.$store.commit("web3/connectingWalletId", null)
 			}
 		},
 		_close() {
 			this.$modal.hide("connecting-web3-wallet")
+		},
+		async disconnect() {
+			await this.$store.dispatch("web3/disconnect")
 		},
 	},
 })

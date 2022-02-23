@@ -1,6 +1,6 @@
 <template lang="pug">
-	div(:class="['vts-dropdown', classes.root]", @focus="isFocused = true", @blur="isFocused = false", @focusout="onFocusout")
-		button(:aria-expanded="!!isFocused", aria-haspopup="true", :class="['vts-dropdown__trigger', classes.trigger]", @click="isFocused = !isFocused")
+	div(:class="['vts-dropdown', classes.root]", @focus="isFocused = true", @blur="isFocused = false")
+		button(:aria-expanded="!!isFocused", aria-haspopup="true", :class="['vts-dropdown__trigger', classes.trigger]", @click="onFocusout")
 			slot(name="trigger") {{ text }}
 		transition(:name="transition")
 			div.vts-dropdown__content(v-if="!!isFocused", :class="[`vts-dropdown__content--${position}`, classes.content]")
@@ -39,20 +39,12 @@ export default Vue.extend({
 	data: () => ({
 		isFocused: false,
 	}),
-	mounted() {
-		document.addEventListener("click", this.onClickout)
-	},
 
 	methods: {
-		onClickout(e) {
-			if (!this.$el.contains(e.target)) {
-				this.isFocused = false
-			}
-		},
-		onFocusout(event) {
-			if (!this.$el.contains(event.relatedTarget)) {
-				this.isFocused = false
-			}
+		onFocusout() {
+			this.isFocused = !this.isFocused
+			this.$store.commit("web3/connectingWalletId", null)
+			this.$store.commit("web3/connectingWalletError", null)
 		},
 	},
 })

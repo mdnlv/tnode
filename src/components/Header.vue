@@ -56,7 +56,7 @@ import Hamburger from "~/components/Hamburger.vue"
 import LoadingValue from "~/components/LoadingValue.vue"
 import ConnectModal from "~/components/ConnectModal.vue"
 
-import { EVMAccount, EVMWallet } from "~/_types"
+import { EVMAccount } from "~/_types"
 
 export default Vue.extend({
 	components: {
@@ -80,12 +80,13 @@ export default Vue.extend({
 		account(): EVMAccount | null {
 			return this.$store.getters["web3/account"] as EVMAccount
 		},
-		connectedEVMWallet(): EVMWallet | null {
-			return this.$store.getters["web3/wallets"].find(w => w.id === this.account?.walletId) ?? null
-		},
 		tnodePrice(): number | null {
 			return this.$store.getters["denoms/all"].find(d => d.id === "tnode")!.price
 		},
+	},
+	mounted() {
+		this.$store.commit("web3/connectingWalletId", null)
+		this.$store.commit("web3/connectingWalletError", null)
 	},
 	methods: {
 		async connectWallet() {
@@ -171,6 +172,8 @@ tnode-ui >>> .space-items-horz-big >>> :not(:last-child)
 				--price-mr: #{$space-big}
 				margin-right: var(--price-mr)
 				font-size: 0.9rem
+				@media (max-width: $breakpoint-mobile-small)
+					font-size: 0.7rem
 				img
 					--price-img-mr: #{$unit1}
 					border-radius: $unit10
@@ -216,6 +219,8 @@ tnode-ui >>> .space-items-horz-big >>> :not(:last-child)
 		font-size: $unit2
 		font-family: $font
 		font-weight: $font-weight-header
+		@media (max-width: $breakpoint-mobile-small)
+			padding: 0 0.8rem
 		.icon svg
 			width: 24px
 		.dropdown-icon-collapse
