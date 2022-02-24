@@ -9,7 +9,7 @@
 			@closed="doneConnecting"
 		)
 			.header.flex-space-between
-				h3 Connect your wallet Trusted Node
+				h3 Connect your wallet
 				#close-button.cursor-pointer(@click="_close" v-html="crossIcon")
 			Web3
 </template>

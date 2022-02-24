@@ -20,27 +20,34 @@
 							img(src="~/assets/img/tnode-icon-2.png")
 							span BUY TNODE NOW
 				.divider
-				HeaderDropdown.nostyle.dropdown(:classes="classes")
+				HeaderDropdown.nostyle.dropdown
 					template(v-slot:trigger)
 						.flex.space-items-horz
 							.connect-wallet
 								.mobile(style="cursor: pointer")
-									.flex.space-items-horz
+									.flex.space-items-horz(v-if="!account")
 										img(src="~/assets/svg/wallet.svg")
 										.flex.dropdown-icons
 											.flex.dropdown-icon-expand(v-html="dropDownIconExpand")
 											.flex.dropdown-icon-collapse(v-html="dropDownIconCollapse")
+									.flex.space-items-horz.wallet(v-else @click="disconnect")
+										img(:src="connectedEVMWallet.icon")
+										.flex(v-html="dropDownIconExpand")
 								button.no-mobile.pill
-									.flex.space-items-horz
+									.flex.space-items-horz(v-if="!account")
 										img(src="~/assets/svg/wallet.svg")
 										span CONNECT WALLET
 										.flex.dropdown-icons
 											.flex.dropdown-icon-expand(v-html="dropDownIconExpand")
 											.flex.dropdown-icon-collapse(v-html="dropDownIconCollapse")
+									.flex.space-items-horz(v-else	@click="disconnect")
+										img(:src="connectedEVMWallet.icon")
+										span {{ account.address | accountAddress }}
+										.flex(v-html="dropDownIconExpand")
 					template(v-slot:default)
 						.opacity-line
 						.no-opacity
-							h3 Connect your wallet Trusted Node
+							h3 Connect your wallet
 						Web3
 						.no-opacity
 		Wallets
@@ -56,7 +63,7 @@ import Hamburger from "~/components/Hamburger.vue"
 import LoadingValue from "~/components/LoadingValue.vue"
 import ConnectModal from "~/components/ConnectModal.vue"
 
-import { EVMAccount } from "~/_types"
+import { EVMAccount, EVMWallet } from "~/_types"
 
 export default Vue.extend({
 	components: {
@@ -70,8 +77,6 @@ export default Vue.extend({
 	data() {
 		return {
 			logoImage: require("~/assets/svg/logo.svg?raw"),
-			classes: {
-			},
 			dropDownIconCollapse: require("~/assets/svg/ui/arrow_drop_down_collapse.svg?raw"),
 			dropDownIconExpand: require("~/assets/svg/ui/arrow_drop_down_expand.svg?raw"),
 		}
@@ -79,6 +84,9 @@ export default Vue.extend({
 	computed: {
 		account(): EVMAccount | null {
 			return this.$store.getters["web3/account"] as EVMAccount
+		},
+		connectedEVMWallet(): EVMWallet | null {
+			return this.$store.getters["web3/wallets"].find(w => w.id === this.account?.walletId) ?? null
 		},
 		tnodePrice(): number | null {
 			return this.$store.getters["denoms/all"].find(d => d.id === "tnode")!.price
@@ -210,8 +218,12 @@ tnode-ui >>> .space-items-horz-big >>> :not(:last-child)
 						height: $unit2
 					span
 						transform: translateY(1px)
+				img
+					height: $unit3
+				.wallet
+					margin-right: 0.4rem
 
-	.vts-dropdown__trigger
+	.header-dropdown__trigger
 		min-height: 50px
 		border: none
 		color: $white
@@ -226,7 +238,7 @@ tnode-ui >>> .space-items-horz-big >>> :not(:last-child)
 		.dropdown-icon-collapse
 			display: none
 			max-height: 24px
-	.vts-dropdown__trigger[aria-expanded]
+	.header-dropdown__trigger[aria-expanded]
 		.trigger-text
 			text-indent: -9999px
 			line-height: 0
@@ -240,7 +252,7 @@ tnode-ui >>> .space-items-horz-big >>> :not(:last-child)
 			display: none
 		.dropdown-icon-collapse
 			display: block
-	.vts-dropdown__content
+	.header-dropdown__content
 		width: 440px
 		height: 1200px
 		transform: translateX(-160px)
@@ -255,7 +267,7 @@ tnode-ui >>> .space-items-horz-big >>> :not(:last-child)
 		a.buy-tnode
 			align-self: center
 			width: 100%
-	.vts-dropdown
+	.header-dropdown
 		@media (max-width: $breakpoint-mobile)
 			display: block
 	.opacity-line

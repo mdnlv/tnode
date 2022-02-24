@@ -18,7 +18,7 @@
 						.flex.space-items-horz-small
 							img.img-outer(src="~/assets/img/tnode-icon-2.png")
 							span BUY TNODE NOW
-		.space-items(v-else)
+		.space-items.errors(v-else)
 			template(v-if="!installed")
 				h3 {{ name }} Not Found
 				p Please install the <a :href="link" target="_blank"> {{ name }} browser extension</a> and create an account to get started.
@@ -109,6 +109,8 @@ export default Vue.extend({
 	background-color: $bg2-1
 	@media (max-width: $breakpoint-mobile)
 		height: 100%
+	.errors
+		padding: 0 2em
 #connect-modal, #web3
 	.space-items-big
 		width: 100%
