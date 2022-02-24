@@ -2,16 +2,22 @@
 #web3
 	.message
 		.space-items-big(v-if="!connectingWalletId")
-			.wallet-choices.flex-start
-				.wallet-choice.space-items(
-					v-for="wallet of wallets"
-				)
+			.wallet-choices.flex-start(v-if="!account")
+				.wallet-choice.space-items(v-for="wallet of wallets")
 					.flex-column.center.space-items-horz(v-if="!account || wallet.id !== account.walletId" @click="connectWallet(wallet.id)")
 						img.img-outer(:src="wallet.icon")
 						span {{ wallet.name }}
 					.flex-column.center.space-items-horz(v-else @click="disconnect()")
 						img.img-outer(:src="wallet.icon")
 						span {{ account.address | accountAddress }}
+			.wallet-choices.flex-start(v-else)
+				.wallet-choice.space-items
+					.flex-column.center.space-items-horz(@click="disconnect")
+						button.pill.disconnect-btn
+							.flex.space-items-horz
+								img.disconnect-img(:src="connectedEVMWallet.icon")
+								span DISCONNECT WALLET
+						span {{ account.address }}
 			.gray-line.flex-column.flex-space-between
 				a.buy-tnode(href="https://pancakeswap.finance/swap?inputCurrency=0xe9e7cea3dedca5984780bafc599bd69add087d56&outputCurrency=0x7f12a37b6921ffac11fab16338b3ae67ee0c462b" target="_blank")
 					button
@@ -39,7 +45,7 @@
 
 <script lang="ts">
 import Vue from "vue"
-import { Wallet, EVMAccount } from "~/_types"
+import { Wallet, EVMAccount, EVMWallet } from "~/_types"
 
 export default Vue.extend({
 	data() {
@@ -69,6 +75,9 @@ export default Vue.extend({
 		},
 		account(): EVMAccount | null {
 			return this.$store.getters["web3/account"] as EVMAccount
+		},
+		connectedEVMWallet(): EVMWallet | null {
+			return this.$store.getters["web3/wallets"].find(w => w.id === this.account?.walletId) ?? null
 		},
 	},
 	watch: {
@@ -127,6 +136,10 @@ export default Vue.extend({
 				height: $unit6
 				margin-bottom: 1em
 				margin-right: 0
+			.disconnect-img
+				height: $unit3
+			.disconnect-btn
+				margin-bottom: $unit1
 	.divider
 		position: relative
 		color: $fg-1

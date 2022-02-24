@@ -30,7 +30,7 @@
 										.flex.dropdown-icons
 											.flex.dropdown-icon-expand(v-html="dropDownIconExpand")
 											.flex.dropdown-icon-collapse(v-html="dropDownIconCollapse")
-									.flex.space-items-horz.wallet(v-else @click="disconnect")
+									.flex.space-items-horz.wallet(v-else)
 										img(:src="connectedEVMWallet.icon")
 										.flex(v-html="dropDownIconExpand")
 								button.no-mobile.pill
@@ -40,14 +40,14 @@
 										.flex.dropdown-icons
 											.flex.dropdown-icon-expand(v-html="dropDownIconExpand")
 											.flex.dropdown-icon-collapse(v-html="dropDownIconCollapse")
-									.flex.space-items-horz(v-else	@click="disconnect")
+									.flex.space-items-horz(v-else)
 										img(:src="connectedEVMWallet.icon")
 										span {{ account.address | accountAddress }}
 										.flex(v-html="dropDownIconExpand")
 					template(v-slot:default)
 						.opacity-line
-						.no-opacity
-							h3 Connect your wallet
+						.no-opacity.center
+							h3(v-if="!account") Connect your wallet
 						Web3
 						.no-opacity
 		Wallets

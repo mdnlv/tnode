@@ -3,14 +3,12 @@
 		button.header-dropdown__trigger(:aria-expanded="!!isFocused", aria-haspopup="true", @click="onFocusout")
 			slot(name="trigger") {{ text }}
 		transition(:name="transition")
-			.header-dropdown__content(v-if="!!isFocused && !account")
+			.header-dropdown__content(v-if="!!isFocused")
 				slot
 </template>
 
 <script lang="ts">
 import Vue from "vue"
-
-import { EVMAccount } from "~/_types"
 
 export default Vue.extend({
 	name: "VDrawer",
@@ -29,12 +27,6 @@ export default Vue.extend({
 	data: () => ({
 		isFocused: false,
 	}),
-
-	computed: {
-		account(): EVMAccount | null {
-			return this.$store.getters["web3/account"] as EVMAccount
-		},
-	},
 
 	methods: {
 		onFocusout() {
