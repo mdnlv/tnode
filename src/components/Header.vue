@@ -46,8 +46,9 @@
 										.flex(v-html="dropDownIconExpand")
 					template(v-slot:default)
 						.opacity-line
-						.no-opacity.center
+						.no-opacity
 							h3(v-if="!account") Connect your wallet
+							h3(v-else) Connected wallet
 						Web3
 						.no-opacity
 		Wallets

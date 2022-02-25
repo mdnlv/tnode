@@ -7,17 +7,19 @@
 					.flex-column.center.space-items-horz(v-if="!account || wallet.id !== account.walletId" @click="connectWallet(wallet.id)")
 						img.img-outer(:src="wallet.icon")
 						span {{ wallet.name }}
-					.flex-column.center.space-items-horz(v-else @click="disconnect()")
+					.flex-column.center.space-items-horz(v-else @click="disconnect")
 						img.img-outer(:src="wallet.icon")
 						span {{ account.address | accountAddress }}
-			.wallet-choices.flex-start(v-else)
-				.wallet-choice.space-items
-					.flex-column.center.space-items-horz(@click="disconnect")
-						button.pill.disconnect-btn
-							.flex.space-items-horz
-								img.disconnect-img(:src="connectedEVMWallet.icon")
-								span DISCONNECT WALLET
-						span {{ account.address }}
+			.flex-column.connected(v-else)
+				.flex.space-items-horz
+					img.wallet-icon(:src="connectedEVMWallet.icon")
+					span {{ account.address | accountAddress }}
+				.center
+					button.big-padding
+						span CHANGE WALLET
+				a.flex.space-items-horz.disconnect(@click="disconnect")
+					.img-outer(v-html="disconnectIcon")
+					span DISCONNECT
 			.gray-line.flex-column.flex-space-between
 				a.buy-tnode(href="https://pancakeswap.finance/swap?inputCurrency=0xe9e7cea3dedca5984780bafc599bd69add087d56&outputCurrency=0x7f12a37b6921ffac11fab16338b3ae67ee0c462b" target="_blank")
 					button
@@ -51,7 +53,7 @@ export default Vue.extend({
 	data() {
 		return {
 			installed: false,
-			crossIcon: require("~/assets/svg/ui/cross.svg?raw"),
+			disconnectIcon: require("~/assets/svg/disconnect.svg?raw"),
 		}
 	},
 	computed: {
@@ -120,9 +122,27 @@ export default Vue.extend({
 		height: 100%
 	.errors
 		padding: 0 2em
+	.wallet-icon
+		height: $unit3
+
+#connect-modal
+	#web3
+		margin-left: -$space-big
+		margin-right: -$space-big
+
 #connect-modal, #web3
 	.space-items-big
 		width: 100%
+	.disconnect
+		color: $fg
+		margin-top: $unit1
+	.connected
+		padding: 0 4em
+		> *:not(:last-child)
+			padding-bottom: $unit1
+	a
+		text-decoration: none
+		cursor: pointer
 	.wallet-choices
 		align-items: stretch
 		width: 100%
