@@ -14,7 +14,7 @@
 				.flex.space-items-horz
 					img.wallet-icon(:src="connectedEVMWallet.icon")
 					span {{ account.address | accountAddress }}
-				.center
+				//-.center
 					button.big-padding
 						span CHANGE WALLET
 				a.flex.space-items-horz.disconnect(@click="disconnect")
