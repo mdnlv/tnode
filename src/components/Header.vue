@@ -8,35 +8,61 @@
 					nuxt-link.logo-link(:to="'/'" v-html="logoImage")
 			.flex.space-items-horz-big.buttons.flex-wrap.wrap-space
 				.price.flex.space-items-horz(@click="addToMetamask")
-					img(src="~/assets/img/tnode-icon-2.png")
+					.price-icon
+						img(src="~/assets/img/tnode-icon-2.png")
 					LoadingValue(:value="tnodePrice" #default="{ value }")
 						p.bold
 							span.number ${{ value | floorToDPorE(4) }}
 				.divider.no-mobile
-				a.buy-tnode(href="https://pancakeswap.finance/swap?inputCurrency=0xe9e7cea3dedca5984780bafc599bd69add087d56&outputCurrency=0x7f12a37b6921ffac11fab16338b3ae67ee0c462b" target="_blank")
+				a.no-mobile.buy-tnode(href="https://pancakeswap.finance/swap?inputCurrency=0xe9e7cea3dedca5984780bafc599bd69add087d56&outputCurrency=0x7f12a37b6921ffac11fab16338b3ae67ee0c462b" target="_blank")
 					button
 						.flex.space-items-horz-small
 							img(src="~/assets/img/tnode-icon-2.png")
 							span BUY TNODE NOW
-				.divider.no-mobile
-				.connect-wallet
-					button.pill(v-if="!account" @click="connectWallet") CONNECT WALLET
-					.button.pill.flex.space-items-horz(
-						v-else
-						@click="disconnect"
-					)
-						img(:src="connectedEVMWallet.icon")
-						span {{ account.address | accountAddress }}
+				.divider
+				HeaderDropdown.nostyle.dropdown
+					template(v-slot:trigger)
+						.flex.space-items-horz
+							.connect-wallet
+								.mobile(style="cursor: pointer")
+									.flex.space-items-horz(v-if="!account")
+										img(src="~/assets/svg/wallet.svg")
+										.flex.dropdown-icons
+											.flex.dropdown-icon-expand(v-html="dropDownIconExpand")
+											.flex.dropdown-icon-collapse(v-html="dropDownIconCollapse")
+									.flex.space-items-horz.wallet(v-else)
+										img(:src="connectedEVMWallet.icon")
+										.flex(v-html="dropDownIconExpand")
+								button.no-mobile.pill
+									.flex.space-items-horz(v-if="!account")
+										img(src="~/assets/svg/wallet.svg")
+										span CONNECT WALLET
+										.flex.dropdown-icons
+											.flex.dropdown-icon-expand(v-html="dropDownIconExpand")
+											.flex.dropdown-icon-collapse(v-html="dropDownIconCollapse")
+									.flex.space-items-horz(v-else)
+										img(:src="connectedEVMWallet.icon")
+										span {{ account.address | accountAddress }}
+										.flex(v-html="dropDownIconExpand")
+					template(v-slot:default)
+						.opacity-line
+						.no-opacity
+							h3(v-if="!account") Connect your wallet
+							h3(v-else) Connected wallet
+						Web3
+						.no-opacity
 		Wallets
-		Web3
+		ConnectModal
 </template>
 
 <script lang="ts">
 import Vue from "vue"
+import HeaderDropdown from "~/components/HeaderDropdown.vue"
 import Wallets from "~/components/Wallets.vue"
 import Web3 from "~/components/Web3.vue"
 import Hamburger from "~/components/Hamburger.vue"
 import LoadingValue from "~/components/LoadingValue.vue"
+import ConnectModal from "~/components/ConnectModal.vue"
 
 import { EVMAccount, EVMWallet } from "~/_types"
 
@@ -46,10 +72,14 @@ export default Vue.extend({
 		Web3,
 		Hamburger,
 		LoadingValue,
+		HeaderDropdown,
+		ConnectModal,
 	},
 	data() {
 		return {
 			logoImage: require("~/assets/svg/logo.svg?raw"),
+			dropDownIconCollapse: require("~/assets/svg/ui/arrow_drop_down_collapse.svg?raw"),
+			dropDownIconExpand: require("~/assets/svg/ui/arrow_drop_down_expand.svg?raw"),
 		}
 	},
 	computed: {
@@ -62,6 +92,10 @@ export default Vue.extend({
 		tnodePrice(): number | null {
 			return this.$store.getters["denoms/all"].find(d => d.id === "tnode")!.price
 		},
+	},
+	mounted() {
+		this.$store.commit("web3/connectingWalletId", null)
+		this.$store.commit("web3/connectingWalletError", null)
 	},
 	methods: {
 		async connectWallet() {
@@ -77,11 +111,27 @@ export default Vue.extend({
 })
 </script>
 
-<style lang="sass" scoped>
+<style lang="sass">
 
 .logo-link
 	display: flex
 	align-items: center
+
+tnode-ui >>> .space-items-horz-big >>> :not(:last-child)
+	margin-right: 0
+
+.tnode-ui >>> .flex
+	/deep/
+	.mobile
+		display: none
+		@media (max-width: $breakpoint-mobile)
+			display: flex
+	.no-mobile
+		@media (max-width: $breakpoint-mobile)
+			display: none
+	.no-tablet
+		@media (max-width: $breakpoint-tablet)
+			display: none
 
 #header
 	header
@@ -89,9 +139,6 @@ export default Vue.extend({
 		width: 100%
 		background: $header-bg
 		padding: $header-padding 0
-		// padding-right: $space-medium
-		// @media (max-width: $breakpoint-mobile)
-		// 	padding-left: 0
 		.buttons
 			padding-left: $unit2
 		> .flex
@@ -106,7 +153,7 @@ export default Vue.extend({
 			> *:last-child
 				padding-right: $space-big
 				@media (max-width: $breakpoint-mobile)
-					padding-right: $space-medium
+					padding: 0
 			.logo
 				// height: $header-height
 				position: relative
@@ -126,15 +173,29 @@ export default Vue.extend({
 				b
 					color: $fg2
 			.price
+				display: flex
+				flex-direction: row
+				justify-content: center
 				cursor: pointer
 				@include hover-scale-opacity
 				--price-mr: #{$space-big}
 				margin-right: var(--price-mr)
+				font-size: 0.9rem
+				@media (max-width: $breakpoint-mobile-small)
+					font-size: 0.7rem
 				img
 					--price-img-mr: #{$unit1}
 					border-radius: $unit10
 					width: $unit4
-					margin-right: var(--price-img-mr)
+				@media (max-width: $breakpoint-mobile)
+					--price-mr: #{$space}
+					flex-direction: column
+					.price-icon
+						margin-right: 0
+						margin-bottom: 0.2em
+						width: $unit3
+						img
+							margin-right: 0
 			.buy-tnode
 				img
 					border-radius: $unit10
@@ -148,6 +209,8 @@ export default Vue.extend({
 			.divider
 				border-left: 1px solid $color
 				height: $unit5
+				@media (max-width: $breakpoint-mobile)
+					margin-right: 0
 
 			.connect-wallet
 				.button
@@ -156,6 +219,70 @@ export default Vue.extend({
 						height: $unit2
 					span
 						transform: translateY(1px)
+				img
+					height: $unit3
+				.wallet
+					margin-right: 0.4rem
+
+	.header-dropdown__trigger
+		min-height: 50px
+		border: none
+		color: $white
+		padding: 0 $unit1
+		font-size: $unit2
+		font-family: $font
+		font-weight: $font-weight-header
+		@media (max-width: $breakpoint-mobile-small)
+			padding: 0 0.8rem
+		.icon svg
+			width: 24px
+		.dropdown-icon-collapse
+			display: none
+			max-height: 24px
+	.header-dropdown__trigger[aria-expanded]
+		.trigger-text
+			text-indent: -9999px
+			line-height: 0
+		.trigger-text::after
+			content: "Select Chain"
+			text-indent: 0
+			line-height: unset
+		.icon svg
+			display: none
+		.dropdown-icon-expand
+			display: none
+		.dropdown-icon-collapse
+			display: block
+	.header-dropdown__content
+		width: 440px
+		height: 1200px
+		transform: translateX(-160px)
+		@include box-shadow
+		@media (max-width: $breakpoint-mobile)
+			transform: translateX(0px)
+			position: fixed
+			top: 70px
+			left: 0
+			width: 100%
+			height: calc(100% - 72px)
+		a.buy-tnode
+			align-self: center
+			width: 100%
+	.header-dropdown
+		@media (max-width: $breakpoint-mobile)
+			display: block
+	.opacity-line
+		background-color: (0,0,0,0)
+		width: 100%;
+		height: 16px;
+		@media (max-width: $breakpoint-mobile)
+			height: 28px;
+	.no-opacity
+		padding: 3em
+		background-color: $bg2-1
+	.dropdown-icons
+		width: 28px
+		overflow: hidden
 
 //TODO: Handle tablet size
 // @media (max-width: $breakpoint-tablet)

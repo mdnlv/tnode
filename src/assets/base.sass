@@ -507,6 +507,8 @@
 		padding: $unit-1 $unit6
 		&.small-padding
 			padding: $unit-5 $unit-2
+		&.big-padding
+			padding: $unit-5 $unit6
 		border: none
 		text-align: center
 		background: $fg
@@ -543,7 +545,12 @@
 			&.concise
 				opacity: $opacity1
 			pointer-events: none
-
+		&.no-mobile
+			@media (max-width: $breakpoint-mobile)
+				display: none
+		&.vts-dropdown__trigger
+			border: 0
+				
 	// forms
 	form:not(.nostyle),
 	.form
