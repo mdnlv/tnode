@@ -41,6 +41,7 @@ export const state = () => ({
 				gasLimit: 200000,
 			},
 			txLinkTemplate: "https://bscscan.com/tx/###",
+			swapRouterAddress: "0x10ed43c718714eb63d5aa57b78b54704e256024e", // pancakeswap
 		},
 		{
 			chainId: `0x${Number(97).toString(16)}`,
@@ -66,6 +67,7 @@ export const state = () => ({
 				gasLimit: 200000,
 			},
 			txLinkTemplate: "https://testnet.bscscan.com/tx/###",
+			swapRouterAddress: null,
 		},
 		{
 			chainId: `0x${Number(4).toString(16)}`,
@@ -86,6 +88,7 @@ export const state = () => ({
 				gasLimit: 1000000,
 			},
 			txLinkTemplate: "https://rinkeby.etherscan.io/tx/###",
+			swapRouterAddress: null,
 		},
 		{
 			chainId: `0x${Number(5).toString(16)}`,
@@ -108,6 +111,7 @@ export const state = () => ({
 				gasLimit: 1000000,
 			},
 			txLinkTemplate: "https://goerli.etherscan.io/tx/###",
+			swapRouterAddress: null,
 		},
 		{
 			chainId: `0x${Number(250).toString(16)}`,
@@ -130,10 +134,11 @@ export const state = () => ({
 				"https://ftmscan.com",
 			],
 			gasConfig: {
-				gasPrice: times10toPow(0.00000015, 18, true),
-				gasLimit: 1000000,
+				gasPrice: times10toPow(0.0000005, 18, true),
+				gasLimit: 2000000,
 			},
 			txLinkTemplate: "https://ftmscan.com/tx/###",
+			swapRouterAddress: "0xF491e7B69E4244ad4002BC14e878a34207E38c29", // spookyswap
 		},
 	] as Network[],
 })

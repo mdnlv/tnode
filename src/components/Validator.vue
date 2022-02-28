@@ -61,7 +61,7 @@
 			:name="`delegate-${validator.chainId}`"
 			:loading="!modalLoaded"
 			:title="`Stake ${validator.denom.symbol}`"
-			:height="700"
+			:height="750"
 		)
 			.modal-form.space-items-big.form
 				.flex.space-items-horz

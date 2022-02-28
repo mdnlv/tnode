@@ -138,28 +138,28 @@ export const state = () => ({
 			lpId: "tnode-busd",
 			userBalance: null,
 		},
-		// {
-		// 	id: "ftm-busd-tnode",
-		// 	symbol: "LP",
-		// 	decimals: 18,
-		// 	price: bn(1),
-		// 	stable: true,
-		// 	icon: require("~/assets/img/busd-icon.png"),
-		// 	contractAddress: "0xC0Fb1ee924b59c3D371473eBC715E5D1356E9521",
-		// 	networkName: SupportedNetworks.FTM_MAINNET,
-		// 	userBalance: null,
-		// },
-		// {
-		// 	id: "ftm-tnode",
-		// 	symbol: "TNODE",
-		// 	decimals: 18,
-		// 	price: bn(0.1),
-		// 	stable: true,
-		// 	icon: require("~/assets/img/tnode-icon-2.png"),
-		// 	contractAddress: "0xE68A4f3BdFfEe49604B6dae9e973ee86fedC42dD",
-		// 	networkName: SupportedNetworks.FTM_MAINNET,
-		// 	userBalance: null,
-		// },
+		{
+			id: "usdc",
+			symbol: "USDC",
+			decimals: 6,
+			price: bn(1),
+			stable: true,
+			icon: require("~/assets/img/usdc-icon.png"),
+			contractAddress: "0x04068DA6C83AFCFA0e13ba15A6696662335D5B75",
+			networkName: SupportedNetworks.FTM_MAINNET,
+			userBalance: null,
+		},
+		{
+			id: "ftm-tnode",
+			symbol: "TNODE",
+			decimals: 18,
+			price: null,
+			stable: false,
+			icon: require("~/assets/img/tnode-icon-2.png"),
+			contractAddress: "0x7FC5670B2041d34414B0b2178Fc660b1E1faF801",
+			networkName: SupportedNetworks.FTM_MAINNET,
+			userBalance: null,
+		},
 	] as ERC20Denom[],
 	lp: [
 		{
@@ -175,6 +175,19 @@ export const state = () => ({
 				"tnode",
 			],
 		},
+		{
+			id: "tnode-usdc",
+			symbol: "LP",
+			price: null as bn | null,
+			icon: require("~/assets/img/usdc-icon.png"),
+			contractAddress: "0x9206444A1820c508FbA5bF815713451Ee540B3c8", // LP token
+			networkName: SupportedNetworks.FTM_MAINNET,
+			decimals: 18,
+			denomIds: [
+				"usdc",
+				"ftm-tnode",
+			],
+		},
 	],
 })
 
@@ -186,9 +199,6 @@ export type AddLiquidityPayload = {
 	amountA: BigSource,
 	amountB: BigSource,
 }
-
-// TODO: put this somewhere else
-const poolAddress = "0x10ed43c718714eb63d5aa57b78b54704e256024e"		// PancakeSwap Router address
 
 export const getters: GetterTree<LocalState, RootState> = {
 	coinGeckoIds: state => uniq([
@@ -407,27 +417,31 @@ export const actions: ActionTree<LocalState, RootState> = {
 			status: "pending",
 		}
 	},
-	async _getUniswapContractSigner(_, { networkName }: {networkName: string}): Promise<ETHContract> {
+	async _getUniswapContractSigner({ rootGetters }, { networkName }: {networkName: string}): Promise<ETHContract> {
 		const poolImmutablesAbi = [
 			"function addLiquidity(address tokenA, address tokenB, uint256 amountADesired, uint256 amountBDesired, uint256 amountAMin, uint256 amountBMin, address to, uint256 deadline)",
 		]
 		const offlineSigner = await this.dispatch("web3/getOfflineSigner", { networkName, switchNetwork: true }) as ethers.providers.JsonRpcSigner
+		const networks = rootGetters["networks/all"] as Network[]
+		const network = networks.find(n => n.chainName === networkName)!
 		return new ethers.Contract(
-			poolAddress,
+			network.swapRouterAddress,
 			poolImmutablesAbi,
 			offlineSigner,
 		)
 	},
-	async _approveUsage({ dispatch }, { account, token }: {account: EVMAccount, token: ERC20Denom}) {
+	async _approveUsage({ dispatch, rootGetters }, { account, token }: {account: EVMAccount, token: ERC20Denom}) {
 		const tokenContract = await dispatch("_getTokenContract", { denom: token }) as ETHContract
 		const offlineSigner = await this.dispatch("web3/getOfflineSigner", { networkName: token.networkName, switchNetwork: true }) as ethers.providers.JsonRpcSigner
 		const tokenContractSigner = tokenContract.connect(offlineSigner)
-		const allowance = await tokenContractSigner.allowance(account.address, poolAddress) as { toString: () => string }
+		const networks = rootGetters["networks/all"] as Network[]
+		const network = networks.find(n => n.chainName === token.networkName)!
+		const allowance = await tokenContractSigner.allowance(account.address, network.swapRouterAddress) as { toString: () => string }
 		const totalSupply = await tokenContractSigner.totalSupply() as { toString: () => string }
 		if (bn(totalSupply.toString()).gt(allowance.toString())) {
 			const gasConfig = await dispatch("_getGasConfig", token.networkName) as Network["gasConfig"]
 			await tokenContractSigner.approve(
-				poolAddress,
+				network.swapRouterAddress,
 				utils.parseUnits(
 					totalSupply.toString(),
 				),
