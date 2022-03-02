@@ -45,7 +45,7 @@ export default Vue.extend({
 
 .header-dropdown__content
 	position: absolute
-  z-index: 5
+	z-index: 5
 	min-inline-size: 100%
 	margin-top: 16px
 	@media (max-width: $breakpoint-mobile)
