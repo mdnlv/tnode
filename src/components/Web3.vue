@@ -4,12 +4,9 @@
 		.space-items-big(v-if="!connectingWalletId")
 			.wallet-choices.flex-start(v-if="!account")
 				.wallet-choice.space-items(v-for="wallet of wallets")
-					.flex-column.center.space-items-horz(v-if="!account || wallet.id !== account.walletId" @click="connectWallet(wallet.id)")
+					.flex-column.center.space-items-horz(@click="connectWallet(wallet.id)")
 						img.img-outer(:src="wallet.icon")
 						span {{ wallet.name }}
-					.flex-column.center.space-items-horz(v-else @click="disconnect")
-						img.img-outer(:src="wallet.icon")
-						span {{ account.address | accountAddress }}
 			.flex-column.connected(v-else)
 				.flex.space-items-horz
 					img.wallet-icon(:src="connectedEVMWallet.icon")

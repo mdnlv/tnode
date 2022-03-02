@@ -211,6 +211,8 @@ tnode-ui >>> .space-items-horz-big >>> :not(:last-child)
 					margin-right: 0
 
 			.connect-wallet
+				@media (min-width: $breakpoint-mobile)
+					width: 242px
 				.button
 					display: flex
 					img
@@ -252,8 +254,8 @@ tnode-ui >>> .space-items-horz-big >>> :not(:last-child)
 		.dropdown-icon-collapse
 			display: block
 	.header-dropdown__content
-		width: 440px
-		transform: translateX(-160px)
+		width: 430px
+		transform: translateX(-138px)
 		@include box-shadow
 		@media (max-width: $breakpoint-mobile)
 			transform: translateX(0px)
