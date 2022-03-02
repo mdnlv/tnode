@@ -21,7 +21,7 @@
 							span BUY TNODE NOW
 				.divider
 				HeaderDropdown.nostyle
-					template(v-slot:trigger)
+					template(#trigger)
 						.flex.space-items-horz
 							.connect-wallet
 								.mobile(style="cursor: pointer")
@@ -44,7 +44,7 @@
 										img(:src="connectedEVMWallet.icon")
 										span {{ account.address | accountAddress }}
 										.flex(v-html="dropDownIconExpand")
-					template(v-slot:default)
+					template(#default)
 						.dropdown-title
 							h3(v-if="!account") Connect your wallet
 							h3(v-else) Connected wallet
