@@ -35,6 +35,7 @@ import {
 	UserActionResponse,
 	Account,
 	Validator,
+	Delegation,
 } from "~/_types"
 import { RootState } from "~/store"
 
@@ -151,8 +152,28 @@ export const actions: ActionTree<LocalState, RootState> = {
 			: null
 		commit("staking/userRewards", { ...validator, userRewards }, { root: true })
 	},
-	async getDelegations(_) {
-		return await null
+	async getDelegations({ dispatch }, validator: Validator): Promise<Delegation[] | null> {
+		const tmClient = await dispatch("_getTmClient", validator) as TMClient
+		const account: Account = await dispatch("_getAccount", validator)
+		try {
+			const { delegationResponses } = await tmClient.staking.delegatorDelegations(account.address)
+			return delegationResponses
+				.filter(del =>
+					del.delegation?.validatorAddress !== validator.address
+					&& del.balance
+					&& del.balance.amount !== "0",
+				)
+				.map(del => ({
+					address: del.delegation?.validatorAddress || "",
+					amount: divBy10toPow(
+						del.balance?.amount || 0,
+						validator.denom.decimals,
+					),
+				}))
+		}
+		catch (e) {
+			return []
+		}
 	},
 	async delegate({ dispatch }, { amount, validator }: {amount: number, validator: Validator}) {
 		try {
@@ -219,8 +240,41 @@ export const actions: ActionTree<LocalState, RootState> = {
 			return dispatch("_handleError", { error, statusPrefix: "REWARDS CLAIM" })
 		}
 	},
-	async redelegate() {
-		return await { message: "not implemented" }
+	async redelegate({ dispatch }, { amount, validator, delegation }: { amount: bn, validator: Validator, delegation: Delegation }) {
+		try {
+			const signer = await dispatch("_getSigner", validator)
+			const account: Account = await dispatch("_getAccount", validator)
+			const msg = {
+				typeUrl: "/cosmos.staking.v1beta1.MsgBeginRedelegate",
+				value: {
+					delegatorAddress: account.address,
+					validatorSrcAddress: delegation.address,
+					validatorDstAddress: validator.address,
+					amount: coin(
+						times10toPow(amount, validator.denom.decimals, true),
+						validator.denom.min,
+					),
+				},
+			}
+			const response = await signer.signAndBroadcast(
+				account.address,
+				[msg],
+				await dispatch("_sendFee", validator),
+				`Redelegating ${validator.denom.symbol} via trustednode.io`,
+			)
+			if (response.code === 32) {
+				return { message: "Couldn't redelegate: not allowed to redelegate less than 21 days after initial delegation" }
+			}
+			else {
+				return {
+					hash: response.transactionHash,
+					status: "REDELEGATION IN PROGRESS",
+				}
+			}
+		}
+		catch (error) {
+			return dispatch("_handleError", { error, statusPrefix: "REDELEGATION" })
+		}
 	},
 	async _getSigner(_, validator: Validator) {
 		const offlineSigner = await this.dispatch(`staking/wallets/${validator.walletId}/getOfflineSigner`, validator.chainId)
