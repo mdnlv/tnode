@@ -17,7 +17,7 @@
 				//-.center
 					button.big-padding
 						span CHANGE WALLET
-				a.flex.space-items-horz.disconnect(@click="disconnect")
+				.button.bare.flex.space-items-horz.no-padding.disconnect(@click="disconnect")
 					.img-outer(v-html="disconnectIcon")
 					span DISCONNECT
 			.gray-line.flex-column.flex-space-between
@@ -135,7 +135,6 @@ export default Vue.extend({
 	.space-items-big
 		width: 100%
 	.disconnect
-		color: $fg
 		margin-top: $unit1
 	.connected
 		padding: 0 4em
