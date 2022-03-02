@@ -115,6 +115,7 @@ export default Vue.extend({
 
 <style lang="sass">
 #web3
+	padding-bottom: $unit4
 	.message
 		padding: 0
 	background-color: $bg2-1
