@@ -4,12 +4,9 @@
 		.space-items-big(v-if="!connectingWalletId")
 			.wallet-choices.flex-start(v-if="!account")
 				.wallet-choice.space-items(v-for="wallet of wallets")
-					.flex-column.center.space-items-horz(v-if="!account || wallet.id !== account.walletId" @click="connectWallet(wallet.id)")
+					.flex-column.center.space-items-horz(@click="connectWallet(wallet.id)")
 						img.img-outer(:src="wallet.icon")
 						span {{ wallet.name }}
-					.flex-column.center.space-items-horz(v-else @click="disconnect")
-						img.img-outer(:src="wallet.icon")
-						span {{ account.address | accountAddress }}
 			.flex-column.connected(v-else)
 				.flex.space-items-horz
 					img.wallet-icon(:src="connectedEVMWallet.icon")
@@ -18,16 +15,15 @@
 							span.green CONNECTED WALLET
 							span {{ account.address | accountAddress }}
 						.img-copy(v-html="copyIcon")
-
 				NuxtLink.flex.space-items-horz.disconnect(to="profile" @click.native="changeDropdownVisible()")
 					.img-outer(v-html="profileIcon")
 					span YOUR PROFILE
-				a.flex.space-items-horz.disconnect(@click="disconnect")
+				.button.bare.flex.space-items-horz.no-padding.disconnect(@click="disconnect")
 					.img-outer(v-html="disconnectIcon")
 					span DISCONNECT
 			.gray-line.flex-column.flex-space-between
-				a.buy-tnode(href="https://pancakeswap.finance/swap?inputCurrency=0xe9e7cea3dedca5984780bafc599bd69add087d56&outputCurrency=0x7f12a37b6921ffac11fab16338b3ae67ee0c462b" target="_blank")
-					button
+				.buy-tnode
+					a.button(href="https://pancakeswap.finance/swap?inputCurrency=0xe9e7cea3dedca5984780bafc599bd69add087d56&outputCurrency=0x7f12a37b6921ffac11fab16338b3ae67ee0c462b" target="_blank")
 						.flex.space-items-horz-small
 							img.img-outer(src="~/assets/img/tnode-icon-2.png")
 							span BUY TNODE NOW
@@ -125,6 +121,7 @@ export default Vue.extend({
 
 <style lang="sass">
 #web3
+	padding-bottom: $unit4
 	.message
 		padding: 0
 	background-color: $bg2-1
@@ -144,7 +141,6 @@ export default Vue.extend({
 	.space-items-big
 		width: 100%
 	.disconnect
-		color: $fg
 		margin-top: $unit1
 	.connected
 		padding: 0 4em

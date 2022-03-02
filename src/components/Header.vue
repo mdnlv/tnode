@@ -20,8 +20,8 @@
 							img(src="~/assets/img/tnode-icon-2.png")
 							span BUY TNODE NOW
 				.divider
-				HeaderDropdown.nostyle.dropdown
-					template(v-slot:trigger)
+				HeaderDropdown.nostyle
+					template(#trigger)
 						.flex.space-items-horz
 							.connect-wallet
 								.mobile(style="cursor: pointer")
@@ -44,13 +44,11 @@
 										img(:src="connectedEVMWallet.icon")
 										span {{ account.address | accountAddress }}
 										.flex(v-html="dropDownIconExpand")
-					template(v-slot:default)
-						.opacity-line
-						.no-opacity
+					template(#default)
+						.dropdown-title
 							h3(v-if="!account") Connect your wallet
 							h3(v-else) Connected wallet
 						Web3
-						.no-opacity
 		Wallets
 		ConnectModal
 </template>
@@ -213,6 +211,8 @@ tnode-ui >>> .space-items-horz-big >>> :not(:last-child)
 					margin-right: 0
 
 			.connect-wallet
+				@media (min-width: $breakpoint-mobile)
+					width: 242px
 				.button
 					display: flex
 					img
@@ -254,9 +254,8 @@ tnode-ui >>> .space-items-horz-big >>> :not(:last-child)
 		.dropdown-icon-collapse
 			display: block
 	.header-dropdown__content
-		width: 440px
-		height: 1200px
-		transform: translateX(-160px)
+		width: 430px
+		transform: translateX(-138px)
 		@include box-shadow
 		@media (max-width: $breakpoint-mobile)
 			transform: translateX(0px)
@@ -264,20 +263,13 @@ tnode-ui >>> .space-items-horz-big >>> :not(:last-child)
 			top: 70px
 			left: 0
 			width: 100%
-			height: calc(100% - 72px)
 		a.buy-tnode
 			align-self: center
 			width: 100%
 	.header-dropdown
 		@media (max-width: $breakpoint-mobile)
 			display: block
-	.opacity-line
-		background-color: (0,0,0,0)
-		width: 100%;
-		height: 16px;
-		@media (max-width: $breakpoint-mobile)
-			height: 28px;
-	.no-opacity
+	.dropdown-title
 		padding: 3em
 		background-color: $bg2-1
 	.dropdown-icons

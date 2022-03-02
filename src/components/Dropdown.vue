@@ -1,5 +1,5 @@
 <template lang="pug">
-VDropdown.nostyle.dropdown(:classes="classes")
+VDropdown.nostyle(:classes="classes")
 	template(v-slot:trigger)
 		.flex-space-between
 			.flex.space-items-horz-small
