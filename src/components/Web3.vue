@@ -13,10 +13,15 @@
 			.flex-column.connected(v-else)
 				.flex.space-items-horz
 					img.wallet-icon(:src="connectedEVMWallet.icon")
-					span {{ account.address | accountAddress }}
-				//-.center
-					button.big-padding
-						span CHANGE WALLET
+					.flex
+						.flex-column.flex-start
+							span.green CONNECTED WALLET
+							span {{ account.address | accountAddress }}
+						.img-copy(v-html="copyIcon")
+
+				NuxtLink.flex.space-items-horz.disconnect(to="profile" @click.native="changeDropdownVisible()")
+					.img-outer(v-html="profileIcon")
+					span YOUR PROFILE
 				a.flex.space-items-horz.disconnect(@click="disconnect")
 					.img-outer(v-html="disconnectIcon")
 					span DISCONNECT
@@ -54,6 +59,8 @@ export default Vue.extend({
 		return {
 			installed: false,
 			disconnectIcon: require("~/assets/svg/disconnect.svg?raw"),
+			profileIcon: require("~/assets/svg/profile.svg?raw"),
+			copyIcon: require("~/assets/svg/copy.svg?raw"),
 		}
 	},
 	computed: {
@@ -109,6 +116,9 @@ export default Vue.extend({
 		async disconnect() {
 			await this.$store.dispatch("web3/disconnect")
 		},
+		changeDropdownVisible(e) {
+			this.$store.commit("web3/changeDropdownVisible")
+		},
 	},
 })
 </script>
@@ -140,6 +150,11 @@ export default Vue.extend({
 		padding: 0 4em
 		> *:not(:last-child)
 			padding-bottom: $unit1
+		.green
+			color: $fg3
+			font-size: 0.60em
+		.img-copy
+			margin-left: $unit10
 	a
 		text-decoration: none
 		cursor: pointer

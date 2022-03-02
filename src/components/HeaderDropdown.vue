@@ -24,13 +24,16 @@ export default Vue.extend({
 			default: "",
 		},
 	},
-	data: () => ({
-		isFocused: false,
-	}),
+
+	computed: {
+		isFocused(): boolean {
+			return this.$store.getters["web3/dropdownVisible"]
+		},
+	},
 
 	methods: {
 		onFocusout() {
-			this.isFocused = !this.isFocused
+			this.$store.commit("web3/changeDropdownVisible")
 			this.$store.commit("web3/connectingWalletId", null)
 			this.$store.commit("web3/connectingWalletError", null)
 		},

@@ -26,6 +26,7 @@ const defaultState = {
 			link: "https://walletconnect.com/",
 		},
 	] as EVMWallet[],
+	dropdownVisible: false as boolean,
 }
 
 export const state = () => defaultState
@@ -37,12 +38,14 @@ export const getters: GetterTree<LocalState, RootState> = {
 	connectingWalletId: state => state.connectingWalletId,
 	connectingWalletError: state => state.connectingWalletError,
 	wallets: state => state.wallets,
+	dropdownVisible: state => state.dropdownVisible,
 }
 
 export const mutations: MutationTree<LocalState> = {
 	account: (state, account) => { state.account = account },
 	connectingWalletId: (state, connectingWalletId) => { state.connectingWalletId = connectingWalletId },
 	connectingWalletError: (state, connectingWalletError) => { state.connectingWalletError = connectingWalletError },
+	changeDropdownVisible: state => { state.dropdownVisible = !state.dropdownVisible },
 }
 
 export const actions: ActionTree<LocalState, RootState> = {
