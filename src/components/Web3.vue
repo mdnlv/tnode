@@ -10,8 +10,7 @@
 			.flex-column.connected(v-else)
 				.flex.space-items-horz.wrap
 					img.wallet-icon(:src="connectedEVMWallet.icon")
-					span.no-mobile {{ account.address }}
-					span.mobile {{ account.address | accountAddress }}
+					span {{ account.address }}
 				//-.center
 					button.big-padding
 						span CHANGE WALLET
