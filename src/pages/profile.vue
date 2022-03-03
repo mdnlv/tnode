@@ -75,7 +75,7 @@ import {
 	Wallet,
 	EVMAccount,
 	EVMWallet,
-	Vault as tVault
+	Vault as tVault,
 } from "~/_types"
 
 const ALL_NETWORKS_FILTER = "ALL"
