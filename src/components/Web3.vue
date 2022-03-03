@@ -13,7 +13,8 @@
 					.flex
 						.flex-column.flex-start
 							span.green CONNECTED WALLET
-							span {{ account.address }}
+							span.no-mobile {{ account.address }}
+							span.mobile {{ account.address | accountAddress }}
 						.img-copy(v-html="copyIcon")
 				NuxtLink.flex.space-items-horz.disconnect(to="profile" @click.native="changeDropdownVisible()")
 					.img-outer(v-html="profileIcon")
@@ -154,6 +155,8 @@ export default Vue.extend({
 			font-size: 0.60em
 		.img-copy
 			margin-left: $unit3
+			@media (max-width: $breakpoint-mobile)
+				margin-left: $unit9
 	a
 		text-decoration: none
 		cursor: pointer
