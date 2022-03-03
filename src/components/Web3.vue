@@ -13,12 +13,15 @@
 					.flex
 						.flex-column.flex-start
 							span.green CONNECTED WALLET
-							span.no-mobile {{ account.address }}
-							span.mobile {{ account.address | accountAddress }}
+							span {{ account.address }}
 						.img-copy(v-html="copyIcon")
 				NuxtLink.flex.space-items-horz.disconnect(to="profile" @click.native="changeDropdownVisible()")
 					.img-outer(v-html="profileIcon")
 					span YOUR PROFILE
+					span {{ account.address }}
+				//-.center
+					button.big-padding
+						span CHANGE WALLET
 				.button.bare.flex.space-items-horz.no-padding.disconnect(@click="disconnect")
 					.img-outer(v-html="disconnectIcon")
 					span DISCONNECT
