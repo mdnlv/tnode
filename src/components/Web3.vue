@@ -155,8 +155,6 @@ export default Vue.extend({
 			font-size: 0.60em
 		.img-copy
 			margin-left: $unit3
-			@media (max-width: $breakpoint-mobile)
-				margin-left: $unit9
 	a
 		text-decoration: none
 		cursor: pointer
