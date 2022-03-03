@@ -8,9 +8,9 @@
 						img.img-outer(:src="wallet.icon")
 						span {{ wallet.name }}
 			.flex-column.connected(v-else)
-				.flex.space-items-horz
+				.flex.space-items-horz.wrap
 					img.wallet-icon(:src="connectedEVMWallet.icon")
-					span {{ account.address | accountAddress }}
+					span {{ account.address }}
 				//-.center
 					button.big-padding
 						span CHANGE WALLET
@@ -111,6 +111,9 @@ export default Vue.extend({
 </script>
 
 <style lang="sass">
+.wrap
+	overflow-wrap: anywhere
+	text-align: left
 #web3
 	padding-bottom: $unit4
 	.message
