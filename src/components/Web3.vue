@@ -18,10 +18,6 @@
 				NuxtLink.flex.space-items-horz.disconnect(to="profile" @click.native="changeDropdownVisible()")
 					.img-outer(v-html="profileIcon")
 					span YOUR PROFILE
-					span {{ account.address }}
-				//-.center
-					button.big-padding
-						span CHANGE WALLET
 				.button.bare.flex.space-items-horz.no-padding.disconnect(@click="disconnect")
 					.img-outer(v-html="disconnectIcon")
 					span DISCONNECT

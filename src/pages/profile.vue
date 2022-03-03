@@ -1,5 +1,5 @@
 <template lang="pug">
-#delegate
+#profile
 	section
 		.container.space-items-big
 			h1 My Profile
@@ -22,18 +22,18 @@
 						img.loading-medium(v-if="totalDelegationsLoading" src="~/assets/gif/loading-3.gif")
 						.h1.delegated-number ${{ totalAssetsDelegated | floorToDP(0) }}
 	section
-		.container.flex.space-items-horz
-			img.wallet-icon(:src="connectedEVMWallet.icon")
-			.flex
+		#subline.container.flex.space-items-horz.flex-wrap
+			img.wallet-icon.item(:src="connectedEVMWallet.icon")
+			.flex.item
 				.flex-column.flex-start
 					span.green CONNECTED WALLET
 					span {{ account.address | accountAddress }}
 				.img-copy(v-html="copyIcon")
-				span CHANGE
-				.flex
-					.img-copy(v-html="infoIcon")
-					span.green Learn more about linking wallets
-
+			.flex.item
+				a#change CHANGE
+				a.flex(href="#")
+					.flex.img-info(v-html="infoIcon")
+					span#info-link Learn more about linking wallets
 	section
 		.container.tabs
 			input(type="radio" name="tab-btn" id="tab-btn-1" value="" checked)
@@ -214,71 +214,69 @@ export default Vue.extend({
 </script>
 
 <style lang="sass" scoped>
-#vaults
-	.vertical-hr
-		width: 1px
-		background: $white
-		height: $unit8
-	@media (max-width: $breakpoint-tablet)
-		.container
-			padding: 0
-
-.wallet-icon
-	height: $unit3
-.green
-	color: $fg3
-	font-size: 0.60em
-.img-copy
-	margin-left: $unit10
-
-.tabs>input[type="radio"]
-	display: none
-
-.tabs>div
-	display: none
-	padding: 10px 0
-	font-size: 16px
-
-#tab-btn-1
-	&:checked
-		&~#content-1
-			display: block
-
-#tab-btn-2
-	&:checked
-		&~#content-2
-			display: block
-
-.tabs
-	label
-		display: inline-block
-		text-align: center
-		user-select: none
-		transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out
-		cursor: pointer
-		position: relative
-		top: 1px
-		color: $fg
-		padding: 10px 25px
-
-.tabs>label:not(:first-of-type)
-	border-left: none
-
-.tabs>input[type="radio"]:checked+label
-	border-bottom: 1px solid $fg
-
-#delegate
+#profile
 	.vertical-hr
 		width: 1px
 		background: $white
 		height: $unit9
-	.search
-		input
-			width: $unit17
-			border: 2px solid white
+
 	@media (max-width: $breakpoint-tablet)
 		.container
 			padding: 0
+
+	#subline
+		.item
+			margin-top: 15px
+		.wallet-icon
+			height: $unit3
+		.green
+			color: $fg3
+			font-size: 0.60em
+		#info-link
+			color: $fg3
+			@include hover-opacity
+			text-decoration: underline
+		#change
+			color: $fg
+		.img-copy
+			margin-left: $unit6
+			margin-right: $unit8
+		.img-info
+			margin-left: $unit10
+			margin-right: 6px
+
+	.tabs
+		label
+			display: inline-block
+			text-align: center
+			user-select: none
+			transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out
+			cursor: pointer
+			position: relative
+			top: 1px
+			color: $fg
+			padding: 10px 25px
+		>label:not(:first-of-type)
+			border-left: none
+		>input[type="radio"]:checked+label
+			border-bottom: 1px solid $fg
+		>input[type="radio"]
+			display: none
+		>div
+			display: none
+			padding: 10px 0
+			font-size: 16px
+
+	#tab-btn-1
+		&:checked
+			&~#content-1
+				display: block
+
+	#tab-btn-2
+		&:checked
+			&~#content-2
+				display: block
+
 	#validators
 		.spacer
 			height: $space-big
@@ -286,4 +284,13 @@ export default Vue.extend({
 			display: table
 			.spacer
 				display: table-row
+
+	#vaults
+		.vertical-hr
+			width: 1px
+			background: $white
+			height: $unit8
+		@media (max-width: $breakpoint-tablet)
+			.container
+				padding: 0
 </style>
