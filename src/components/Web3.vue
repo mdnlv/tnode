@@ -8,12 +8,12 @@
 						img.img-outer(:src="wallet.icon")
 						span {{ wallet.name }}
 			.flex-column.connected(v-else)
-				.flex.space-items-horz
+				.flex.space-items-horz.wrap
 					img.wallet-icon(:src="connectedEVMWallet.icon")
 					.flex
 						.flex-column.flex-start
 							span.green CONNECTED WALLET
-							span {{ account.address | accountAddress }}
+							span {{ account.address }}
 						.img-copy(v-html="copyIcon")
 				NuxtLink.flex.space-items-horz.disconnect(to="profile" @click.native="changeDropdownVisible()")
 					.img-outer(v-html="profileIcon")
@@ -120,6 +120,9 @@ export default Vue.extend({
 </script>
 
 <style lang="sass">
+.wrap
+	overflow-wrap: anywhere
+	text-align: left
 #web3
 	padding-bottom: $unit4
 	.message
@@ -150,7 +153,7 @@ export default Vue.extend({
 			color: $fg3
 			font-size: 0.60em
 		.img-copy
-			margin-left: $unit10
+			margin-left: $unit3
 	a
 		text-decoration: none
 		cursor: pointer
