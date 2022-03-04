@@ -122,7 +122,10 @@ export default Vue.extend({
 	@media (max-width: $breakpoint-mobile)
 		height: 100%
 	.errors
-		padding: 0 2em
+		text-align: left
+		padding: 3em 2em
+		h3
+			padding-bottom: 1em
 	.wallet-icon
 		height: $unit3
 
