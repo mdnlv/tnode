@@ -11,14 +11,14 @@
 			#menu-toggle.mobile.cursor-pointer(type="button" @click="toggleActive" v-html="menuIcon")
 		#contents.grow(:class="{ active }")
 			.css-grid
-				.field.flex-column#total-delegated
+				.field.flex-column#delegated
 					.label.small AMOUNT DELEGATED
 					.flex
 						LoadingValue(:value="validator.totalDelegated" #default="{ value }")
 							span {{ value | floorToDP(0) }}&nbsp;
 						span {{ validator.denom.symbol }}
 				.field.flex-column#staked
-					.label.small REWARDS
+					.label.small AMOUNT REWARDS
 					.flex
 						LoadingValue(:value="userDelegated", :loading="loadingPersonalInfo" #default="{ value }")
 							span {{ value | floorToDP(6) }}
@@ -525,6 +525,9 @@ export default Vue.extend({
 			.field
 				display: flex
 				justify-content: center
+				@media (max-width: $breakpoint-tablet)
+					justify-content: flex-start
+					padding-top: $unit1
 			> *:last-child
 				text-align: center
 				@media (max-width: $breakpoint-tablet)
@@ -532,8 +535,6 @@ export default Vue.extend({
 			display: grid
 			button
 				background: $bg
-			@media (max-width: $breakpoint-tablet)
-				row-gap: $space-medium
 			#delegated
 				grid-area: delegated
 			#staked
@@ -544,40 +545,14 @@ export default Vue.extend({
 				grid-area: k
 			#discon
 				grid-area: discon
-			#wallet
-				grid-area: wallet
-				@media (max-width: $breakpoint-mobile)
-					&.active
-						display: none
-			#stake-unstake
-				grid-area: stake-unstake
-				.button-outer
-					width: 100%
-				@media (min-width: $breakpoint-mobile-upper)
-					display: flex
-					@include spaceHorz
-				@media (max-width: $breakpoint-mobile)
-					grid-area: wallet
-					.button-outer:first-child
-						button
-							margin-bottom: $space-medium
-					.button-outer
-						max-height: $unit10
-						@include openOnActive
-			#claim-rewards
-				grid-area: claim-rewards
-				@media (max-width: $breakpoint-mobile)
-					button
-						width: 100%
-					.button-outer
-						@include openOnActive
 			grid-template-columns: auto auto auto auto auto
 			grid-template-areas: "delegated staked claimrewards k discon"
+			@media (max-width: $breakpoint-tablet)
 				grid-template-columns: auto auto $unit15
-				grid-template-areas: "delegated staked claimrewards" "k discon"
+				grid-template-areas: "delegated staked claimrewards" "k discon wallet"
 			@media (max-width: $breakpoint-mobile)
 				grid-template-columns: auto auto
-				grid-template-areas: "delegated staked" "claimrewards k" "discon"
+				grid-template-areas: "delegated staked" "claimrewards k" "discon wallet"
 	@media (max-width: $breakpoint-tablet)
 		.label
 			font-size: 0.8rem

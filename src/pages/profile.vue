@@ -10,13 +10,13 @@
 						img.loading-medium(v-if="totalDelegationsLoading" src="~/assets/gif/loading-3.gif")
 						.h1.delegated-number ${{ totalAssetsDelegated | floorToDP(0) }}
 				.vertical-hr.no-mobile
-				space-items-small
+				.space-items-small
 					p.label.small TOTAL ASSETS DELEGATED
 					.flex
 						img.loading-medium(v-if="totalDelegationsLoading" src="~/assets/gif/loading-3.gif")
 						.h1.delegated-number ${{ totalAssetsDelegated | floorToDP(0) }}
 				.vertical-hr.no-mobile
-				space-items-small
+				.space-items-small
 					p.label.small TOTAL ASSETS STAKED
 					.flex
 						img.loading-medium(v-if="totalDelegationsLoading" src="~/assets/gif/loading-3.gif")
@@ -47,11 +47,10 @@
 			#content-2
 				section.big-padding
 					#vaults
-						template(v-for="validator of matchingValidators")
-							Vault(
-								:key="validator.chainId"
-								:validator="validator"
-							)
+						template(v-for="vaults of vaultsChunked")
+							Vault(:vault="vaults[0]", :networks="networks")
+							.spacer
+							Vault(v-if="vaults[1]" :vault="vaults[1]", :networks="networks")
 							.spacer
 
 </template>
@@ -66,6 +65,8 @@ import ValidatorComingSoon from "~/components/ValidatorComingSoon.vue"
 import Vault from "~/components/VaultProfile.vue"
 import ConnectedWallet from "~/components/common/ConnectedWallet.vue"
 import {
+	DropdownOption,
+	SupportedNetworks,
 	Validator as tValidator,
 	ValidatorComingSoon as tValidatorComingSoon,
 	Vault as tVault,
@@ -92,6 +93,23 @@ export default Vue.extend({
 			infoIcon: require("~/assets/svg/ui/info-icon.svg?raw"),
 			filterIcon: require("~/assets/svg/ui/filter.svg?raw"),
 			selectedNetwork: ALL_NETWORKS_FILTER,
+			networks: [
+				{
+					icon: require("~/assets/svg/chains/all-chains-logo.svg?raw"),
+					label: "All Chains",
+					value: ALL_NETWORKS_FILTER,
+				},
+				{
+					icon: require("~/assets/svg/chains/binance-logo.svg?raw"),
+					label: "Binance Smart Chain",
+					value: SupportedNetworks.BSC_MAINNET,
+				},
+				{
+					icon: require("~/assets/svg/chains/fantom-logo.svg?raw"),
+					label: "Fantom Opera",
+					value: SupportedNetworks.FTM_MAINNET,
+				},
+			] as DropdownOption[],
 		}
 	},
 	head() {
@@ -144,30 +162,6 @@ export default Vue.extend({
 		},
 		vaultsChunked(): tVault[][] {
 			return chunk(this.filteredVaults, 2)
-		},
-		totalAssetsInVaults(): bn {
-			return this.filteredVaults.reduce(
-				(acc, v) => acc.plus(v.tvl && v.stakeDenom.price
-					? v.tvl.times(v.stakeDenom.price)
-					: 0,
-				),
-				bn(0),
-			)
-		},
-		totalAssetsInVaultsLoading(): boolean {
-			return false
-		},
-		totalStakingInVaults(): bn {
-			return this.filteredVaults.reduce(
-				(acc, v) => acc.plus(v.userStaked && v.stakeDenom.price
-					? v.userStaked.times(v.stakeDenom.price)
-					: 0,
-				),
-				bn(0),
-			)
-		},
-		totalStakingInVaultsLoading(): boolean {
-			return false
 		},
 	},
 	mounted() {
@@ -225,7 +219,7 @@ export default Vue.extend({
 			color: $fg
 			margin-left: $unit6
 			@media (max-width: $breakpoint-tablet)
-				margin-left: 0
+				margin-left: $unit3
 		.img-copy
 			margin-left: $unit6
 			margin-right: $unit8
