@@ -8,13 +8,8 @@
 						img.img-outer(:src="wallet.icon")
 						span {{ wallet.name }}
 			.flex-column.connected(v-else)
-				.flex.space-items-horz.wrap
-					img.wallet-icon(:src="connectedEVMWallet.icon")
-					.flex
-						.flex-column.flex-start
-							span.green CONNECTED WALLET
-							span {{ account.address }}
-						.img-copy(v-html="copyIcon")
+				.flex.wrap
+					ConnectedWallet(long-address)
 				NuxtLink.flex.space-items-horz.disconnect(to="profile" @click.native="changeDropdownVisible()")
 					.img-outer(v-html="profileIcon")
 					span YOUR PROFILE
@@ -48,9 +43,13 @@
 
 <script lang="ts">
 import Vue from "vue"
-import { Wallet, EVMAccount, EVMWallet } from "~/_types"
+import ConnectedWallet from "~/components/common/ConnectedWallet.vue"
+import { Wallet, EVMAccount } from "~/_types"
 
 export default Vue.extend({
+	components: {
+		ConnectedWallet,
+	},
 	data() {
 		return {
 			installed: false,
@@ -80,9 +79,6 @@ export default Vue.extend({
 		},
 		account(): EVMAccount | null {
 			return this.$store.getters["web3/account"] as EVMAccount
-		},
-		connectedEVMWallet(): EVMWallet | null {
-			return this.$store.getters["web3/wallets"].find(w => w.id === this.account?.walletId) ?? null
 		},
 	},
 	watch: {

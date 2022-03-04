@@ -11,28 +11,29 @@
 			#menu-toggle.mobile.cursor-pointer(type="button" @click="toggleActive" v-html="menuIcon")
 		#contents.grow(:class="{ active }")
 			.css-grid
-				#total-delegated
-					.label.small.no-mobile TOTAL STAKED
-					.label.small.mobile TOTAL AMOUNT STAKED
+				.field.flex-column#total-delegated
+					.label.small AMOUNT DELEGATED
 					.flex
 						LoadingValue(:value="validator.totalDelegated" #default="{ value }")
 							span {{ value | floorToDP(0) }}&nbsp;
 						span {{ validator.denom.symbol }}
-				#token-price
-					span.label.small TOKEN PRICE
-					br
-					|${{ validator.denom.price | floorToDP(4) }}
-				#staked
-					.label.small YOUR STAKE
+				.field.flex-column#staked
+					.label.small REWARDS
 					.flex
 						LoadingValue(:value="userDelegated", :loading="loadingPersonalInfo" #default="{ value }")
 							span {{ value | floorToDP(6) }}
 						span &nbsp;{{ validator.denom.symbol }}
-				#claimrewards
-					.button-outer(:class="{ active }")
-						button.wide.nowrap.flex.space-items-horz-small(@click="openModal('claimRewards')")
-							img.loading-small(v-if="claimingRewards" src="~/assets/gif/loading-3.gif")
-							span CLAIM REWARDS
+				.field.flex#claimrewards
+					.button.bare.flex.space-items-horz.no-padding
+						.img-outer.inline-middle(v-html="claimIcon")
+						span CLAIM REWARDS
+				.field.flex#k
+					.button.bare.flex.space-items-horz.no-padding
+						.img-outer.inline-middle(v-html="kIcon")
+						span.color-f 98WAW3...89FAWF
+				.field.flex#discon
+					.button.bare.flex.space-items-horz.no-padding
+						div(v-html="disconIcon")
 </template>
 
 <script lang="ts">
@@ -71,6 +72,9 @@ export default Vue.extend({
 	data() {
 		return {
 			crossIcon: require("~/assets/svg/ui/cross.svg?raw"),
+			disconIcon: require("~/assets/svg/discon.svg?raw"),
+			claimIcon: require("~/assets/svg/claim_rewards.svg?raw"),
+			kIcon: require("~/assets/svg/k.svg?raw"),
 			optionsIcon: require("~/assets/svg/ui/options.svg?raw"),
 			actionIcon: {
 				delegate: require("~/assets/svg/ui/delegate-icon.svg?raw"),
@@ -456,7 +460,9 @@ export default Vue.extend({
 </script>
 
 <style lang="sass" scoped>
-
+.tnode-ui >>> .flex
+	display: flex
+	align-items: center
 @mixin closeOnActive
 	overflow: hidden
 	@include transition(max-height)
@@ -475,7 +481,7 @@ export default Vue.extend({
 		display: table-row
 		> *
 			display: table-cell
-			vertical-align: top
+			vertical-align: middle
 	#header
 		background: $bg-1
 		padding: $space
@@ -485,7 +491,6 @@ export default Vue.extend({
 			border-top-right-radius: 0
 			border-bottom-right-radius: 0
 			#name
-				margin-bottom: $space-medium
 				@media (max-width: $breakpoint-tablet)
 					margin-bottom: $space-big
 			#apr
@@ -517,21 +522,28 @@ export default Vue.extend({
 			border-top-left-radius: 0
 			border-top-right-radius: 0
 		.css-grid
+			.field
+				display: flex
+				justify-content: center
+			> *:last-child
+				text-align: center
+				@media (max-width: $breakpoint-tablet)
+					text-align: left
 			display: grid
-			column-gap: $space
-			row-gap: $space-big
 			button
 				background: $bg
 			@media (max-width: $breakpoint-tablet)
 				row-gap: $space-medium
-			#total-delegated
-				grid-area: total-delegated
-			#token-price
-				grid-area: token-price
+			#delegated
+				grid-area: delegated
 			#staked
 				grid-area: staked
-			#rewards
-				grid-area: rewards
+			#claimrewards
+				grid-area: claimrewards
+			#k
+				grid-area: k
+			#discon
+				grid-area: discon
 			#wallet
 				grid-area: wallet
 				@media (max-width: $breakpoint-mobile)
@@ -559,14 +571,13 @@ export default Vue.extend({
 						width: 100%
 					.button-outer
 						@include openOnActive
-			grid-template-columns: auto auto auto auto $unit15
-			grid-template-areas: "total-delegated token-price staked rewards wallet" "stake-unstake stake-unstake claim-rewards claim-rewards wallet"
-			@media (max-width: $breakpoint-tablet)
+			grid-template-columns: auto auto auto auto auto
+			grid-template-areas: "delegated staked claimrewards k discon"
 				grid-template-columns: auto auto $unit15
-				grid-template-areas: "total-delegated token-price wallet" "staked rewards wallet" "stake-unstake stake-unstake claim-rewards"
+				grid-template-areas: "delegated staked claimrewards" "k discon"
 			@media (max-width: $breakpoint-mobile)
 				grid-template-columns: auto auto
-				grid-template-areas: "total-delegated token-price" "staked rewards" "wallet wallet" "claim-rewards claim-rewards"
+				grid-template-areas: "delegated staked" "claimrewards k" "discon"
 	@media (max-width: $breakpoint-tablet)
 		.label
 			font-size: 0.8rem

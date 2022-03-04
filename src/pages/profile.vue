@@ -23,14 +23,9 @@
 						.h1.delegated-number ${{ totalAssetsDelegated | floorToDP(0) }}
 	section
 		#subline.container.flex.space-items-horz.flex-wrap
-			img.wallet-icon.item(:src="connectedEVMWallet.icon")
+			ConnectedWallet.item
 			.flex.item
-				.flex-column.flex-start
-					span.green CONNECTED WALLET
-					span {{ account.address | accountAddress }}
-				.img-copy(v-html="copyIcon")
-			.flex.item
-				a#change CHANGE
+				button.bare#change CHANGE
 				a.flex(href="#")
 					.flex.img-info(v-html="infoIcon")
 					span#info-link Learn more about linking wallets
@@ -51,7 +46,7 @@
 							.spacer
 			#content-2
 				section.big-padding
-					#validators
+					#vaults
 						template(v-for="validator of matchingValidators")
 							Vault(
 								:key="validator.chainId"
@@ -69,12 +64,10 @@ import Nav from "~/components/NavMenu.vue"
 import Validator from "~/components/ValidatorProfile.vue"
 import ValidatorComingSoon from "~/components/ValidatorComingSoon.vue"
 import Vault from "~/components/VaultProfile.vue"
+import ConnectedWallet from "~/components/common/ConnectedWallet.vue"
 import {
 	Validator as tValidator,
 	ValidatorComingSoon as tValidatorComingSoon,
-	Wallet,
-	EVMAccount,
-	EVMWallet,
 	Vault as tVault,
 } from "~/_types"
 
@@ -86,6 +79,7 @@ export default Vue.extend({
 		Validator,
 		ValidatorComingSoon,
 		Vault,
+		ConnectedWallet,
 	},
 	scrollToTop: true,
 	data() {
@@ -140,15 +134,6 @@ export default Vue.extend({
 		},
 		totalStakedLoading(): boolean {
 			return this.validators.some(v => v.loadingPersonalInfo)
-		},
-		account(): EVMAccount | null {
-			return this.$store.getters["web3/account"] as EVMAccount
-		},
-		wallets(): Wallet[] {
-			return this.$store.getters["web3/wallets"]
-		},
-		connectedEVMWallet(): EVMWallet | null {
-			return this.$store.getters["web3/wallets"].find(w => w.id === this.account?.walletId) ?? null
 		},
 
 		allVaults(): tVault[] {
@@ -238,6 +223,9 @@ export default Vue.extend({
 			text-decoration: underline
 		#change
 			color: $fg
+			margin-left: $unit6
+			@media (max-width: $breakpoint-tablet)
+				margin-left: 0
 		.img-copy
 			margin-left: $unit6
 			margin-right: $unit8
@@ -277,7 +265,7 @@ export default Vue.extend({
 			&~#content-2
 				display: block
 
-	#validators
+	#validators, #vaults
 		.spacer
 			height: $space-big
 		@media (min-width: $breakpoint-mobile-upper)
@@ -285,12 +273,4 @@ export default Vue.extend({
 			.spacer
 				display: table-row
 
-	#vaults
-		.vertical-hr
-			width: 1px
-			background: $white
-			height: $unit8
-		@media (max-width: $breakpoint-tablet)
-			.container
-				padding: 0
 </style>
