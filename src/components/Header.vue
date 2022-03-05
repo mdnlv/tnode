@@ -118,26 +118,6 @@ export default Vue.extend({
 
 <style lang="sass">
 
-.logo-link
-	display: flex
-	align-items: center
-
-tnode-ui >>> .space-items-horz-big >>> :not(:last-child)
-	margin-right: 0
-
-.tnode-ui >>> .flex
-	/deep/
-	.mobile
-		display: none
-		@media (max-width: $breakpoint-mobile)
-			display: flex
-	.no-mobile
-		@media (max-width: $breakpoint-mobile)
-			display: none
-	.no-tablet
-		@media (max-width: $breakpoint-tablet)
-			display: none
-
 #header
 	header
 		position: fixed
@@ -163,6 +143,9 @@ tnode-ui >>> .space-items-horz-big >>> :not(:last-child)
 				// height: $header-height
 				position: relative
 				// background-color: red
+				.logo-link
+					display: flex
+					align-items: center
 				a
 					transition: 0.3s
 					height: 100%
@@ -178,16 +161,15 @@ tnode-ui >>> .space-items-horz-big >>> :not(:last-child)
 				b
 					color: $fg2
 			.price
-				display: flex
 				flex-direction: row
 				justify-content: center
 				cursor: pointer
 				@include hover-scale-opacity
 				--price-mr: #{$space-big}
 				margin-right: var(--price-mr)
-				font-size: 0.9rem
+				font-size: $font-size-small
 				@media (max-width: $breakpoint-mobile-small)
-					font-size: 0.7rem
+					font-size: $font-size-smaller
 				img
 					--price-img-mr: #{$unit1}
 					border-radius: $unit10
@@ -218,6 +200,8 @@ tnode-ui >>> .space-items-horz-big >>> :not(:last-child)
 					margin-right: 0
 
 			.connect-wallet
+				@media (max-width: $breakpoint-mobile)
+					width: 64px
 				.button
 					display: flex
 					img
