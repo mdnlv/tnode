@@ -105,6 +105,8 @@ export default Vue.extend({
 		},
 		async disconnect() {
 			await this.$store.dispatch("web3/disconnect")
+			this.$store.commit("web3/connectingWalletId", null)
+			this.$store.commit("web3/connectingWalletError", null)
 		},
 	},
 })
