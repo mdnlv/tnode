@@ -177,9 +177,9 @@ export default Vue.extend({
 				@media (max-width: $breakpoint-mobile)
 					--price-mr: #{$space}
 					flex-direction: column
+					padding-top: 0.2em
 					.price-icon
 						margin-right: 0
-						margin-bottom: 0.2em
 						width: $unit3
 						img
 							margin-right: 0
