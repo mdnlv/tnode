@@ -175,6 +175,8 @@ export default Vue.extend({
 		justify-content: center
 		a
 			text-decoration: none
+		@media (min-width: $breakpoint-mobile)
+			display: none
 	.buy-tnode
 		align-self: center
 		img
