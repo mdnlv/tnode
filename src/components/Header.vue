@@ -10,7 +10,7 @@
 				.price.flex.space-items-horz(@click="addToMetamask")
 					.price-icon
 						img(src="~/assets/img/tnode-icon-2.png")
-					LoadingValue(:value="tnodePrice" #default="{ value }")
+					LoadingValue(:value="tnodePrice" #default="{ value }" size="small-no-margin")
 						p.bold
 							span.number ${{ value | floorToDPorE(4) }}
 				.divider.no-mobile
@@ -172,8 +172,6 @@ export default Vue.extend({
 					font-size: $font-size-smaller
 				img
 					--price-img-mr: #{$unit1}
-					border-radius: $unit10
-					width: $unit4
 				@media (max-width: $breakpoint-mobile)
 					--price-mr: #{$space}
 					flex-direction: column
@@ -183,6 +181,12 @@ export default Vue.extend({
 						width: $unit3
 						img
 							margin-right: 0
+							border-radius: none
+							width: $unit1
+				.price-icon
+					img
+						border-radius: $unit10
+						width: $unit4
 			.buy-tnode
 				img
 					border-radius: $unit10
