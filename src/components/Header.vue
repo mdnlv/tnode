@@ -22,7 +22,7 @@
 				.divider
 				HeaderDropdown.nostyle
 					template(#trigger)
-						.flex.space-items-horz
+						.flex
 							.connect-wallet
 								.mobile(style="cursor: pointer")
 									.flex.space-items-horz(v-if="!account")
@@ -205,7 +205,7 @@ export default Vue.extend({
 
 			.connect-wallet
 				@media (max-width: $breakpoint-mobile)
-					width: $unit8
+					width: $unit9
 				.button
 					display: flex
 					img
