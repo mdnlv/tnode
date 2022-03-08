@@ -205,7 +205,7 @@ export default Vue.extend({
 
 			.connect-wallet
 				@media (max-width: $breakpoint-mobile)
-					width: 64px
+					width: $unit8
 				.button
 					display: flex
 					img
@@ -250,7 +250,7 @@ export default Vue.extend({
 			display: block
 	.header-dropdown__content
 		width: 430px
-		transform: translateX(-200px)
+		transform: translateX(-$unit15)
 		@include box-shadow
 		@media (max-width: $breakpoint-mobile)
 			transform: translateX(0px)
