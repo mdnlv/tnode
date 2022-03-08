@@ -107,6 +107,8 @@ export default Vue.extend({
 		},
 		async disconnect() {
 			await this.$store.dispatch("web3/disconnect")
+			this.$store.commit("web3/connectingWalletId", null)
+			this.$store.commit("web3/connectingWalletError", null)
 		},
 		changeDropdownVisible(e) {
 			this.$store.commit("web3/changeDropdownVisible")
@@ -127,7 +129,10 @@ export default Vue.extend({
 	@media (max-width: $breakpoint-mobile)
 		height: 100%
 	.errors
-		padding: 0 2em
+		text-align: left
+		padding: 3em 2em
+		h3
+			padding-bottom: 1em
 	.wallet-icon
 		height: $unit3
 
@@ -141,6 +146,8 @@ export default Vue.extend({
 		width: 100%
 	.disconnect
 		margin-top: $unit1
+		display: flex
+		width: 100%
 	.connected
 		padding: 0 4em
 		> *:not(:last-child)
@@ -170,26 +177,6 @@ export default Vue.extend({
 				height: $unit3
 			.disconnect-btn
 				margin-bottom: $unit1
-	.divider
-		position: relative
-		color: $fg-1
-		span
-			display: inline-block
-			padding: 0 $unit-3
-			background: $bg
-			position: relative
-		&:before
-			content: ""
-			position: absolute
-			width: $unit12
-			height: $border-width
-			background: $fg-1
-			top: 50%
-			left: 50%
-			transform: translate(-50%, -50%)
-	.flex
-		display: flex
-		width: 100%
 	.gray-line
 		width: 100%
 		height: 100px
@@ -198,6 +185,8 @@ export default Vue.extend({
 		justify-content: center
 		a
 			text-decoration: none
+		@media (min-width: $breakpoint-mobile)
+			display: none
 	.buy-tnode
 		align-self: center
 		img

@@ -50,7 +50,7 @@ export default Vue.extend({
 	position: absolute
 	z-index: 5
 	min-inline-size: 100%
-	margin-top: 16px
+	margin-top: 18px
 	@media (max-width: $breakpoint-mobile)
-		margin-top: 28px
+		margin-top: 10px
 </style>

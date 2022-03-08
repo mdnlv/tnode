@@ -1,12 +1,12 @@
 <template lang="pug">
 #header
 	header
-		.flex.space-items-horz.flex-wrap.wrap-space
+		.flex.space-items-horz
 			.flex.space-items-horz
 				Hamburger.mobile
 				.logo
 					nuxt-link.logo-link(:to="'/'" v-html="logoImage")
-			.flex.space-items-horz-big.buttons.flex-wrap.wrap-space
+			.flex.space-items-horz-big.buttons
 				.price.flex.space-items-horz(@click="addToMetamask")
 					.price-icon
 						img(src="~/assets/img/tnode-icon-2.png")
@@ -32,20 +32,24 @@
 											.flex.dropdown-icon-collapse(v-html="dropDownIconCollapse")
 									.flex.space-items-horz.wallet(v-else)
 										img(:src="connectedEVMWallet.icon")
-										.flex(v-html="dropDownIconExpand")
+										.flex.dropdown-icons
+											.flex.dropdown-icon-expand(v-html="dropDownIconExpand")
+											.flex.dropdown-icon-collapse(v-html="dropDownIconCollapse")
 								button.no-mobile.pill
-									.flex.space-items-horz(v-if="!account")
+									.flex-space-between(v-if="!account")
 										img(src="~/assets/svg/wallet.svg")
 										span CONNECT WALLET
 										.flex.dropdown-icons
 											.flex.dropdown-icon-expand(v-html="dropDownIconExpand")
 											.flex.dropdown-icon-collapse(v-html="dropDownIconCollapse")
-									.flex.space-items-horz(v-else)
+									.flex-space-between(v-else)
 										img(:src="connectedEVMWallet.icon")
 										span {{ account.address | accountAddress }}
-										.flex(v-html="dropDownIconExpand")
+										.flex.dropdown-icons
+											.flex.dropdown-icon-expand(v-html="dropDownIconExpand")
+											.flex.dropdown-icon-collapse(v-html="dropDownIconCollapse")
 					template(#default)
-						.dropdown-title
+						.dropdown-title(v-if="!connectingWalletId")
 							h3(v-if="!account") Connect your wallet
 							h3(v-else) Connected wallet
 						Web3
@@ -90,6 +94,9 @@ export default Vue.extend({
 		tnodePrice(): number | null {
 			return this.$store.getters["denoms/all"].find(d => d.id === "tnode")!.price
 		},
+		connectingWalletId(): string | null {
+			return this.$store.getters["web3/connectingWalletId"]
+		},
 	},
 	mounted() {
 		this.$store.commit("web3/connectingWalletId", null)
@@ -110,26 +117,6 @@ export default Vue.extend({
 </script>
 
 <style lang="sass">
-
-.logo-link
-	display: flex
-	align-items: center
-
-tnode-ui >>> .space-items-horz-big >>> :not(:last-child)
-	margin-right: 0
-
-.tnode-ui >>> .flex
-	/deep/
-	.mobile
-		display: none
-		@media (max-width: $breakpoint-mobile)
-			display: flex
-	.no-mobile
-		@media (max-width: $breakpoint-mobile)
-			display: none
-	.no-tablet
-		@media (max-width: $breakpoint-tablet)
-			display: none
 
 #header
 	header
@@ -156,6 +143,9 @@ tnode-ui >>> .space-items-horz-big >>> :not(:last-child)
 				// height: $header-height
 				position: relative
 				// background-color: red
+				.logo-link
+					display: flex
+					align-items: center
 				a
 					transition: 0.3s
 					height: 100%
@@ -171,16 +161,15 @@ tnode-ui >>> .space-items-horz-big >>> :not(:last-child)
 				b
 					color: $fg2
 			.price
-				display: flex
 				flex-direction: row
 				justify-content: center
 				cursor: pointer
 				@include hover-scale-opacity
 				--price-mr: #{$space-big}
 				margin-right: var(--price-mr)
-				font-size: 0.9rem
+				font-size: $font-size-small
 				@media (max-width: $breakpoint-mobile-small)
-					font-size: 0.7rem
+					font-size: $font-size-smaller
 				img
 					--price-img-mr: #{$unit1}
 					border-radius: $unit10
@@ -188,9 +177,9 @@ tnode-ui >>> .space-items-horz-big >>> :not(:last-child)
 				@media (max-width: $breakpoint-mobile)
 					--price-mr: #{$space}
 					flex-direction: column
+					padding-top: 0.2em
 					.price-icon
 						margin-right: 0
-						margin-bottom: 0.2em
 						width: $unit3
 						img
 							margin-right: 0
@@ -211,8 +200,8 @@ tnode-ui >>> .space-items-horz-big >>> :not(:last-child)
 					margin-right: 0
 
 			.connect-wallet
-				@media (min-width: $breakpoint-mobile)
-					width: 242px
+				@media (max-width: $breakpoint-mobile)
+					width: 64px
 				.button
 					display: flex
 					img
@@ -220,20 +209,20 @@ tnode-ui >>> .space-items-horz-big >>> :not(:last-child)
 					span
 						transform: translateY(1px)
 				img
-					height: $unit3
+					width: $unit3
 				.wallet
 					margin-right: 0.4rem
+				button
+					width: 210px
 
 	.header-dropdown__trigger
-		min-height: 50px
 		border: none
 		color: $white
-		padding: 0 $unit1
 		font-size: $unit2
 		font-family: $font
 		font-weight: $font-weight-header
-		@media (max-width: $breakpoint-mobile-small)
-			padding: 0 0.8rem
+		@media (min-width: $breakpoint-mobile)
+			padding: 0
 		.icon svg
 			width: 24px
 		.dropdown-icon-collapse
@@ -255,7 +244,7 @@ tnode-ui >>> .space-items-horz-big >>> :not(:last-child)
 			display: block
 	.header-dropdown__content
 		width: 430px
-		transform: translateX(-138px)
+		transform: translateX(-200px)
 		@include box-shadow
 		@media (max-width: $breakpoint-mobile)
 			transform: translateX(0px)
@@ -273,7 +262,7 @@ tnode-ui >>> .space-items-horz-big >>> :not(:last-child)
 		padding: 3em
 		background-color: $bg2-1
 	.dropdown-icons
-		width: 28px
+		width: 20px
 		overflow: hidden
 
 //TODO: Handle tablet size
