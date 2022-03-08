@@ -215,9 +215,11 @@ export default Vue.extend({
 				img
 					width: $unit3
 				.wallet
-					margin-right: 0.4rem
+					margin-right: $space-small
 				button
-					width: 210px
+					width: 220px
+					img
+						margin-right: $space-small
 
 	.header-dropdown__trigger
 		border: none
