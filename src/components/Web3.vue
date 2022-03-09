@@ -153,6 +153,8 @@ export default Vue.extend({
 	.wallet-choices
 		align-items: stretch
 		width: 100%
+		@media (max-width: $breakpoint-mobile)
+			padding: 0 $unit9
 		.wallet-choice
 			width: 100%
 			cursor: pointer
