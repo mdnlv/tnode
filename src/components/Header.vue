@@ -253,10 +253,8 @@ export default Vue.extend({
 					display: block
 			.header-dropdown__content
 				width: 430px
-				transform: translateX(-$unit15)
 				@include box-shadow
 				@media (max-width: $breakpoint-mobile)
-					transform: translateX(0px)
 					position: fixed
 					top: 70px
 					left: 0
