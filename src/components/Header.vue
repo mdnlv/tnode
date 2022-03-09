@@ -36,13 +36,13 @@
 											.flex.dropdown-icon-expand(v-html="dropDownIconExpand")
 											.flex.dropdown-icon-collapse(v-html="dropDownIconCollapse")
 								button.no-mobile.pill
-									.flex-space-between(v-if="!account")
+									.flex.space-items-horz-small(v-if="!account")
 										img(src="~/assets/svg/wallet.svg")
 										span CONNECT WALLET
 										.flex.dropdown-icons
 											.flex.dropdown-icon-expand(v-html="dropDownIconExpand")
 											.flex.dropdown-icon-collapse(v-html="dropDownIconCollapse")
-									.flex-space-between(v-else)
+									.flex.space-items-horz-small(v-else)
 										img(:src="connectedEVMWallet.icon")
 										span {{ account.address | accountAddress }}
 										.flex.dropdown-icons
@@ -222,7 +222,10 @@ export default Vue.extend({
 				button
 					width: 220px
 					img
-						margin-right: $space-small
+						margin-right: $unit-3
+					.space-items-horz-small
+						justify-content: center
+						padding-left: $unit-9
 
 			.header-dropdown__trigger
 				border: none
