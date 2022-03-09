@@ -10,7 +10,7 @@
 				.price.flex.space-items-horz(@click="addToMetamask")
 					.price-icon
 						img(src="~/assets/img/tnode-icon-2.png")
-					LoadingValue(:value="tnodePrice" #default="{ value }")
+					LoadingValue(:value="tnodePrice" #default="{ value }" size="small-no-margin")
 						p.bold
 							span.number ${{ value | floorToDPorE(4) }}
 				.divider.no-mobile
@@ -22,7 +22,7 @@
 				.divider
 				HeaderDropdown.nostyle
 					template(#trigger)
-						.flex.space-items-horz
+						.flex
 							.connect-wallet
 								.mobile(style="cursor: pointer")
 									.flex.space-items-horz(v-if="!account")
@@ -172,8 +172,6 @@ export default Vue.extend({
 					font-size: $font-size-smaller
 				img
 					--price-img-mr: #{$unit1}
-					border-radius: $unit10
-					width: $unit4
 				@media (max-width: $breakpoint-mobile)
 					--price-mr: #{$space}
 					flex-direction: column
@@ -183,6 +181,12 @@ export default Vue.extend({
 						width: $unit3
 						img
 							margin-right: 0
+							border-radius: none
+							width: $unit1
+				.price-icon
+					img
+						border-radius: $unit10
+						width: $unit4
 			.buy-tnode
 				img
 					border-radius: $unit10
@@ -200,8 +204,11 @@ export default Vue.extend({
 					margin-right: 0
 
 			.connect-wallet
+				.mobile
+					img
+						margin-right: $unit-2
 				@media (max-width: $breakpoint-mobile)
-					width: 64px
+					width: $unit8
 				.button
 					display: flex
 					img
@@ -211,59 +218,59 @@ export default Vue.extend({
 				img
 					width: $unit3
 				.wallet
-					margin-right: 0.4rem
+					margin-right: $space-small
 				button
-					width: 210px
+					width: 220px
+					img
+						margin-right: $space-small
 
-	.header-dropdown__trigger
-		border: none
-		color: $white
-		font-size: $unit2
-		font-family: $font
-		font-weight: $font-weight-header
-		@media (min-width: $breakpoint-mobile)
-			padding: 0
-		.icon svg
-			width: 24px
-		.dropdown-icon-collapse
-			display: none
-			max-height: 24px
-	.header-dropdown__trigger[aria-expanded]
-		.trigger-text
-			text-indent: -9999px
-			line-height: 0
-		.trigger-text::after
-			content: "Select Chain"
-			text-indent: 0
-			line-height: unset
-		.icon svg
-			display: none
-		.dropdown-icon-expand
-			display: none
-		.dropdown-icon-collapse
-			display: block
-	.header-dropdown__content
-		width: 430px
-		transform: translateX(-200px)
-		@include box-shadow
-		@media (max-width: $breakpoint-mobile)
-			transform: translateX(0px)
-			position: fixed
-			top: 70px
-			left: 0
-			width: 100%
-		a.buy-tnode
-			align-self: center
-			width: 100%
-	.header-dropdown
-		@media (max-width: $breakpoint-mobile)
-			display: block
-	.dropdown-title
-		padding: 3em
-		background-color: $bg2-1
-	.dropdown-icons
-		width: 20px
-		overflow: hidden
+			.header-dropdown__trigger
+				border: none
+				color: $white
+				font-size: $unit2
+				font-family: $font
+				font-weight: $font-weight-header
+				@media (min-width: $breakpoint-mobile)
+					padding: 0
+				.icon svg
+					width: 24px
+				.dropdown-icon-collapse
+					display: none
+					max-height: 24px
+			.header-dropdown__trigger[aria-expanded]
+				.trigger-text
+					text-indent: -9999px
+					line-height: 0
+				.trigger-text::after
+					content: "Select Chain"
+					text-indent: 0
+					line-height: unset
+				.icon svg
+					display: none
+				.dropdown-icon-expand
+					display: none
+				.dropdown-icon-collapse
+					display: block
+			.header-dropdown__content
+				width: 430px
+				@include box-shadow
+				@media (max-width: $breakpoint-mobile)
+					position: fixed
+					top: 70px
+					left: 0
+					width: 100%
+				a.buy-tnode
+					align-self: center
+					width: 100%
+			.header-dropdown
+				@media (max-width: $breakpoint-mobile)
+					display: block
+			.dropdown-title
+				padding: 3em
+				background-color: $bg2-1
+			.dropdown-icons
+				width: $unit2
+				overflow: hidden
 
 //TODO: Handle tablet size
 // @media (max-width: $breakpoint-tablet)

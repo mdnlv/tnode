@@ -16,7 +16,7 @@
 				.button.bare.flex.space-items-horz.no-padding.disconnect(@click="disconnect")
 					.img-outer(v-html="disconnectIcon")
 					span DISCONNECT
-			.gray-line.flex-column.flex-space-between
+			.gray-line.center
 				.buy-tnode
 					a.button(href="https://pancakeswap.finance/swap?inputCurrency=0xe9e7cea3dedca5984780bafc599bd69add087d56&outputCurrency=0x7f12a37b6921ffac11fab16338b3ae67ee0c462b" target="_blank")
 						.flex.space-items-horz-small
@@ -163,6 +163,8 @@ export default Vue.extend({
 	.wallet-choices
 		align-items: stretch
 		width: 100%
+		@media (max-width: $breakpoint-mobile)
+			padding: 0 $unit9
 		.wallet-choice
 			width: 100%
 			cursor: pointer
