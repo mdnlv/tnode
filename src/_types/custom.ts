@@ -1,6 +1,18 @@
 import { ethers } from "ethers"
 import bn from "big.js"
 
+export type Notification = {
+	category_name: string
+	description: string
+	end_at: string
+	href: string
+	id: number
+	link: string
+	order: number
+	start_at: string
+	title: string
+}
+
 export type Network = {
 	chainId: string
 	chainName: string

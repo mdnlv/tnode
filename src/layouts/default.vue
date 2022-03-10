@@ -2,6 +2,7 @@
 	#layout-default.layout
 		Header
 		NavMenu
+		Notifications
 		main(:class="{ folded: !menuActive }")
 			nuxt
 			Footer
@@ -10,6 +11,7 @@
 <script lang="ts">
 import Vue from "vue"
 
+import Notifications from "~/components/Notifications.vue"
 import Header from "~/components/Header.vue"
 import NavMenu from "~/components/NavMenu.vue"
 import Footer from "~/components/Footer.vue"
@@ -18,6 +20,7 @@ export default Vue.extend({
 	components: {
 		Header,
 		NavMenu,
+		Notifications,
 		Footer,
 	},
 	computed: {
