@@ -126,6 +126,7 @@ export default Vue.extend({
 		padding: $header-padding 0
 		.buttons
 			padding-left: $unit2
+			margin-right: $unit7
 		> .flex
 			display: flex
 			justify-content: space-between
