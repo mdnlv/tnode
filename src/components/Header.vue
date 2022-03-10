@@ -8,7 +8,7 @@
 					nuxt-link.logo-link(:to="'/'" v-html="logoImage")
 			.flex.space-items-horz-big.buttons
 				.price.flex.space-items-horz(@click="addToMetamask")
-					.price-icon
+					.price-icon(v-if="tnodePrice !== null")
 						img(src="~/assets/img/tnode-icon-2.png")
 					LoadingValue(:value="tnodePrice" #default="{ value }" size="small-no-margin")
 						p.bold
