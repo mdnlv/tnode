@@ -155,7 +155,7 @@ export default Vue.extend({
 		width: 100%
 		.wallet-choice
 			cursor: pointer
-			margin-bottom: 1em
+			margin: 1em 0
 			@include hover-scale-opacity
 			.img-outer
 				margin-bottom: 1em
