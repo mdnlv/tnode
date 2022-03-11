@@ -2,7 +2,7 @@
 #web3
 	.message
 		.space-items-big(v-if="!connectingWalletId")
-			.wallet-choices.flex-start(v-if="!account")
+			.wallet-choices.flex-center(v-if="!account")
 				.wallet-choice.space-items(v-for="wallet of wallets")
 					.flex-column.center.space-items-horz(@click="connectWallet(wallet.id)")
 						img.img-outer(:src="wallet.icon")
@@ -156,11 +156,9 @@ export default Vue.extend({
 		@media (max-width: $breakpoint-mobile)
 			padding: 0 $unit9
 		.wallet-choice
-			width: 100%
 			cursor: pointer
 			margin-bottom: 1em
 			@include hover-scale-opacity
-			justify-content: space-between
 			.img-outer
 				height: $unit6
 				margin-bottom: 1em
@@ -169,6 +167,8 @@ export default Vue.extend({
 				height: $unit3
 			.disconnect-btn
 				margin-bottom: $unit1
+			&:not(:last-child)
+				margin-right: $space-big
 	.gray-line
 		width: 100%
 		height: 100px
