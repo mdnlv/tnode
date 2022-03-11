@@ -1,17 +1,21 @@
 <template lang="pug">
-	.header-dropdown(@focus="isFocused = true", @blur="isFocused = false")
-		button.header-dropdown__trigger(:aria-expanded="!!isFocused", aria-haspopup="true", @click="onFocusout")
+	.header-dropdown
+		button.header-dropdown__trigger(:aria-expanded="!!isFocused" aria-haspopup="true", @click="onClick")
 			slot(name="trigger") {{ text }}
 		transition(:name="transition")
-			.header-dropdown__content(v-if="!!isFocused")
+			.header-dropdown__content(v-if="isFocused" ref="dropdown" v-click-outside="onClick")
 				slot
 </template>
 
 <script lang="ts">
 import Vue from "vue"
+import vClickOutside from "v-click-outside"
 
 export default Vue.extend({
 	name: "VDrawer",
+	directives: {
+		clickOutside: vClickOutside.directive,
+	},
 	props: {
 
 		text: {
@@ -25,15 +29,12 @@ export default Vue.extend({
 		},
 	},
 
-	computed: {
-		isFocused(): boolean {
-			return this.$store.getters["web3/dropdownVisible"]
-		},
-	},
-
+	data: () => ({
+		isFocused: false,
+	}),
 	methods: {
-		onFocusout() {
-			this.$store.commit("web3/changeDropdownVisible")
+		onClick() {
+			this.isFocused = !this.isFocused
 			this.$store.commit("web3/connectingWalletId", null)
 			this.$store.commit("web3/connectingWalletError", null)
 		},
@@ -49,7 +50,7 @@ export default Vue.extend({
 .header-dropdown__content
 	position: absolute
 	z-index: 5
-	right: 0
+	right: -$unit9
 	min-inline-size: 100%
 	margin-top: 18px
 	@media (max-width: $breakpoint-mobile)

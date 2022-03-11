@@ -42,8 +42,11 @@ export default {
 			"@polkadot/apps-config",
 		],
 		extractCSS: true,
-		extend(config, { isDev }) {
-			if (!isDev) {
+		extend(config, ctx) {
+			if (ctx.isDev) {
+				config.devtool = ctx.isClient ? "source-map" : "inline-source-map"
+			}
+			else {
 				const ruleString = "/\\.(png|jpe?g|gif|svg|webp|avif)$/i"
 
 				if (!config.module.rules
@@ -108,6 +111,12 @@ export default {
 		],
 	},
 	publicRuntimeConfig: {
-		backendUrl: process.env.BACKEND_URL,
+		backendUrl: process.env.BACKEND_URL || "http://localhost:8080/api",
+	},
+	vue: {
+		config: {
+			productionTip: false,
+			devtools: true,
+		},
 	},
 }

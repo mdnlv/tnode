@@ -1,6 +1,7 @@
 import Vue from "vue"
 import bn, { BigSource } from "big.js"
 import cn from "comma-number"
+import { format } from "date-fns"
 import { preventSciNotation, toLink } from "~/_utils"
 
 export const floorToDP = (value: BigSource, dp: number): bn => {
@@ -77,4 +78,9 @@ Vue.filter(
 Vue.filter(
 	"toLink",
 	toLink,
+)
+
+Vue.filter(
+	"formatDate",
+	date => format(new Date(date), "d.M.yyyy"),
 )

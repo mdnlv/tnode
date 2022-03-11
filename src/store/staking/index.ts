@@ -33,7 +33,7 @@ const defaultState = {
 			denomId: "dot",
 			gas: 200000,
 			transactionFee: 0.01,
-			minimumStakingAmount: 120, // polkadot
+			minimumStakingAmount: 160, // polkadot
 			walletId: "polkadotjs",
 			disclaimer: null,
 			unstakingDays: 28,
@@ -313,30 +313,44 @@ export const mutations: MutationTree<LocalState> = {
 	connectingWalletError: (state, connectingWalletError) => { state.connectingWalletError = connectingWalletError },
 	setTotalDelegated: (state, { chainId, totalDelegated }: {chainId: string, totalDelegated: bn}) => {
 		const validator = state.validators.find(v => v.chainId === chainId)!
+		if (!validator) {
+			return
+		}
 		validator.totalDelegated = totalDelegated
 	},
 	setAPR: (state, { chainId, apr }: {chainId: string, apr: bn}) => {
 		const validator = state.validators.find(v => v.chainId === chainId)!
+		if (!validator) {
+			return
+		}
 		validator.apr = apr
 	},
 	userDelegated: (state, { chainId, userDelegated }: { chainId: string, userDelegated: bn }) => {
 		const validator = state.validators.find(v => v.chainId === chainId)!
+		if (!validator) {
+			return
+		}
 		validator.userDelegated = userDelegated
 	},
 	loadingPersonalInfo: (state, { chainId, loadingPersonalInfo }: { chainId: string, loadingPersonalInfo: boolean }) => {
 		const validator = state.validators.find(v => v.chainId === chainId)!
+		if (!validator) {
+			return
+		}
 		validator.loadingPersonalInfo = loadingPersonalInfo
 	},
 	userRewards: (state, { chainId, userRewards }: { chainId: string, userRewards: bn }) => {
 		const validator = state.validators.find(v => v.chainId === chainId)!
+		if (!validator) {
+			return
+		}
 		validator.userRewards = userRewards
 	},
 }
 
 export const actions: ActionTree<LocalState, RootState> = {
 	async getAllValidatorInfo({ commit, getters }) {
-		const apiURL = this.app.$config.backendUrl || "http://localhost:8080/api"
-		const validatorInfoURL = `${apiURL}/validator-info/`
+		const validatorInfoURL = `${this.app.$config.backendUrl}/validator-info/`
 		try {
 			const { data } = await axios.get(validatorInfoURL)
 			const aprResults = data?.latestAprValues || []

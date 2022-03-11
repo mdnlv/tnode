@@ -68,7 +68,7 @@ export const actions: ActionTree<LocalState, RootState> = {
 		}, { root: true })
 	},
 	async setAPR({ commit }, validator: Validator) {
-		const { data } = await axios.get(`${validator.rpcEndpoint}/v1/dashboard/staking_return`)
+		const { data } = await axios.get("https://fcd.terra.dev/v1/dashboard/staking_return")
 		const dailyReturns: { annualizedReturn: string }[] = data
 		commit("staking/setAPR", {
 			chainId: validator.chainId,
