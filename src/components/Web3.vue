@@ -153,8 +153,6 @@ export default Vue.extend({
 	.wallet-choices
 		align-items: stretch
 		width: 100%
-		@media (max-width: $breakpoint-mobile)
-			padding: 0 $unit9
 		.wallet-choice
 			cursor: pointer
 			margin-bottom: 1em
@@ -168,7 +166,7 @@ export default Vue.extend({
 			.disconnect-btn
 				margin-bottom: $unit1
 			&:not(:last-child)
-				margin-right: $space-big
+				margin-right: $unit10
 	.gray-line
 		width: 100%
 		height: 100px
