@@ -51,6 +51,7 @@
 		"nuxt": "^2.15.8",
 		"patch-package": "^6.4.7",
 		"postinstall-postinstall": "^2.1.0",
+		"v-click-outside": "^3.1.2",
 		"vue-js-modal": "^2.0.1",
 		"vuetensils": "^0.10.4",
 		"web3modal": "^1.9.4"
