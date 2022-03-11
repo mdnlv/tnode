@@ -158,13 +158,14 @@ export default Vue.extend({
 			margin-bottom: 1em
 			@include hover-scale-opacity
 			.img-outer
-				height: $unit6
 				margin-bottom: 1em
 				margin-right: 0
 			.disconnect-img
 				height: $unit3
 			.disconnect-btn
 				margin-bottom: $unit1
+			div
+				height: $unit6
 			&:not(:last-child)
 				margin-right: $unit10
 	.gray-line
