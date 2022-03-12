@@ -18,7 +18,7 @@
 							span {{ value | floorToDP(0) }}&nbsp;
 						span {{ validator.denom.symbol }}
 				.field.flex-column#staked
-					.label.small AMOUNT REWARDS
+					.label.small REWARDS
 					.flex
 						LoadingValue(:value="userDelegated", :loading="loadingPersonalInfo" #default="{ value }")
 							span {{ value | floorToDP(6) }}

@@ -21,27 +21,32 @@ export default Vue.extend({
 				{
 					label: "Overview",
 					link: "/",
-					iconSrc: require("../assets/svg/ui/overview.svg"),
+					iconSrc: require("../assets/svg/ui/overview-icon.svg"),
+					activeIcon: require("../assets/svg/ui/overview-active.svg"),
 				},
 				{
 					label: "Staking Portal",
 					link: "/staking-portal",
 					iconSrc: require("../assets/svg/ui/delegate-icon.svg"),
+					activeIcon: require("../assets/svg/ui/delegate-active.svg"),
 				},
 				{
 					label: "The Vaults",
 					link: "/the-vaults",
 					iconSrc: require("../assets/svg/ui/vaults-icon.svg"),
+					activeIcon: require("../assets/svg/ui/vaults-active.svg"),
 				},
 				{
 					label: "Liquid Staking",
 					link: null,
 					iconSrc: require("../assets/svg/ui/liquidstaking-icon.svg"),
+					activeIcon: require("../assets/svg/ui/liquidstaking-active.svg"),
 				},
 				{
 					label: "Multichain Governance",
 					link: null,
 					iconSrc: require("../assets/svg/ui/governance-icon.svg"),
+					activeIcon: require("../assets/svg/ui/governance-active.svg"),
 				},
 			],
 		}
