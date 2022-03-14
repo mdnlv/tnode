@@ -4,10 +4,10 @@
 		ul.menus
 			li(v-for="menu in menus")
 				nuxt-link.item.flex(v-if="menu.link" :to="menu.link")
-					img.icon(:src="menu.iconSrc")
+					img.icon(:src="iconSrc(menu.icon, menu.name)")
 					span.link-text {{ menu.label }}
 				.cursor-default.item.flex(v-else class="cursor-default")
-					img.icon(:src="menu.iconSrc")
+					img.icon(:src="iconSrc(menu.icon, menu.name)")
 					span.link-text {{ menu.label }}
 </template>
 
@@ -21,32 +21,32 @@ export default Vue.extend({
 				{
 					label: "Overview",
 					link: "/",
-					iconSrc: require("../assets/svg/ui/overview-icon.svg"),
-					activeIcon: require("../assets/svg/ui/overview-active.svg"),
+					name: "index",
+					icon: "overview",
 				},
 				{
 					label: "Staking Portal",
 					link: "/staking-portal",
-					iconSrc: require("../assets/svg/ui/delegate-icon.svg"),
-					activeIcon: require("../assets/svg/ui/delegate-active.svg"),
+					name: "staking-portal",
+					icon: "delegate",
 				},
 				{
 					label: "The Vaults",
 					link: "/the-vaults",
-					iconSrc: require("../assets/svg/ui/vaults-icon.svg"),
-					activeIcon: require("../assets/svg/ui/vaults-active.svg"),
+					name: "the-vaults",
+					icon: "vaults",
 				},
 				{
 					label: "Liquid Staking",
 					link: null,
-					iconSrc: require("../assets/svg/ui/liquidstaking-icon.svg"),
-					activeIcon: require("../assets/svg/ui/liquidstaking-active.svg"),
+					name: "",
+					icon: "liquidstaking",
 				},
 				{
 					label: "Multichain Governance",
 					link: null,
-					iconSrc: require("../assets/svg/ui/governance-icon.svg"),
-					activeIcon: require("../assets/svg/ui/governance-active.svg"),
+					name: "",
+					icon: "governance",
 				},
 			],
 		}
@@ -54,6 +54,11 @@ export default Vue.extend({
 	computed: {
 		isMenuFolded() {
 			return this.$store.getters["menu/isActive"]
+		},
+	},
+	methods: {
+		iconSrc(icon: String, name : String) {
+			return require("../assets/svg/ui/" + icon + "-" + (this.$nuxt.$route.name === name ? "active" : "icon") + ".svg")
 		},
 	},
 })
