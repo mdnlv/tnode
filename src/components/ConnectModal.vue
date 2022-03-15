@@ -1,17 +1,17 @@
 <template lang="pug">
-	#connect-modal
-		VueModal(
-			v-if="loaded"
-			name="connecting-web3-wallet"
-			:adaptive="true"
-			height="auto"
-			@before-open="startConnecting"
-			@closed="doneConnecting"
-		)
-			.header.flex-space-between
-				h3 Connect your wallet
-				#close-button.cursor-pointer(@click="_close" v-html="crossIcon")
-			Web3
+#connect-modal
+	VueModal(
+		v-if="loaded"
+		name="connecting-web3-wallet"
+		:adaptive="true"
+		height="auto"
+		@before-open="startConnecting"
+		@closed="doneConnecting"
+	)
+		.header.flex-space-between
+			h3 Connect your wallet
+			#close-button.cursor-pointer(@click="_close" v-html="crossIcon")
+		Web3
 </template>
 
 <script lang="ts">
