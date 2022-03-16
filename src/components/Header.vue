@@ -216,7 +216,7 @@ export default Vue.extend({
 				.wallet
 					margin-right: $space-small
 				button
-					width: 220px
+					width: calc(#{$unit16} - #{$unit3})
 					img
 						margin-right: $unit-3
 					.space-items-horz-small
@@ -251,11 +251,11 @@ export default Vue.extend({
 				.dropdown-icon-collapse
 					display: block
 			.header-dropdown__content
-				width: 430px
+				width: $unit19
 				@include box-shadow
 				@media (max-width: $breakpoint-mobile)
 					position: fixed
-					top: 70px
+					top: $unit8
 					left: 0
 					width: 100%
 				a.buy-tnode

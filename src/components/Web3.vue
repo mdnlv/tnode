@@ -170,7 +170,7 @@ export default Vue.extend({
 				margin-right: $unit10
 	.gray-line
 		width: 100%
-		height: 100px
+		height: $unit11
 		background: $bg2
 		line-height: auto
 		justify-content: center

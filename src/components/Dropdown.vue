@@ -57,8 +57,6 @@ export default Vue.extend({
 		min-width: $unit18
 		@media (max-width: $breakpoint-mobile-small)
 			min-width: $unit16
-		min-height: 50px
-		border-radius: 20px
 		border: none
 		color: $white
 		padding: 0 $unit3
@@ -66,12 +64,11 @@ export default Vue.extend({
 		font-family: $font
 		font-weight: $font-weight-header
 		.icon svg
-			width: 24px
+			width: $unit2
 		.dropdown-icon-collapse
 			display: none
-			max-height: 24px
+			max-height: $unit2
 	.vts-dropdown__trigger[aria-expanded]
-		border-radius: 20px 20px 0 0
 		.trigger-text
 			text-indent: -9999px
 			line-height: 0

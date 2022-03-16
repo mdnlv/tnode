@@ -52,7 +52,7 @@ export default Vue.extend({
 	z-index: 5
 	right: -$unit9
 	min-inline-size: 100%
-	margin-top: 18px
+	margin-top: $unit2
 	@media (max-width: $breakpoint-mobile)
-		margin-top: 10px
+		margin-top: $unit2
 </style>
