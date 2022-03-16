@@ -86,5 +86,5 @@ export default Vue.extend({
 
 <style lang="sass" scoped>
 	.header
-		padding-bottom: 2.4em
+		padding-bottom: $unit6
 </style>

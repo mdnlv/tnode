@@ -148,13 +148,8 @@ export default Vue.extend({
 					display: flex
 					align-items: center
 				a
-					transition: 0.3s
 					height: 100%
-					img
-						height: 100%
-						position: relative
-						transform: translateX(0.85rem) translateY(0.35rem)
-						@include hover-opacity
+					@include hover-opacity
 			.yield-boost
 				@include hover-opacity
 				img
@@ -176,7 +171,7 @@ export default Vue.extend({
 				@media (max-width: $breakpoint-mobile)
 					--price-mr: #{$space}
 					flex-direction: column
-					padding-top: 0.2em
+					padding-top: $unit-10
 					.price-icon
 						margin-right: 0
 						width: $unit3
@@ -270,7 +265,7 @@ export default Vue.extend({
 				@media (max-width: $breakpoint-mobile)
 					display: block
 			.dropdown-title
-				padding: 3em
+				padding: $unit7
 				background-color: $bg2-1
 			.dropdown-icons
 				width: $unit2

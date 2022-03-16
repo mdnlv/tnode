@@ -69,7 +69,7 @@ export default Vue.extend({
 			div
 				display: block
 				padding: $space-medium $space-big
-				font-size: 1.10rem
+				font-size: $unit1
 				font-weight: bold
 				color: $fg
 				@include hover-opacity
@@ -80,7 +80,7 @@ export default Vue.extend({
 				opacity: 0.5
 				position: relative
 				&:after
-					font-size: 0.75em
+					font-size: $unit-1
 					position: absolute
 					bottom: 0
 					left: $unit8

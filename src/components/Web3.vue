@@ -125,9 +125,9 @@ export default Vue.extend({
 		height: 100%
 	.errors
 		text-align: left
-		padding: 3em 2em
+		padding: $unit7 $unit6
 		h3
-			padding-bottom: 1em
+			padding-bottom: $unit1
 	.wallet-icon
 		height: $unit3
 
@@ -144,7 +144,7 @@ export default Vue.extend({
 		display: flex
 		width: 100%
 	.connected
-		padding: 0 4em
+		padding: 0 $unit7
 		> *:not(:last-child)
 			padding-bottom: $unit1
 	a
@@ -155,10 +155,10 @@ export default Vue.extend({
 		width: 100%
 		.wallet-choice
 			cursor: pointer
-			margin: 1em 0
+			margin: $unit1 0
 			@include hover-scale-opacity
 			.img-outer
-				margin-bottom: 1em
+				margin-bottom: $unit1
 				margin-right: 0
 			.disconnect-img
 				height: $unit3
