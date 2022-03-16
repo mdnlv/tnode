@@ -10,7 +10,7 @@
 				.price.flex.space-items-horz(@click="addToMetamask")
 					.price-icon(v-if="tnodePrice !== null")
 						img(src="~/assets/img/tnode-icon-2.png")
-					LoadingValue(:value="tnodePrice" #default="{ value }" size="small-no-margin")
+					LoadingValue(:value="tnodePrice" #default="{ value }")
 						p.bold
 							span.number ${{ value | floorToDPorE(4) }}
 				.divider.no-mobile
@@ -148,13 +148,8 @@ export default Vue.extend({
 					display: flex
 					align-items: center
 				a
-					transition: 0.3s
 					height: 100%
-					img
-						height: 100%
-						position: relative
-						transform: translateX(0.85rem) translateY(0.35rem)
-						@include hover-opacity
+					@include hover-opacity
 			.yield-boost
 				@include hover-opacity
 				img
@@ -176,7 +171,7 @@ export default Vue.extend({
 				@media (max-width: $breakpoint-mobile)
 					--price-mr: #{$space}
 					flex-direction: column
-					padding-top: 0.2em
+					padding-top: $unit-10
 					.price-icon
 						margin-right: 0
 						width: $unit3
@@ -221,7 +216,7 @@ export default Vue.extend({
 				.wallet
 					margin-right: $space-small
 				button
-					width: 220px
+					width: calc(#{$unit16} - #{$unit3})
 					img
 						margin-right: $unit-3
 					.space-items-horz-small
@@ -256,11 +251,11 @@ export default Vue.extend({
 				.dropdown-icon-collapse
 					display: block
 			.header-dropdown__content
-				width: 430px
+				width: $unit19
 				@include box-shadow
 				@media (max-width: $breakpoint-mobile)
 					position: fixed
-					top: 70px
+					top: $unit8
 					left: 0
 					width: 100%
 				a.buy-tnode
@@ -270,7 +265,7 @@ export default Vue.extend({
 				@media (max-width: $breakpoint-mobile)
 					display: block
 			.dropdown-title
-				padding: 3em
+				padding: $unit7
 				background-color: $bg2-1
 			.dropdown-icons
 				width: $unit2

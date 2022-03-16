@@ -89,7 +89,7 @@ export default Vue.extend({
 				opacity: 0.5
 				position: relative
 				&:after
-					font-size: 0.75em
+					font-size: $unit-1
 					position: absolute
 					bottom: 0
 					left: $unit13
