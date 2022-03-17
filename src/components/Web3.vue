@@ -154,7 +154,7 @@ export default Vue.extend({
 			padding-bottom: $unit1
 		.green
 			color: $fg3
-			font-size: 0.60em
+			font-size: $unit-3
 		.img-copy
 			margin-left: $unit3
 	a

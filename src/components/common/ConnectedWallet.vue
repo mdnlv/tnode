@@ -49,9 +49,9 @@ export default Vue.extend({
 #connected-wallet
 	padding: 0
 	> :last-child
-		margin-left: 0.8rem
+		margin-left: $unit-2
 		@media (max-width: $breakpoint-tablet)
-			margin-left: 0.6rem
+			margin-left: $unit-3
 	display: flex
 	align-items: enter
 	.wallet-icon
@@ -59,14 +59,14 @@ export default Vue.extend({
 		height: $unit4
 	.green
 		color: $fg3
-		font-size: 0.60em
+		font-size: $unit-3
 	.color-f
 		font-size: $unit1
 		text-align: left
 		@media (max-width: $breakpoint-tablet)
-			font-size: 0.95rem
+			font-size: $unit-1
 		@media (max-width: $breakpoint-mobile)
-			font-size: 0.9rem
+			font-size: $unit-1
 	.img-copy
 		margin-left: $unit6
 		@media (max-width: $breakpoint-tablet)
