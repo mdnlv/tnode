@@ -94,6 +94,7 @@ export default Vue.extend({
 					bottom: 0
 					left: $unit13
 					content: "coming soon.."
+					text-transform: none
 			.icon
 				width: $unit3
 				height: $unit3
