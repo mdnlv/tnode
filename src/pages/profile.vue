@@ -205,12 +205,12 @@ export default Vue.extend({
 
 	#subline
 		.item
-			margin-top: 15px
+			margin-top: $unit1
 		.wallet-icon
 			height: $unit3
 		.green
 			color: $fg3
-			font-size: 0.60em
+			font-size: $unit-4
 		#info-link
 			color: $fg3
 			@include hover-opacity
@@ -225,7 +225,7 @@ export default Vue.extend({
 			margin-right: $unit8
 		.img-info
 			margin-left: $unit10
-			margin-right: 6px
+			margin-right: $unit-5
 
 	.tabs
 		label
@@ -237,7 +237,7 @@ export default Vue.extend({
 			position: relative
 			top: 1px
 			color: $fg
-			padding: 10px 25px
+			padding: $unit-2 $unit7
 		>label:not(:first-of-type)
 			border-left: none
 		>input[type="radio"]:checked+label
@@ -246,8 +246,8 @@ export default Vue.extend({
 			display: none
 		>div
 			display: none
-			padding: 10px 0
-			font-size: 16px
+			padding: $unit-2 0
+			font-size: $unit1
 
 	#tab-btn-1
 		&:checked

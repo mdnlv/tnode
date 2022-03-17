@@ -555,7 +555,7 @@ export default Vue.extend({
 				grid-template-areas: "delegated staked" "claimrewards k" "discon wallet"
 	@media (max-width: $breakpoint-tablet)
 		.label
-			font-size: 0.8rem
+			font-size: $unit-2
 			letter-spacing: 0
 	.wrap
 		word-wrap: break-word

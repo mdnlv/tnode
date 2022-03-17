@@ -232,10 +232,10 @@ export default Vue.extend({
 				@media (min-width: $breakpoint-mobile)
 					padding: 0
 				.icon svg
-					width: 24px
+					width: $unit3
 				.dropdown-icon-collapse
 					display: none
-					max-height: 24px
+					max-height: $unit4
 			.header-dropdown__trigger[aria-expanded]
 				.trigger-text
 					text-indent: -9999px

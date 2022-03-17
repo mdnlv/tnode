@@ -182,7 +182,7 @@ export default Vue.extend({
 			display: table-cell
 			vertical-align: middle
 	.title
-		width: 300px
+		width: $unit16
 		.image
 			position: relative
 			margin-right: $unit7
@@ -191,7 +191,7 @@ export default Vue.extend({
 				@include box-shadow
 			> .icon:first-child
 				img
-					padding: 3px
+					padding: $unit-10
 					border: solid $color 2px
 					border-radius: $unit10
 			img
@@ -309,7 +309,7 @@ export default Vue.extend({
 				grid-template-areas: "delegated staked" "k discon"
 	@media (max-width: $breakpoint-tablet)
 		.label
-			font-size: 0.8rem
+			font-size: $unit-2
 			letter-spacing: 0
 	.wrap
 		word-wrap: break-word
