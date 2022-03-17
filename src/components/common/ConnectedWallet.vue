@@ -55,7 +55,7 @@ export default Vue.extend({
 	display: flex
 	align-items: enter
 	.wallet-icon
-		padding-top: 4px
+		padding-top: $unit-7
 		height: $unit4
 	.green
 		color: $fg3
