@@ -1,6 +1,6 @@
 <template lang="pug">
 	.header-dropdown
-		button.header-dropdown__trigger(:aria-expanded="!!isFocused" aria-haspopup="true", @click="onClick")
+		button.header-dropdown__trigger(:aria-expanded="!!isFocused" @click="onClick")
 			slot(name="trigger") {{ text }}
 		transition(:name="transition")
 			.header-dropdown__content(v-if="isFocused" ref="dropdown" v-click-outside="onClick")
@@ -32,8 +32,18 @@ export default Vue.extend({
 	data: () => ({
 		isFocused: false,
 	}),
+
+	/*
+	computed: {
+		isFocused() : boolean {
+			return this.$store.getters["web3/dropdownVisible"]
+		},
+	},
+	*/
+
 	methods: {
 		onClick() {
+			// this.$store.commit("web3/changeDropdownVisible")
 			this.isFocused = !this.isFocused
 			this.$store.commit("web3/connectingWalletId", null)
 			this.$store.commit("web3/connectingWalletError", null)
