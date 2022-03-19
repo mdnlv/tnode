@@ -20,39 +20,40 @@
 							img(src="~/assets/img/tnode-icon-2.png")
 							span BUY TNODE NOW
 				.divider
-				HeaderDropdown.nostyle
-					template(#trigger)
-						.flex
-							.connect-wallet
-								.mobile(style="cursor: pointer")
-									.flex.space-items-horz(v-if="!account")
-										img(src="~/assets/svg/wallet.svg")
-										.flex.dropdown-icons
-											.flex.dropdown-icon-expand(v-html="dropDownIconExpand")
-											.flex.dropdown-icon-collapse(v-html="dropDownIconCollapse")
-									.flex.space-items-horz.wallet(v-else)
-										img(:src="connectedEVMWallet.icon")
-										.flex.dropdown-icons
-											.flex.dropdown-icon-expand(v-html="dropDownIconExpand")
-											.flex.dropdown-icon-collapse(v-html="dropDownIconCollapse")
-								button.no-mobile.pill
-									.flex.space-items-horz-small(v-if="!account")
-										img(src="~/assets/svg/wallet.svg")
-										span CONNECT WALLET
-										.flex.dropdown-icons
-											.flex.dropdown-icon-expand(v-html="dropDownIconExpand")
-											.flex.dropdown-icon-collapse(v-html="dropDownIconCollapse")
-									.flex.space-items-horz-small(v-else)
-										img(:src="connectedEVMWallet.icon")
-										span {{ account.address | accountAddress }}
-										.flex.dropdown-icons
-											.flex.dropdown-icon-expand(v-html="dropDownIconExpand")
-											.flex.dropdown-icon-collapse(v-html="dropDownIconCollapse")
-					template(#default)
-						.dropdown-title(v-if="!connectingWalletId")
-							h3(v-if="!account") Connect your wallet
-							h3(v-else) Connected wallet
-						Web3
+				client-only
+					HeaderDropdown.nostyle
+						template(#trigger)
+							.flex
+								.connect-wallet
+									.mobile(style="cursor: pointer")
+										.flex.space-items-horz(v-if="!account")
+											img(src="~/assets/svg/wallet.svg")
+											.flex.dropdown-icons
+												.flex.dropdown-icon-expand(v-html="dropDownIconExpand")
+												.flex.dropdown-icon-collapse(v-html="dropDownIconCollapse")
+										.flex.space-items-horz.wallet(v-else)
+											img(:src="connectedEVMWallet.icon")
+											.flex.dropdown-icons
+												.flex.dropdown-icon-expand(v-html="dropDownIconExpand")
+												.flex.dropdown-icon-collapse(v-html="dropDownIconCollapse")
+									button.no-mobile.pill
+										.flex.space-items-horz-small(v-if="!account")
+											img(src="~/assets/svg/wallet.svg")
+											span CONNECT WALLET
+											.flex.dropdown-icons
+												.flex.dropdown-icon-expand(v-html="dropDownIconExpand")
+												.flex.dropdown-icon-collapse(v-html="dropDownIconCollapse")
+										.flex.space-items-horz-small(v-else)
+											img(:src="connectedEVMWallet.icon")
+											span {{ account.address | accountAddress }}
+											.flex.dropdown-icons
+												.flex.dropdown-icon-expand(v-html="dropDownIconExpand")
+												.flex.dropdown-icon-collapse(v-html="dropDownIconCollapse")
+						template(#default)
+							.dropdown-title(v-if="!connectingWalletId")
+								h3(v-if="!account") Connect your wallet
+								h3(v-else) Connected wallet
+							Web3
 		Wallets
 		ConnectModal
 </template>
@@ -235,7 +236,7 @@ export default Vue.extend({
 					width: $unit3
 				.dropdown-icon-collapse
 					display: none
-					max-height: $unit4
+					max-height: $unit3
 			.header-dropdown__trigger[aria-expanded]
 				.trigger-text
 					text-indent: -9999px

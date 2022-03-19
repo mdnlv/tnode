@@ -10,7 +10,7 @@
 			.flex-column.connected(v-else)
 				.flex.wrap
 					ConnectedWallet(long-address)
-				NuxtLink.flex.space-items-horz.disconnect(to="profile" @click.native="changeDropdownVisible()")
+				NuxtLink.button.bare.flex.space-items-horz.no-padding.disconnect(to="profile" @click.native="changeDropdownVisible")
 					.img-outer(v-html="profileIcon")
 					span YOUR PROFILE
 				NuxtLink.button.bare.flex.space-items-horz.no-padding.disconnect(to="/" @click.native="disconnect")
@@ -58,6 +58,7 @@ export default Vue.extend({
 			copyIcon: require("~/assets/svg/copy.svg?raw"),
 		}
 	},
+
 	computed: {
 		loaded(): boolean {
 			return this.$store.getters.loaded
@@ -81,6 +82,7 @@ export default Vue.extend({
 			return this.$store.getters["web3/account"] as EVMAccount
 		},
 	},
+
 	watch: {
 		async connectingWalletId(walletId: string) {
 			if (walletId) {
@@ -110,7 +112,7 @@ export default Vue.extend({
 			this.$store.commit("web3/connectingWalletId", null)
 			this.$store.commit("web3/connectingWalletError", null)
 		},
-		changeDropdownVisible(e) {
+		changeDropdownVisible() {
 			this.$store.commit("web3/changeDropdownVisible")
 		},
 	},

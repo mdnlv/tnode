@@ -1,54 +1,37 @@
 <template lang="pug">
 	.header-dropdown
-		button.header-dropdown__trigger(:aria-expanded="!!isFocused" @click="onClick")
-			slot(name="trigger") {{ text }}
-		transition(:name="transition")
-			.header-dropdown__content(v-if="isFocused" ref="dropdown" v-click-outside="onClick")
-				slot
+		button.header-dropdown__trigger(:aria-expanded="!!isFocused" ref="header")
+			slot(name="trigger")
+		.header-dropdown__content(v-show="isFocused" ref="dropdown")
+			slot
 </template>
 
 <script lang="ts">
 import Vue from "vue"
-import vClickOutside from "v-click-outside"
 
 export default Vue.extend({
-	name: "VDrawer",
-	directives: {
-		clickOutside: vClickOutside.directive,
-	},
-	props: {
 
-		text: {
-			type: String,
-			default: "",
-		},
-
-		transition: {
-			type: String,
-			default: "",
-		},
-	},
-
-	data: () => ({
-		isFocused: false,
-	}),
-
-	/*
 	computed: {
 		isFocused() : boolean {
 			return this.$store.getters["web3/dropdownVisible"]
 		},
 	},
-	*/
 
-	methods: {
-		onClick() {
-			// this.$store.commit("web3/changeDropdownVisible")
-			this.isFocused = !this.isFocused
-			this.$store.commit("web3/connectingWalletId", null)
-			this.$store.commit("web3/connectingWalletError", null)
-		},
+	mounted() {
+		// eslint-disable-next-line nuxt/no-env-in-hooks
+		if (process.client) {
+			document.addEventListener("click", (e: MouseEvent) => {
+				const withinBoundaries = e.composedPath().includes(this.$refs.dropdown as Element)
+				const header = e.composedPath().includes(this.$refs.header as Element)
+				if (!withinBoundaries && (header || (!header && this.$store.getters["web3/dropdownVisible"]))) {
+					this.$store.commit("web3/changeDropdownVisible")
+					this.$store.commit("web3/connectingWalletId", null)
+					this.$store.commit("web3/connectingWalletError", null)
+				}
+			})
+		}
 	},
+
 })
 </script>
 
