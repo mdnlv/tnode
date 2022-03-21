@@ -1,5 +1,5 @@
 <template lang="pug">
-	button#connected-wallet.bare
+	button#connected-wallet.bare(@click="copy")
 		img.wallet-icon(:src="connectedEVMWallet.icon")
 		.flex
 			.flex-column.flex-start
@@ -37,6 +37,13 @@ export default Vue.extend({
 		},
 		connectedEVMWallet(): EVMWallet | null {
 			return this.$store.getters["web3/wallets"].find(w => w.id === this.account?.walletId) ?? null
+		},
+	},
+	methods: {
+		copy() {
+			if (process.client && this.account?.address) {
+				navigator.clipboard.writeText(this.account.address)
+			}
 		},
 	},
 })
