@@ -127,8 +127,10 @@ export default Vue.extend({
 		.buttons
 			padding-left: $unit2
 			margin-right: $unit7
+			@media (max-width: $breakpoint-mobile-small)
+					margin-right: $unit5
+					padding-left: 0
 		> .flex
-			display: flex
 			justify-content: space-between
 			flex-wrap: wrap
 			align-items: stretch
@@ -136,12 +138,16 @@ export default Vue.extend({
 				padding-left: $space-big
 				@media (max-width: $breakpoint-mobile)
 					padding-left: $space-medium
+				@media (max-width: $breakpoint-mobile-small)
+					padding-left: $space-small
 			> *:last-child
 				padding-right: $space-big
 				@media (max-width: $breakpoint-mobile)
 					padding: 0
 			.logo
 				// height: $header-height
+				@media (max-width: $breakpoint-mobile-small)
+					width: $unit10
 				position: relative
 				// background-color: red
 				.logo-link
@@ -203,6 +209,8 @@ export default Vue.extend({
 				.mobile
 					img
 						margin-right: $unit-2
+						@media (max-width: $breakpoint-mobile-small)
+							margin-right: $unit-8
 				@media (max-width: $breakpoint-mobile)
 					width: $unit8
 				.button
@@ -215,6 +223,8 @@ export default Vue.extend({
 					width: $unit3
 				.wallet
 					margin-right: $space-small
+					@media (max-width: $breakpoint-mobile-small)
+						margin-right: 0
 				button
 					width: calc(#{$unit16} - #{$unit3})
 					img
