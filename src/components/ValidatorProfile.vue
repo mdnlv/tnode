@@ -24,14 +24,16 @@
 							span {{ value | floorToDP(6) }}
 						span &nbsp;{{ validator.denom.symbol }}
 				.field.flex#claimrewards
-					.button.bare.flex.space-items-horz.no-padding
+					.button.bare.flex.space-items-horz.no-padding(@click="openModal('claimRewards')")
 						.img-outer.inline-middle(v-html="claimIcon")
 						span CLAIM REWARDS
 				.field.flex#k
-					.button.bare.flex.space-items-horz.no-padding
-						.img-outer.inline-middle(v-html="kIcon")
-						span.color-f 98WAW3...89FAWF
-				.field.flex#discon
+					.button.bare.flex.space-items-horz.no-padding(v-if="!account" @click="connectWallet") CONNECT WALLET
+					.account.flex.space-items-horz(v-else)
+						img.icon(:src="wallet.icon")
+						p {{ account.address | accountAddress }}
+
+				.field.flex#discon(v-if="account" @click="connectWallet")
 					.button.bare.flex.space-items-horz.no-padding
 						div(v-html="disconIcon")
 </template>
