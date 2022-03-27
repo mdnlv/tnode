@@ -25,15 +25,16 @@
 						span &nbsp;{{ validator.denom.symbol }}
 				.field.flex#claimrewards
 					.button.bare.flex.space-items-horz.no-padding(@click="openModal('claimRewards')")
-						.img-outer.inline-middle(v-html="claimIcon")
-						span CLAIM REWARDS
+						.img-outer.inline-middle(v-html="!!account ? claimIcon : claimGrayIcon")
+						span(v-if="!!account") CLAIM REWARDS
+						span.disable(v-else) CLAIM REWARDS
 				.field.flex#k
 					.button.bare.flex.space-items-horz.no-padding(v-if="!account" @click="connectWallet") CONNECT WALLET
 					.account.flex.space-items-horz(v-else)
 						img.icon(:src="wallet.icon")
 						p {{ account.address | accountAddress }}
 
-				.field.flex#discon(v-if="account" @click="connectWallet")
+				.field.flex#discon(v-if="account" @click="disconnectWallet")
 					.button.bare.flex.space-items-horz.no-padding
 						div(v-html="disconIcon")
 </template>
@@ -76,6 +77,7 @@ export default Vue.extend({
 			crossIcon: require("~/assets/svg/ui/cross.svg?raw"),
 			disconIcon: require("~/assets/svg/discon.svg?raw"),
 			claimIcon: require("~/assets/svg/claim_rewards.svg?raw"),
+			claimGrayIcon: require("~/assets/svg/claim_gray.svg?raw"),
 			kIcon: require("~/assets/svg/k.svg?raw"),
 			optionsIcon: require("~/assets/svg/ui/options.svg?raw"),
 			actionIcon: {
@@ -233,6 +235,18 @@ export default Vue.extend({
 				this.$modal.hide("connecting-staking-wallet")
 			}
 		},
+		/*
+		async disconnectWallet() {
+			this.$store.commit("staking/disconnectWallet")
+			await this.$store.dispatch(
+				this.walletModuleName("getAccount"),
+				this.validator.chainId,
+			)
+			this.walletInstalled = await this.$store.dispatch(
+				this.walletModuleName("installed"),
+			)
+		},
+		*/
 		async openModal(type: TransactionType) {
 			this.modalLoaded = false
 			await this.connectWallet()
@@ -543,6 +557,8 @@ export default Vue.extend({
 				grid-area: staked
 			#claimrewards
 				grid-area: claimrewards
+				.disable
+					color: #3f505a
 			#k
 				grid-area: k
 			#discon
