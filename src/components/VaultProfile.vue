@@ -17,7 +17,9 @@
 				.field.flex-column#total-delegated
 					.label.small AMOUNT STAKED
 					.flex
-						span &nbsp;{{ "" }}
+						LoadingValue(:value="vault.userStaked" #default="{ value }" size="medium", :loading="userStakedLoading !== null ? userStakedLoading : !vault.userStaked")
+							span.number {{ value | floorToDPorE(1) }}&nbsp;
+						span {{ vault.stakeDenom.symbol }}
 				.field.flex-column#staked
 					.label.small LIQUIDITY VAULTS
 					.flex
