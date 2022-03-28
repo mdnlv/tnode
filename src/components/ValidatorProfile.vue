@@ -12,19 +12,24 @@
 		#contents.grow(:class="{ active }")
 			.css-grid
 				.field.flex-column#delegated
+					//.label.small AMOUNT DELEGATED
+					//.flex
+					//	LoadingValue(:value="validator.totalDelegated" #default="{ value }")
+					//		span {{ value | floorToDP(0) }}&nbsp;
+					//	span {{ validator.denom.symbol }}
 					.label.small AMOUNT DELEGATED
-					.flex
-						LoadingValue(:value="validator.totalDelegated" #default="{ value }")
-							span {{ value | floorToDP(0) }}&nbsp;
-						span {{ validator.denom.symbol }}
-				.field.flex-column#staked
-					.label.small REWARDS
 					.flex
 						LoadingValue(:value="userDelegated", :loading="loadingPersonalInfo" #default="{ value }")
 							span {{ value | floorToDP(6) }}
 						span &nbsp;{{ validator.denom.symbol }}
+				.field.flex-column#staked
+					.label.small YOUR REWARDS
+					.flex
+						LoadingValue(:value="userRewards", :loading="loadingPersonalInfo" #default="{ value }")
+							span {{ value | floorToDP(6) }}
+						span &nbsp;{{ validator.denom.symbol }}
 				.field.flex#claimrewards
-					.button.bare.flex.space-items-horz.no-padding(@click="openModal('claimRewards')")
+					.button.bare.flex.space-items-horz.no-padding(@click="!!account && openModal('claimRewards')")
 						.img-outer.inline-middle(v-html="!!account ? claimIcon : claimGrayIcon")
 						span(v-if="!!account") CLAIM REWARDS
 						span.disable(v-else) CLAIM REWARDS
