@@ -34,7 +34,7 @@
 						img.icon(:src="wallet.icon")
 						p {{ account.address | accountAddress }}
 
-				.field.flex#discon(v-if="account" @click="disconnectWallet")
+				.field.flex#discon(v-if="account")
 					.button.bare.flex.space-items-horz.no-padding
 						div(v-html="disconIcon")
 </template>
@@ -235,18 +235,7 @@ export default Vue.extend({
 				this.$modal.hide("connecting-staking-wallet")
 			}
 		},
-		/*
-		async disconnectWallet() {
-			this.$store.commit("staking/disconnectWallet")
-			await this.$store.dispatch(
-				this.walletModuleName("getAccount"),
-				this.validator.chainId,
-			)
-			this.walletInstalled = await this.$store.dispatch(
-				this.walletModuleName("installed"),
-			)
-		},
-		*/
+
 		async openModal(type: TransactionType) {
 			this.modalLoaded = false
 			await this.connectWallet()
