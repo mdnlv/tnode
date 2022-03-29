@@ -9,18 +9,18 @@
 					.flex
 						img.loading-medium(v-if="totalDelegationsLoading" src="~/assets/gif/loading-3.gif")
 						.h1.delegated-number ${{ totalAssetsDelegated | floorToDP(0) }}
-				.vertical-hr.no-mobile
-				.space-items-small
-					p.label.small TOTAL ASSETS DELEGATED
-					.flex
-						img.loading-medium(v-if="totalDelegationsLoading" src="~/assets/gif/loading-3.gif")
-						.h1.delegated-number ${{ totalAssetsDelegated | floorToDP(0) }}
-				.vertical-hr.no-mobile
-				.space-items-small
-					p.label.small TOTAL ASSETS STAKED
-					.flex
-						img.loading-medium(v-if="totalDelegationsLoading" src="~/assets/gif/loading-3.gif")
-						.h1.delegated-number ${{ totalAssetsDelegated | floorToDP(0) }}
+				//.vertical-hr.no-mobile
+				//.space-items-small
+				//	p.label.small TOTAL ASSETS DELEGATED
+				//	.flex
+				//		img.loading-medium(v-if="totalDelegationsLoading" src="~/assets/gif/loading-3.gif")
+				//		.h1.delegated-number ${{ totalAssetsDelegated | floorToDP(0) }}
+				//.vertical-hr.no-mobile
+				//.space-items-small
+				//	p.label.small TOTAL ASSETS STAKED
+				//	.flex
+				//		img.loading-medium(v-if="totalDelegationsLoading" src="~/assets/gif/loading-3.gif")
+				//		.h1.delegated-number ${{ totalAssetsDelegated | floorToDP(0) }}
 	section
 		#subline.container.flex.space-items-horz.flex-wrap
 			ConnectedWallet.item

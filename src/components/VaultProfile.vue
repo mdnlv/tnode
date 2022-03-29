@@ -21,43 +21,152 @@
 							span.number {{ value | floorToDPorE(1) }}&nbsp;
 						span {{ vault.stakeDenom.symbol }}
 				.field.flex-column#staked
-					.label.small LIQUIDITY VAULTS
+					.label.small YOUR REWARDS
 					.flex
-						span &nbsp;{{ "" }}
+						LoadingValue(:value="vault.userRewards" #default="{ value }" size="medium")
+							span.number {{ value | floorToDPorE(1) }}&nbsp;
+						span {{ vault.rewardDenom.symbol }}
+				.field.flex#claimrewards
+					.button.bare.flex.space-items-horz.no-padding(@click="openModal('claimRewards')")
+						.img-outer.inline-middle(v-html="claimIcon")
+						span CLAIM REWARDS
 				.field.flex#k
 					ConnectedWallet(no-copy)
 				.field.flex#discon
 					.button.bare.flex.space-items-horz.no-padding
 						div(v-html="disconIcon")
+		Modal(
+			v-if="loaded"
+			:name="`stake-${vault.address}`"
+			:loading="!modalLoaded"
+			:title="`Stake ${vault.stakeDenom.symbol} to vault`"
+		)
+			.modal-form.space-items-big.form
+				.flex.space-items-horz
+					img.icon(:src="vault.stakeDenom.icon")
+					.balance
+						p.label.small BALANCE IN WALLET
+						.h2.number {{ vault.userBalance | floorToDPorE(4) }} {{ vault.stakeDenom.symbol }}
+				MaxInput(
+					v-model="amount"
+					:max="vault.userBalance"
+					:symbol="vault.stakeDenom.symbol"
+					placeholder="Amount to stake"
+				)
+				StatusMessage(:message="statusMessage")
+				#buttons
+					button.bare.big-text(v-if="vault.stakeDenom.denoms", @click="openModal('addLiquidity')") GET LP TOKENS
+					button.bare.big-text(@click="stake") STAKE
+		Modal(
+			v-if="loaded"
+			:name="`unstake-${vault.address}`"
+			:loading="!modalLoaded"
+			:title="`Unstake ${vault.stakeDenom.symbol}`"
+		)
+			.modal-form.space-items-big.form
+				.flex.space-items-horz
+					img.icon(:src="vault.stakeDenom.icon")
+					.balance
+						p.label.small STAKED
+						.h2.number {{ vault.userStaked | floorToDPorE(4) }} {{ vault.stakeDenom.symbol }}
+				MaxInput(
+					v-model="amount"
+					:max="vault.userStaked"
+					:symbol="vault.stakeDenom.symbol"
+					placeholder="Amount to unstake"
+				)
+				StatusMessage(:message="statusMessage")
+				#buttons
+					button.bare.big-text(@click="unstake") UNSTAKE
+		Modal(
+			v-if="loaded"
+			:name="`claimRewards-${vault.address}`"
+			:loading="!modalLoaded"
+			title="Error claiming rewards"
+			:height="300"
+		)
+			#claim-rewards-error
+				StatusMessage(:message="statusMessage", position="relative")
+		Modal(
+			v-if="loaded"
+			:name="`transaction-${vault.address}`"
+			:title="transactionTitle"
+			:width="500"
+			:height="500"
+		)
+			.modal-form.space-items-big
+				.space-items-small
+					.label.small {{ transactionStatus }}
+					.flex-space-between
+						template(v-if="transactionType === 'addLiquidity'")
+							.space-items-small
+								.h2 {{ transactionAmount[0] | floorToDPorE(4) }} {{ transactionDenom[0] }}
+								.h2 {{ transactionAmount[1] | floorToDPorE(4) }} {{ transactionDenom[1] }}
+						template(v-else)
+							.h2 {{ transactionAmount | floorToDPorE(4) }} {{ transactionDenom }}
+						.center(style="transform: scale(1.7)" v-html="arrowRightIcon")
+						.center(v-html="actionIcon[transactionType]")
+				.space-items
+					.label.small TRANSACTION ID
+					.wrap.space-items-horz-small
+						span {{ transactionHash }}
+						a.explorer-link(
+							v-if="transactionHash"
+							:href="toLink(transactionHash, txLinkTemplate)"
+							target="_blank"
+							v-html="linkIcon"
+						)
+					p(v-if="transactionStatus === 'pending'") (please allow time for transaction confirmation)
+				#buttons
+					button.bare.big-text(@click="closeTransactionModal") CLOSE
+		AddLiquidityModal(
+			v-if="loaded && vault.stakeDenom.denoms"
+			:vault="vault"
+			@response="handleResponse('addLiquidity', $event.response, $event.amounts)"
+			ref="addLiquidityModal"
+		)
 </template>
 
 <script lang="ts">
 import Vue from "vue"
+import { differenceInSeconds } from "date-fns"
+import cn from "comma-number"
 import bn from "big.js"
-
+import { isEqual } from "lodash"
+import { Vault, EVMAccount, Network, DropdownOption } from "~/_types"
 import { toLink } from "~/_utils"
-import { Delegation, Vault } from "~/_types"
 import LoadingValue from "~/components/LoadingValue.vue"
 import Modal from "~/components/Modal.vue"
 import MaxInput from "~/components/MaxInput.vue"
+import StatusMessage from "~/components/StatusMessage.vue"
+import AddLiquidityModal from "~/components/AddLiquidityModal.vue"
 import ConnectedWallet from "~/components/common/ConnectedWallet.vue"
-import StakeRow from "~/components/common/StakeRow.vue"
 
-type TransactionType = "delegate" | "undelegate" | "claimRewards" | "redelegate"
+type TransactionType = "stake" | "unstake" | "claimRewards" | "addLiquidity"
+type CountdownUnit = {
+	unit: "DAYS" | "HRS" | "MIN"
+	value: number
+}
 
 export default Vue.extend({
 	components: {
 		LoadingValue,
-		Modal,
 		MaxInput,
+		Modal,
+		StatusMessage,
+		AddLiquidityModal,
 		ConnectedWallet,
-		StakeRow,
 	},
 	filters: {
-		realValue(amount: bn | null, price: bn | null) {
-			return amount === null || price === null
-				? null
-				: amount.times(price)
+		renderProperty(property: Vault["properties"][number], vault: Vault) {
+			const { type, value } = property
+			return {
+				limit: `Limited to ${cn(value)} ${vault.stakeDenom.symbol}`,
+				reset: `Resets every ${value} days`,
+				maxRewards: `Max. Rewards: ${cn(value)} ${vault.rewardDenom.symbol}`,
+				lockup: `${value} days lockup`,
+				compounding: "Monthly compounded APY",
+			}[type]
 		},
 	},
 	props: {
@@ -65,97 +174,384 @@ export default Vue.extend({
 			type: Object as Vue.PropType<Vault>,
 			required: true,
 		},
+		networks: {
+			type: Array as Vue.PropType<DropdownOption[]>,
+			required: true,
+		},
 	},
 	data() {
 		return {
-			crossIcon: require("~/assets/svg/ui/cross.svg?raw"),
+			actionIcon: {
+				stake: require("~/assets/svg/ui/delegate-icon.svg?raw"),
+				unstake: require("~/assets/svg/ui/undelegate-icon.svg?raw"),
+				claimRewards: require("~/assets/svg/ui/claimRewards-icon.svg?raw"),
+				addLiquidity: require("~/assets/svg/ui/addLiquidity-icon.svg?raw"),
+			},
 			disconIcon: require("~/assets/svg/discon.svg?raw"),
 			claimIcon: require("~/assets/svg/claim_rewards.svg?raw"),
-			kIcon: require("~/assets/svg/k.svg?raw"),
-			optionsIcon: require("~/assets/svg/ui/options.svg?raw"),
-			actionIcon: {
-				delegate: require("~/assets/svg/ui/delegate-icon.svg?raw"),
-				undelegate: require("~/assets/svg/ui/undelegate-icon.svg?raw"),
-				claimRewards: require("~/assets/svg/ui/claimRewards-icon.svg?raw"),
-			},
 			arrowRightIcon: require("~/assets/svg/ui/arrow-right.svg?raw"),
 			linkIcon: require("~/assets/svg/ui/link.svg?raw"),
-			infoIcon: require("~/assets/svg/ui/info-icon.svg?raw"),
-			refreshIcon: require("~/assets/svg/ui/refresh.svg?raw"),
-			active: false,
+			auditIcon: require("~/assets/svg/ui/audit.svg?raw"),
+			timeUntilClose: null as CountdownUnit[] | null,
+			timeUntilCloseSetter: null as null | NodeJS.Timer,
+			aprSetter: null as null | NodeJS.Timer,
+			tvlSetter: null as null | NodeJS.Timer,
+			balanceSetter: null as null | NodeJS.Timer,
+			stakedSetter: null as null | NodeJS.Timer,
+			userStakedLoading: null as boolean | null,
+			rewardsSetter: null as null | NodeJS.Timer,
 			modalLoaded: false,
-			statusMessage: null as string | null,
+			provider: null as any | null,
 			amount: null as string | null,
-			balance: null as bn | null,
-			delegations: [] as Delegation[],
-			srcDelegation: null as Delegation | null,
-			usingMax: false,
 			claimingRewards: false,
-			transactionType: "delegate" as TransactionType | null,
-			transactionAmount: null as string | null,
+			statusMessage: null as string | null,
+			transactionType: "stake" as TransactionType | null,
+			transactionAmount: null as string | string[] | null,
 			transactionHash: null as string | null,
 			transactionStatus: null as "success" | "pending" | null,
-			walletInstalled: false,
-			userDelegatedSetter: null as null | NodeJS.Timer,
-			userRewardsSetter: null as null | NodeJS.Timer,
 		}
 	},
 	computed: {
-		menuIcon() {
-			return this.$data.active ? this.$data.crossIcon : this.$data.optionsIcon
-		},
 		loaded(): boolean {
 			return this.$store.getters.loaded
 		},
 		name(): string[] {
 			return this.vault.name.split("\n")
 		},
-
-		connectingWalletError() {
-			return this.$store.getters["staking/connectingWalletError"]
+		network(): DropdownOption {
+			return this.networks.find(n => n.value === this.vault.networkName)!
 		},
-
-		totalDelegation(): bn {
-			if (this.delegations && this.delegations.length > 0) {
-				return this.delegations.reduce((acc, del) =>
-					del.amount.add(acc)
-				, bn(0))
+		wallet(): any {
+			return this.$store.getters[
+				this.walletModuleName("wallet")
+			]
+		},
+		account(): EVMAccount | null {
+			return this.$store.getters[this.walletModuleName("account")] as EVMAccount
+		},
+		tvl(): bn | null {
+			if (this.vault.tvl === null) {
+				return null
 			}
-			return bn(0)
+			return this.vault.stakeDenom.price
+				? this.vault.tvl.times(this.vault.stakeDenom.price)
+				: null
+		},
+		prices(): (bn | null)[] {
+			return [
+				this.vault.stakeDenom.price,
+				this.vault.rewardDenom.price,
+			]
+		},
+		transactionTitle(): string {
+			if (!this.transactionType) {
+				return ""
+			}
+			return {
+				stake: `Stake ${this.vault.stakeDenom.symbol}`,
+				unstake: `Unstake ${this.vault.stakeDenom.symbol}`,
+				claimRewards: `Claim ${this.vault.rewardDenom.symbol} rewards`,
+				addLiquidity: "Add Liquidity",
+			}[this.transactionType]
+		},
+		transactionDenom(): string | string[] {
+			if (!this.transactionType) {
+				return ""
+			}
+			return {
+				stake: this.vault.stakeDenom.symbol,
+				unstake: this.vault.stakeDenom.symbol,
+				claimRewards: this.vault.rewardDenom.symbol,
+				addLiquidity: "denoms" in this.vault.stakeDenom ? this.vault.stakeDenom.denoms.map(d => d.symbol) : [],
+			}[this.transactionType]
+		},
+		txLinkTemplate(): string {
+			const networks = this.$store.getters["networks/all"] as Network[]
+			const network = networks.find(n => n.chainName === this.vault.networkName)
+			return network!.txLinkTemplate
 		},
 	},
 	watch: {
-
-		amount() {
-			this.usingMax = false
+		account: {
+			async handler(account: EVMAccount | null) {
+				if (!account) {
+					return
+				}
+				await this.$store.dispatch("vaults/setStaked", this.vault)
+				await this.$store.dispatch("vaults/setRewards", this.vault)
+			},
+			immediate: true,
 		},
-
+		"vault.closesAt"() {
+			this.setTimeUntilClose()
+		},
+		"vault.userStaked"(newVal, oldVal) {
+			if (!newVal || bn(newVal).eq(0)) {
+				if (this.rewardsSetter !== null) {
+					clearInterval(this.rewardsSetter)
+				}
+				if (this.stakedSetter !== null) {
+					clearInterval(this.stakedSetter)
+				}
+				return
+			}
+			if (newVal !== null && oldVal !== null && !bn(newVal).eq(oldVal)) {
+				this.userStakedLoading = null
+				if (this.stakedSetter !== null) {
+					clearInterval(this.stakedSetter)
+				}
+			}
+			this.monitorRewards()
+		},
+		"vault.userBalance"(newVal, oldVal) {
+			if (newVal !== null && oldVal !== null && !bn(newVal).eq(oldVal)) {
+				if (this.balanceSetter !== null) {
+					clearInterval(this.balanceSetter)
+				}
+			}
+		},
+		prices(newVal, oldVal) {
+			if (isEqual(newVal, oldVal)) {
+				return
+			}
+			this.$store.dispatch("vaults/setAPR", this.vault)
+			this.$store.dispatch("vaults/setTVL", this.vault)
+		},
 	},
-	async mounted() {
-
+	mounted() {
+		this.setClosesAt()
+		this.setAPR()
+		this.setTVL()
+		this.setTimeUntilClose()
+		this.timeUntilCloseSetter = setInterval(
+			() => this.setTimeUntilClose(),
+			60 * 1000,
+		)
+		this.aprSetter = setInterval(
+			() => this.setAPR(),
+			10 * 1000,
+		)
+		this.tvlSetter = setInterval(
+			() => this.setTVL(),
+			30 * 1000,
+		)
 	},
 	destroyed() {
-		if (this.userDelegatedSetter !== null) {
-			clearInterval(this.userDelegatedSetter)
+		if (this.timeUntilCloseSetter !== null) {
+			clearInterval(this.timeUntilCloseSetter)
 		}
-		if (this.userRewardsSetter !== null) {
-			clearInterval(this.userRewardsSetter)
+		if (this.aprSetter !== null) {
+			clearInterval(this.aprSetter)
+		}
+		if (this.tvlSetter !== null) {
+			clearInterval(this.tvlSetter)
+		}
+		if (this.stakedSetter !== null) {
+			clearInterval(this.stakedSetter)
+		}
+		if (this.rewardsSetter !== null) {
+			clearInterval(this.rewardsSetter)
+		}
+		if (this.balanceSetter !== null) {
+			clearInterval(this.balanceSetter)
 		}
 	},
 	methods: {
 		toLink,
-
-		toggleActive() {
-			this.active = !this.active
+		async setClosesAt() {
+			await this.$store.dispatch("vaults/setClosesAt", this.vault)
 		},
+		async setAPR() {
+			await this.$store.dispatch("vaults/setAPR", this.vault)
+		},
+		async setTVL() {
+			await this.$store.dispatch("vaults/setTVL", this.vault)
+		},
+		setTimeUntilClose() {
+			if (this.vault.closesAt === null) {
+				return
+			}
+			const diff = differenceInSeconds(this.vault.closesAt!, new Date())
+			if (diff < 0) {
+				this.timeUntilClose = []
+				return
+			}
+			const minute = 60
+			const hour = minute * 60
+			const day = hour * 24
+			const week = day * 7
+			const unitOrEmpty = (diff: number, value: number, unit: CountdownUnit["unit"]): CountdownUnit => ({
+				unit,
+				value: Math.floor(diff / value),
+			})
+			this.timeUntilClose = [
+				unitOrEmpty(diff % week, day, "DAYS"),
+				unitOrEmpty(diff % day, hour, "HRS"),
+				unitOrEmpty(diff % hour, minute, "MIN"),
+			]
+		},
+		walletModuleName(route: string): string {
+			return `web3/${route}`
+		},
+		async connectWallet() {
+			await this.$store.dispatch("web3/connectWallet", this)
+		},
+		async setStaked() {
+			await this.$store.dispatch("vaults/setStaked", this.vault)
+		},
+		monitorStake() {
+			if (this.stakedSetter !== null) {
+				clearInterval(this.stakedSetter)
+			}
+			this.stakedSetter = setInterval(
+				() => this.setStaked(),
+				5 * 1000,
+			)
+		},
+		async getRewards() {
+			await this.$store.dispatch("vaults/setRewards", this.vault)
+		},
+		monitorRewards() {
+			if (this.rewardsSetter !== null) {
+				clearInterval(this.rewardsSetter)
+			}
+			this.rewardsSetter = setInterval(
+				() => this.getRewards(),
+				5 * 1000,
+			)
+		},
+		monitorBalance() {
+			if (this.balanceSetter !== null) {
+				clearInterval(this.balanceSetter)
+			}
+			this.balanceSetter = setInterval(
+				() => this.setBalance(),
+				5 * 1000,
+			)
+		},
+		async setBalance() {
+			await this.$store.dispatch("vaults/setBalance", this.vault)
+		},
+		async openModal(type: TransactionType) {
+			if (!this.account) {
+				await this.connectWallet()
+			}
+			if (!this.account) {
+				return
+			}
+			this.modalLoaded = false
+			this.statusMessage = null
+			this.amount = null
+			if (type !== "claimRewards") {
+				this.$modal.show(`${type}-${this.vault.address}`)
+			}
 
+			try {
+				switch (type) {
+					case "stake": {
+						await this.setBalance()
+						break
+					}
+					case "unstake": {
+						await this.setStaked()
+						break
+					}
+					case "claimRewards": {
+						this.claimingRewards = true
+						await this.getRewards()
+						this.amount = this.vault.userRewards?.toString() ?? null
+						await this.claimRewards()
+						break
+					}
+					case "addLiquidity": {
+						;(this.$refs.addLiquidityModal as any).reset()
+						await this.setStaked()
+						this.$modal.hide(`stake-${this.vault.address}`)
+						await this.$store.dispatch("denoms/setBalance")
+						break
+					}
+				}
+			}
+			catch (e) {
+				this.handleError(e)
+			}
+			this.modalLoaded = true
+		},
+		validate(input) {
+			if (input === null) {
+				this.statusMessage = "please enter a valid amount"
+				return false
+			}
+			this.statusMessage = null
+			const number = Number(input)
+			if (isNaN(number) || number === 0) {
+				this.statusMessage = "please enter a valid amount"
+				return false
+			}
+			return true
+		},
+		async stake() {
+			if (!this.validate(this.amount)) {
+				return
+			}
+			// check against balance
+			this.statusMessage = "Confirming transaction..."
+			const response = await this.$store.dispatch("vaults/stake", {
+				vault: this.vault,
+				amount: this.amount,
+			})
+			this.handleResponse("stake", response)
+			this.monitorStake()
+		},
+		async unstake() {
+			if (!this.validate(this.amount)) {
+				return
+			}
+			const response = await this.$store.dispatch("vaults/unstake", {
+				vault: this.vault,
+				amount: this.amount,
+			})
+			this.handleResponse("unstake", response)
+			this.monitorStake()
+		},
+		async claimRewards() {
+			const response = await this.$store.dispatch("vaults/claimRewards", this.vault)
+			this.claimingRewards = false
+			this.handleResponse("claimRewards", response)
+		},
+		handleResponse(type: TransactionType, response, amounts?: string[]) {
+			// eslint-disable-next-line no-console
+			console.log({ response })
+			const { message, hash, status } = response
+			if (message) {
+				this.$modal.show(`${type}-${this.vault.address}`)
+				this.statusMessage = message
+			}
+			else if (hash && status) {
+				this.$modal.hide(`${type}-${this.vault.address}`)
+				this.transactionType = type
+				this.transactionAmount = amounts ?? this.amount
+				this.transactionHash = hash
+				this.transactionStatus = status
+				this.$modal.show(`transaction-${this.vault.address}`)
+			}
+		},
 		transactionClosed() {
 			this.transactionType = null
 			this.transactionAmount = null
 			this.transactionHash = null
 			this.transactionStatus = null
 		},
-
+		closeTransactionModal() {
+			this.$modal.hide(`transaction-${this.vault.address}`)
+			if (this.transactionType === "addLiquidity") {
+				this.monitorBalance()
+				this.openModal("stake")
+			}
+		},
+		handleError(_e: Error) {
+			// TODO: handle known errors
+		},
 	},
 })
 </script>
@@ -301,14 +697,14 @@ export default Vue.extend({
 						width: 100%
 					.button-outer
 						@include openOnActive
-			grid-template-columns: auto auto auto auto
-			grid-template-areas: "delegated staked k discon"
+			grid-template-columns: auto auto auto auto auto
+			grid-template-areas: "delegated staked claimrewards k discon"
 			@media (max-width: $breakpoint-tablet)
-				grid-template-columns: auto auto
-				grid-template-areas: "delegated staked" "k discon"
+				grid-template-columns: auto auto auto
+				grid-template-areas: "delegated staked claimrewards" "k discon"
 			@media (max-width: $breakpoint-mobile)
 				grid-template-columns: auto auto
-				grid-template-areas: "delegated staked" "k discon"
+				grid-template-areas: "delegated staked" "claimrewards k"  "discon"
 	@media (max-width: $breakpoint-tablet)
 		.label
 			font-size: $unit-2

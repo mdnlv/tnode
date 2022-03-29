@@ -38,7 +38,6 @@
 					.account.flex.space-items-horz(v-else)
 						img.icon(:src="wallet.icon")
 						p {{ account.address | accountAddress }}
-
 				.field.flex#discon(v-if="account")
 					.button.bare.flex.space-items-horz.no-padding
 						div(v-html="disconIcon")
