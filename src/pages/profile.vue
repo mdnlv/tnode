@@ -4,28 +4,11 @@
 		.container.space-items-big
 			h1 My Profile
 			.flex-start.flex-wrap.wrap-space.space-items-horz-big
-				//.space-items-small
-				//	p.label.small TOTAL ASSETS
-				//	.flex
-				//		img.loading-medium(v-if="totalDelegationsLoading" src="~/assets/gif/loading-3.gif")
-				//		.h1.delegated-number ${{ totalAssetsDelegated | floorToDP(0) }}
 				template(v-if="totalStakingInVaults")
 					p.label.small TOTAL ASSETS
 					.flex
 						img.loading-medium(v-if="totalStakingInVaultsLoading" src="~/assets/gif/loading-3.gif")
 						.h2.delegated-number ${{ totalStakingInVaults | floorToDP(0) }}
-				//.vertical-hr.no-mobile
-				//.space-items-small
-				//	p.label.small TOTAL ASSETS DELEGATED
-				//	.flex
-				//		img.loading-medium(v-if="totalDelegationsLoading" src="~/assets/gif/loading-3.gif")
-				//		.h1.delegated-number ${{ totalAssetsDelegated | floorToDP(0) }}
-				//.vertical-hr.no-mobile
-				//.space-items-small
-				//	p.label.small TOTAL ASSETS STAKED
-				//	.flex
-				//		img.loading-medium(v-if="totalDelegationsLoading" src="~/assets/gif/loading-3.gif")
-				//		.h1.delegated-number ${{ totalAssetsDelegated | floorToDP(0) }}
 	section
 		#subline.container.flex.space-items-horz.flex-wrap
 			ConnectedWallet.item
@@ -57,7 +40,6 @@
 							.spacer
 							Vault(v-if="vaults[1]" :vault="vaults[1]", :networks="networks")
 							.spacer
-
 </template>
 
 <script lang="ts">
@@ -92,11 +74,7 @@ export default Vue.extend({
 		return {
 			searchValue: "",
 			validatorInfoSetter: null as null | NodeJS.Timer,
-			currentTab: "validators" as "validators" | "vaults",
-			profileIcon: require("~/assets/svg/profile.svg?raw"),
-			copyIcon: require("~/assets/svg/copy.svg?raw"),
 			infoIcon: require("~/assets/svg/ui/info-icon.svg?raw"),
-			filterIcon: require("~/assets/svg/ui/filter.svg?raw"),
 			selectedNetwork: ALL_NETWORKS_FILTER,
 			networks: [
 				{
@@ -138,27 +116,12 @@ export default Vue.extend({
 				return regex.test(item.chainName) || regex.test(item.denom.symbol)
 			})
 		},
-		matchingValidatorsComingSoon(): tValidatorComingSoon[] {
-			return this.validatorsComingSoon.filter(item => {
-				const regex = new RegExp(this.searchValue, "i")
-				return regex.test(item.chainName) || regex.test(item.denomName)
-			})
-		},
-		totalAssetsDelegated(): string {
-			return this.validators.reduce((acc, val) => val.totalDelegated && val.denom.price
-				? acc.plus(bn(val.totalDelegated).times(val.denom.price))
-				: acc, bn(0)).toString()
-		},
-		totalDelegationsLoading(): boolean {
-			return this.validators.some(v => v.totalDelegated === null)
-		},
 		totalStaked(): bn {
 			return this.$store.getters["staking/totalDelegated"]
 		},
 		totalStakedLoading(): boolean {
 			return this.validators.some(v => v.loadingPersonalInfo)
 		},
-
 		allVaults(): tVault[] {
 			return this.$store.getters["vaults/all"]
 		},
@@ -196,9 +159,6 @@ export default Vue.extend({
 	methods: {
 		async setValidatorInfo() {
 			await this.$store.dispatch("staking/getAllValidatorInfo")
-		},
-		onNetworkSelect(selectedOption: DropdownOption) {
-			this.selectedNetwork = selectedOption.value
 		},
 		filterVaults(selectedNetwork: string) {
 			return selectedNetwork === ALL_NETWORKS_FILTER

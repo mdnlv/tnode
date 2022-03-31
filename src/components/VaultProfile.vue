@@ -1,5 +1,5 @@
 <template lang="pug">
-	.validator(:class="{ active }")
+	.vault(:class="{ active }")
 		.header.flex
 			.title.flex
 				.image
@@ -572,8 +572,7 @@ export default Vue.extend({
 	max-height: $unit10
 	&:not(.active)
 		max-height: 0
-
-.validator
+.vault
 	@media (min-width: $breakpoint-mobile-upper)
 		display: table-row
 		> *

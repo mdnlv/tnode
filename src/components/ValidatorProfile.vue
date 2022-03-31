@@ -1,22 +1,17 @@
 <template lang="pug">
-	#validator(:class="{ active }")
-		#header.flex-wrap
-			#name.flex.space-items-horz
+	.validator(:class="{ active }")
+		.header.flex-wrap
+			.name.flex.space-items-horz
 				img.icon(:src="validator.denom.icon")
 				div
 					h2 {{ validator.chainName }}
 					h5.denom.label {{ validator.denom.symbol }}
 				a.hover-opacity(href="https://trustednode.medium.com/1-million-tnode-airdrop-alert-f44310d7818" target="_blank")
 					img.small(v-if="validator.promotion" src="~/assets/img/tiger-node.png")
-			#menu-toggle.mobile.cursor-pointer(type="button" @click="toggleActive" v-html="menuIcon")
-		#contents.grow(:class="{ active }")
+			.menu-toggle.mobile.cursor-pointer(type="button" @click="toggleActive" v-html="menuIcon")
+		.contents.grow(:class="{ active }")
 			.css-grid
 				.field.flex-column#delegated
-					//.label.small AMOUNT DELEGATED
-					//.flex
-					//	LoadingValue(:value="validator.totalDelegated" #default="{ value }")
-					//		span {{ value | floorToDP(0) }}&nbsp;
-					//	span {{ validator.denom.symbol }}
 					.label.small AMOUNT DELEGATED
 					.flex
 						LoadingValue(:value="userDelegated", :loading="loadingPersonalInfo" #default="{ value }")
@@ -47,7 +42,7 @@
 import Vue from "vue"
 import bn from "big.js"
 
-import { max, toLink } from "~/_utils"
+import { toLink } from "~/_utils"
 import { Validator, Account, Delegation } from "~/_types"
 import LoadingValue from "~/components/LoadingValue.vue"
 import Modal from "~/components/Modal.vue"
@@ -63,13 +58,6 @@ export default Vue.extend({
 		MaxInput,
 		StakeRow,
 	},
-	filters: {
-		realValue(amount: bn | null, price: bn | null) {
-			return amount === null || price === null
-				? null
-				: amount.times(price)
-		},
-	},
 	props: {
 		validator: {
 			type: Object as Vue.PropType<Validator>,
@@ -84,15 +72,6 @@ export default Vue.extend({
 			claimGrayIcon: require("~/assets/svg/claim_gray.svg?raw"),
 			kIcon: require("~/assets/svg/k.svg?raw"),
 			optionsIcon: require("~/assets/svg/ui/options.svg?raw"),
-			actionIcon: {
-				delegate: require("~/assets/svg/ui/delegate-icon.svg?raw"),
-				undelegate: require("~/assets/svg/ui/undelegate-icon.svg?raw"),
-				claimRewards: require("~/assets/svg/ui/claimRewards-icon.svg?raw"),
-			},
-			arrowRightIcon: require("~/assets/svg/ui/arrow-right.svg?raw"),
-			linkIcon: require("~/assets/svg/ui/link.svg?raw"),
-			infoIcon: require("~/assets/svg/ui/info-icon.svg?raw"),
-			refreshIcon: require("~/assets/svg/ui/refresh.svg?raw"),
 			active: false,
 			modalLoaded: false,
 			statusMessage: null as string | null,
@@ -132,17 +111,6 @@ export default Vue.extend({
 		connectingWalletError() {
 			return this.$store.getters["staking/connectingWalletError"]
 		},
-		transactionTitle(): string {
-			if (!this.transactionType) {
-				return ""
-			}
-			return {
-				delegate: `Stake ${this.validator.denom.symbol}`,
-				redelegate: `Restake ${this.validator.denom.symbol}`,
-				undelegate: `Unstake ${this.validator.denom.symbol}`,
-				claimRewards: `Claim ${this.validator.denom.symbol} rewards`,
-			}[this.transactionType]
-		},
 		userDelegated(): bn | null {
 			return this.$store.getters["staking/userDelegated"](this.validator)
 		},
@@ -151,14 +119,6 @@ export default Vue.extend({
 		},
 		userRewards(): bn | null {
 			return this.$store.getters["staking/userRewards"](this.validator)
-		},
-		totalDelegation(): bn {
-			if (this.delegations && this.delegations.length > 0) {
-				return this.delegations.reduce((acc, del) =>
-					del.amount.add(acc)
-				, bn(0))
-			}
-			return bn(0)
 		},
 	},
 	watch: {
@@ -291,12 +251,6 @@ export default Vue.extend({
 				this.$store.commit("staking/loadingPersonalInfo", { chainId: this.validator.chainId, loadingPersonalInfo: false })
 			}
 			this.modalLoaded = true
-		},
-		async setMaxWithoutFee() {
-			const withoutFee = bn(this.balance ?? 0).minus(this.validator.transactionFee)
-			this.amount = max(withoutFee, 0).toString()
-			await this.$nextTick
-			this.usingMax = true
 		},
 		validate(input: string | null, minAmount?: number | null) {
 			if (input === null) {
@@ -431,15 +385,6 @@ export default Vue.extend({
 				this.$modal.show(`transaction-${this.validator.chainId}`)
 			}
 		},
-		transactionClosed() {
-			this.transactionType = null
-			this.transactionAmount = null
-			this.transactionHash = null
-			this.transactionStatus = null
-		},
-		closeTransactionModal() {
-			this.$modal.hide(`transaction-${this.validator.chainId}`)
-		},
 		monitorDelegation() {
 			if (this.userDelegatedSetter !== null) {
 				clearInterval(this.userDelegatedSetter)
@@ -485,13 +430,13 @@ export default Vue.extend({
 	&:not(.active)
 		max-height: 0
 
-#validator
+.validator
 	@media (min-width: $breakpoint-mobile-upper)
 		display: table-row
 		> *
 			display: table-cell
 			vertical-align: middle
-	#header
+	.header
 		background: $bg-1
 		padding: $space
 		padding-left: $space-medium
@@ -499,7 +444,7 @@ export default Vue.extend({
 		@media (min-width: $breakpoint-mobile-upper)
 			border-top-right-radius: 0
 			border-bottom-right-radius: 0
-			#name
+			.name
 				@media (max-width: $breakpoint-tablet)
 					margin-bottom: $space-big
 			#apr
@@ -514,11 +459,11 @@ export default Vue.extend({
 			display: flex
 			justify-content: space-between
 			align-items: center
-		#menu-toggle
+		.menu-toggle
 			width: $unit3
 			text-align: center
 			@include hover-opacity
-	#contents
+	.contents
 		background: $bg
 		padding: $space
 		padding-right: $space-medium
