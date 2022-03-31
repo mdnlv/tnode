@@ -4,11 +4,16 @@
 		.container.space-items-big
 			h1 My Profile
 			.flex-start.flex-wrap.wrap-space.space-items-horz-big
-				.space-items-small
+				//.space-items-small
+				//	p.label.small TOTAL ASSETS
+				//	.flex
+				//		img.loading-medium(v-if="totalDelegationsLoading" src="~/assets/gif/loading-3.gif")
+				//		.h1.delegated-number ${{ totalAssetsDelegated | floorToDP(0) }}
+				template(v-if="totalStakingInVaults")
 					p.label.small TOTAL ASSETS
 					.flex
-						img.loading-medium(v-if="totalDelegationsLoading" src="~/assets/gif/loading-3.gif")
-						.h1.delegated-number ${{ totalAssetsDelegated | floorToDP(0) }}
+						img.loading-medium(v-if="totalStakingInVaultsLoading" src="~/assets/gif/loading-3.gif")
+						.h2.delegated-number ${{ totalStakingInVaults | floorToDP(0) }}
 				//.vertical-hr.no-mobile
 				//.space-items-small
 				//	p.label.small TOTAL ASSETS DELEGATED
@@ -162,6 +167,18 @@ export default Vue.extend({
 		},
 		vaultsChunked(): tVault[][] {
 			return chunk(this.filteredVaults, 2)
+		},
+		totalStakingInVaults(): bn {
+			return this.filteredVaults.reduce(
+				(acc, v) => acc.plus(v.userStaked && v.stakeDenom.price
+					? v.userStaked.times(v.stakeDenom.price)
+					: 0,
+				),
+				bn(0),
+			)
+		},
+		totalStakingInVaultsLoading(): boolean {
+			return false
 		},
 	},
 	mounted() {
