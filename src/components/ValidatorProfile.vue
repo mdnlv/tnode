@@ -24,10 +24,7 @@
 							span {{ value | floorToDP(6) }}
 						span &nbsp;{{ validator.denom.symbol }}
 				.field.flex#claimrewards
-					.button.bare.flex.space-items-horz.no-padding(@click="!!account && openModal('claimRewards')")
-						.img-outer.inline-middle(v-html="!!account ? claimIcon : claimGrayIcon")
-						span(v-if="!!account") CLAIM REWARDS
-						span.disable(v-else) CLAIM REWARDS
+					ClaimRewards(:active="!!account" @click="!!account && openModal('claimRewards')")
 				.field.flex#k
 					.button.bare.flex.space-items-horz.no-padding(v-if="!account" @click="connectWallet") CONNECT WALLET
 					.account.flex.space-items-horz(v-else)
@@ -41,13 +38,13 @@
 <script lang="ts">
 import Vue from "vue"
 import bn from "big.js"
-
 import { toLink } from "~/_utils"
 import { Validator, Account, Delegation } from "~/_types"
 import LoadingValue from "~/components/LoadingValue.vue"
 import Modal from "~/components/Modal.vue"
 import MaxInput from "~/components/MaxInput.vue"
 import StakeRow from "~/components/common/StakeRow.vue"
+import ClaimRewards from "~/components/common/ClaimRewards.vue"
 
 type TransactionType = "delegate" | "undelegate" | "claimRewards" | "redelegate"
 
@@ -57,6 +54,7 @@ export default Vue.extend({
 		Modal,
 		MaxInput,
 		StakeRow,
+		ClaimRewards
 	},
 	props: {
 		validator: {
@@ -68,8 +66,6 @@ export default Vue.extend({
 		return {
 			crossIcon: require("~/assets/svg/ui/cross.svg?raw"),
 			disconIcon: require("~/assets/svg/discon.svg?raw"),
-			claimIcon: require("~/assets/svg/claim_rewards.svg?raw"),
-			claimGrayIcon: require("~/assets/svg/claim_gray.svg?raw"),
 			kIcon: require("~/assets/svg/k.svg?raw"),
 			optionsIcon: require("~/assets/svg/ui/options.svg?raw"),
 			active: false,
@@ -495,8 +491,6 @@ export default Vue.extend({
 				grid-area: staked
 			#claimrewards
 				grid-area: claimrewards
-				.disable
-					color: #3f505a
 			#k
 				grid-area: k
 			#discon

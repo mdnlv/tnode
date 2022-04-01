@@ -27,9 +27,7 @@
 							span.number {{ value | floorToDPorE(1) }}&nbsp;
 						span {{ vault.rewardDenom.symbol }}
 				.field.flex#claimrewards
-					.button.bare.flex.space-items-horz.no-padding(@click="openModal('claimRewards')")
-						.img-outer.inline-middle(v-html="claimIcon")
-						span CLAIM REWARDS
+					ClaimRewards(@click="openModal('claimRewards')")
 				.field.flex#k
 					ConnectedWallet(no-copy)
 				.field.flex#discon
@@ -141,6 +139,7 @@ import MaxInput from "~/components/MaxInput.vue"
 import StatusMessage from "~/components/StatusMessage.vue"
 import AddLiquidityModal from "~/components/AddLiquidityModal.vue"
 import ConnectedWallet from "~/components/common/ConnectedWallet.vue"
+import ClaimRewards from "~/components/common/ClaimRewards.vue"
 
 type TransactionType = "stake" | "unstake" | "claimRewards" | "addLiquidity"
 type CountdownUnit = {
@@ -156,6 +155,7 @@ export default Vue.extend({
 		StatusMessage,
 		AddLiquidityModal,
 		ConnectedWallet,
+		ClaimRewards,
 	},
 	filters: {
 		renderProperty(property: Vault["properties"][number], vault: Vault) {
@@ -188,7 +188,6 @@ export default Vue.extend({
 				addLiquidity: require("~/assets/svg/ui/addLiquidity-icon.svg?raw"),
 			},
 			disconIcon: require("~/assets/svg/discon.svg?raw"),
-			claimIcon: require("~/assets/svg/claim_rewards.svg?raw"),
 			arrowRightIcon: require("~/assets/svg/ui/arrow-right.svg?raw"),
 			linkIcon: require("~/assets/svg/ui/link.svg?raw"),
 			auditIcon: require("~/assets/svg/ui/audit.svg?raw"),
