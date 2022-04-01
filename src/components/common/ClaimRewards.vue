@@ -8,7 +8,7 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import Vue from "vue"
 export default Vue.extend({
 	props: {
 		small: {
@@ -25,7 +25,7 @@ export default Vue.extend({
 			claimIcon: require("~/assets/svg/claim_rewards.svg?raw"),
 			claimGrayIcon: require("~/assets/svg/claim_gray.svg?raw"),
 		}
-	}
+	},
 })
 </script>
 

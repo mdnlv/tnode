@@ -54,7 +54,7 @@ export default Vue.extend({
 		Modal,
 		MaxInput,
 		StakeRow,
-		ClaimRewards
+		ClaimRewards,
 	},
 	props: {
 		validator: {
