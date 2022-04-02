@@ -1,5 +1,5 @@
 <template lang="pug">
-	.vault(:class="{ active }")
+	.vault
 		.header.flex
 			.title.flex
 				.image
@@ -12,7 +12,7 @@
 				h4 {{ name[0] }}
 					br
 					span.secondary {{ name[1] }}
-		.contents.grow(:class="{ active }")
+		.contents.grow
 			.css-grid
 				.field.flex-column#total-delegated
 					.label.small AMOUNT STAKED
@@ -27,64 +27,27 @@
 							span.number {{ value | floorToDPorE(1) }}&nbsp;
 						span {{ vault.rewardDenom.symbol }}
 				.field.flex#claimrewards
-					ClaimRewards(@click="openModal('claimRewards')")
+					ClaimRewards(active @click="openModal('claimRewards')")
 				.field.flex#k
 					ConnectedWallet(no-copy)
 				.field.flex#discon
 					.button.bare.flex.space-items-horz.no-padding
 						div(v-html="disconIcon")
-		Modal(
-			v-if="loaded"
-			:name="`stake-${vault.address}`"
-			:loading="!modalLoaded"
-			:title="`Stake ${vault.stakeDenom.symbol} to vault`"
+		VaultModals(
+			:loaded="loaded"
+			:modalLoaded="modalLoaded"
+			:vault="vault"
+			:openModal="openModal"
+			:stake="stake"
+			:transactionHash="transactionHash"
+			:txLinkTemplate="txLinkTemplate"
+			:transactionStatus="transactionStatus"
+			:transactionTitle="transactionTitle"
+			:closeTransactionModal="closeTransactionModal"
+			:statusMessage="statusMessage"
+			:unstake="unstake"
+			:amount="amount"
 		)
-			.modal-form.space-items-big.form
-				.flex.space-items-horz
-					img.icon(:src="vault.stakeDenom.icon")
-					.balance
-						p.label.small BALANCE IN WALLET
-						.h2.number {{ vault.userBalance | floorToDPorE(4) }} {{ vault.stakeDenom.symbol }}
-				MaxInput(
-					v-model="amount"
-					:max="vault.userBalance"
-					:symbol="vault.stakeDenom.symbol"
-					placeholder="Amount to stake"
-				)
-				StatusMessage(:message="statusMessage")
-				#buttons
-					button.bare.big-text(v-if="vault.stakeDenom.denoms", @click="openModal('addLiquidity')") GET LP TOKENS
-					button.bare.big-text(@click="stake") STAKE
-		Modal(
-			v-if="loaded"
-			:name="`unstake-${vault.address}`"
-			:loading="!modalLoaded"
-			:title="`Unstake ${vault.stakeDenom.symbol}`"
-		)
-			.modal-form.space-items-big.form
-				.flex.space-items-horz
-					img.icon(:src="vault.stakeDenom.icon")
-					.balance
-						p.label.small STAKED
-						.h2.number {{ vault.userStaked | floorToDPorE(4) }} {{ vault.stakeDenom.symbol }}
-				MaxInput(
-					v-model="amount"
-					:max="vault.userStaked"
-					:symbol="vault.stakeDenom.symbol"
-					placeholder="Amount to unstake"
-				)
-				StatusMessage(:message="statusMessage")
-				#buttons
-					button.bare.big-text(@click="unstake") UNSTAKE
-		Modal(
-			v-if="loaded"
-			:name="`claimRewards-${vault.address}`"
-			:loading="!modalLoaded"
-			title="Error claiming rewards"
-			:height="300"
-		)
-			#claim-rewards-error
-				StatusMessage(:message="statusMessage", position="relative")
 		Modal(
 			v-if="loaded"
 			:name="`transaction-${vault.address}`"
@@ -134,12 +97,13 @@ import { isEqual } from "lodash"
 import { Vault, EVMAccount, Network, DropdownOption } from "~/_types"
 import { toLink } from "~/_utils"
 import LoadingValue from "~/components/LoadingValue.vue"
-import Modal from "~/components/Modal.vue"
 import MaxInput from "~/components/MaxInput.vue"
 import StatusMessage from "~/components/StatusMessage.vue"
 import AddLiquidityModal from "~/components/AddLiquidityModal.vue"
+import VaultModals from "~/components/VaultModals.vue"
 import ConnectedWallet from "~/components/common/ConnectedWallet.vue"
 import ClaimRewards from "~/components/common/ClaimRewards.vue"
+import Modal from "~/components/Modal.vue"
 
 type TransactionType = "stake" | "unstake" | "claimRewards" | "addLiquidity"
 type CountdownUnit = {
@@ -151,11 +115,12 @@ export default Vue.extend({
 	components: {
 		LoadingValue,
 		MaxInput,
-		Modal,
 		StatusMessage,
 		AddLiquidityModal,
 		ConnectedWallet,
 		ClaimRewards,
+		VaultModals,
+		Modal,
 	},
 	filters: {
 		renderProperty(property: Vault["properties"][number], vault: Vault) {
@@ -201,13 +166,13 @@ export default Vue.extend({
 			rewardsSetter: null as null | NodeJS.Timer,
 			modalLoaded: false,
 			provider: null as any | null,
-			amount: null as string | null,
+			amount: "" as string,
 			claimingRewards: false,
-			statusMessage: null as string | null,
+			statusMessage: "" as string,
 			transactionType: "stake" as TransactionType | null,
 			transactionAmount: null as string | string[] | null,
-			transactionHash: null as string | null,
-			transactionStatus: null as "success" | "pending" | null,
+			transactionHash: "" as string,
+			transactionStatus: "" as "success" | "pending",
 		}
 	},
 	computed: {
@@ -439,8 +404,8 @@ export default Vue.extend({
 				return
 			}
 			this.modalLoaded = false
-			this.statusMessage = null
-			this.amount = null
+			this.statusMessage = ""
+			this.amount = ""
 			if (type !== "claimRewards") {
 				this.$modal.show(`${type}-${this.vault.address}`)
 			}
@@ -458,7 +423,7 @@ export default Vue.extend({
 					case "claimRewards": {
 						this.claimingRewards = true
 						await this.getRewards()
-						this.amount = this.vault.userRewards?.toString() ?? null
+						this.amount = this.vault.userRewards?.toString() ?? ""
 						await this.claimRewards()
 						break
 					}
@@ -481,7 +446,7 @@ export default Vue.extend({
 				this.statusMessage = "please enter a valid amount"
 				return false
 			}
-			this.statusMessage = null
+			this.statusMessage = ""
 			const number = Number(input)
 			if (isNaN(number) || number === 0) {
 				this.statusMessage = "please enter a valid amount"
@@ -534,12 +499,6 @@ export default Vue.extend({
 				this.transactionStatus = status
 				this.$modal.show(`transaction-${this.vault.address}`)
 			}
-		},
-		transactionClosed() {
-			this.transactionType = null
-			this.transactionAmount = null
-			this.transactionHash = null
-			this.transactionStatus = null
 		},
 		closeTransactionModal() {
 			this.$modal.hide(`transaction-${this.vault.address}`)
