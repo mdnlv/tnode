@@ -52,6 +52,38 @@ div
 	)
 		#claim-rewards-error
 			StatusMessage(:message="statusMessage", position="relative")
+	Modal(
+		v-if="loaded"
+		:name="`transaction-${vault.address}`"
+		:title="transactionTitle"
+		:width="500"
+		:height="500"
+	)
+		.modal-form.space-items-big
+			.space-items-small
+				.label.small {{ transactionStatus }}
+				.flex-space-between
+					template(v-if="transactionType === 'addLiquidity'")
+						.space-items-small
+							.h2 {{ transactionAmount[0] | floorToDPorE(4) }} {{ transactionDenom[0] }}
+							.h2 {{ transactionAmount[1] | floorToDPorE(4) }} {{ transactionDenom[1] }}
+					template(v-else)
+						.h2 {{ transactionAmount }} {{ transactionDenom }}
+					.center(style="transform: scale(1.7)" v-html="arrowRightIcon")
+					.center(v-html="actionIcon[transactionType]")
+			.space-items
+				.label.small TRANSACTION ID
+				.wrap.space-items-horz-small
+					span {{ transactionHash }}
+					a.explorer-link(
+						v-if="transactionHash"
+						:href="toLink(transactionHash, txLinkTemplate)"
+						target="_blank"
+						v-html="linkIcon"
+					)
+				p(v-if="transactionStatus === 'pending'") (please allow time for transaction confirmation)
+			#buttons
+				button.bare.big-text(@click="closeTransactionModal") CLOSE
 </template>
 
 <script lang="ts">
@@ -104,6 +136,14 @@ export default Vue.extend({
 			type: String as Vue.PropType<string>,
 			required: true,
 		},
+		transactionType: {
+			type: String as Vue.PropType<string>,
+			required: true,
+		},
+		transactionAmount: {
+			type: String as Vue.PropType<string>,
+			required: true,
+		},
 		closeTransactionModal: {
 			type: Function as Vue.PropType<()=>void>,
 			required: true,
@@ -120,6 +160,18 @@ export default Vue.extend({
 			type: String as Vue.PropType<string>,
 			required: true,
 		},
+	},
+	data() {
+		return {
+			actionIcon: {
+				stake: require("~/assets/svg/ui/delegate-icon.svg?raw"),
+				unstake: require("~/assets/svg/ui/undelegate-icon.svg?raw"),
+				claimRewards: require("~/assets/svg/ui/claimRewards-icon.svg?raw"),
+				addLiquidity: require("~/assets/svg/ui/addLiquidity-icon.svg?raw"),
+			},
+			arrowRightIcon: require("~/assets/svg/ui/arrow-right.svg?raw"),
+			linkIcon: require("~/assets/svg/ui/link.svg?raw"),
+		}
 	},
 })
 </script>
