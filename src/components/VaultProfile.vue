@@ -49,6 +49,7 @@
 			:amount="amount"
 			:transactionType="transactionType"
 			:transactionAmount="transactionAmount"
+			:transactionDenom="transactionDenom"
 		)
 		AddLiquidityModal(
 			v-if="loaded && vault.stakeDenom.denoms"
@@ -132,7 +133,7 @@ export default Vue.extend({
 			claimingRewards: false,
 			statusMessage: "" as string,
 			transactionType: "stake" as TransactionType | null,
-			transactionAmount: null as string | string[] | null,
+			transactionAmount: "" as string | string[],
 			transactionHash: "" as string,
 			transactionStatus: "" as "success" | "pending",
 		}

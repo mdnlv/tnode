@@ -93,6 +93,7 @@
 			:amount="amount"
 			:transactionType="transactionType"
 			:transactionAmount="transactionAmount"
+			:transactionDenom="transactionDenom"
 		)
 		AddLiquidityModal(
 			v-if="loaded && vault.stakeDenom.denoms"

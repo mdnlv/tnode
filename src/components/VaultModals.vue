@@ -160,6 +160,10 @@ export default Vue.extend({
 			type: String as Vue.PropType<string>,
 			required: true,
 		},
+		transactionDenom: {
+			type: String as Vue.PropType<string>,
+			required: true,
+		},
 	},
 	data() {
 		return {
