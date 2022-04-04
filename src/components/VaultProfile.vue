@@ -39,17 +39,14 @@
 			:vault="vault"
 			:openModal="openModal"
 			:stake="stake"
-			:transactionHash="transactionHash"
-			:txLinkTemplate="txLinkTemplate"
-			:transactionStatus="transactionStatus"
-			:transactionTitle="transactionTitle"
 			:closeTransactionModal="closeTransactionModal"
 			:statusMessage="statusMessage"
 			:unstake="unstake"
 			:amount="amount"
 			:transactionType="transactionType"
 			:transactionAmount="transactionAmount"
-			:transactionDenom="transactionDenom"
+			:transactionHash="transactionHash"
+			:transactionStatus="transactionStatus"
 		)
 		AddLiquidityModal(
 			v-if="loaded && vault.stakeDenom.denoms"
@@ -65,7 +62,7 @@ import { differenceInSeconds } from "date-fns"
 import cn from "comma-number"
 import bn from "big.js"
 import { isEqual } from "lodash"
-import { Vault, EVMAccount, Network, DropdownOption } from "~/_types"
+import { Vault, EVMAccount } from "~/_types"
 import { toLink } from "~/_utils"
 import LoadingValue from "~/components/LoadingValue.vue"
 import MaxInput from "~/components/MaxInput.vue"
@@ -108,10 +105,6 @@ export default Vue.extend({
 			type: Object as Vue.PropType<Vault>,
 			required: true,
 		},
-		networks: {
-			type: Array as Vue.PropType<DropdownOption[]>,
-			required: true,
-		},
 	},
 	data() {
 		return {
@@ -145,9 +138,6 @@ export default Vue.extend({
 		name(): string[] {
 			return this.vault.name.split("\n")
 		},
-		network(): DropdownOption {
-			return this.networks.find(n => n.value === this.vault.networkName)!
-		},
 		wallet(): any {
 			return this.$store.getters[
 				this.walletModuleName("wallet")
@@ -169,33 +159,6 @@ export default Vue.extend({
 				this.vault.stakeDenom.price,
 				this.vault.rewardDenom.price,
 			]
-		},
-		transactionTitle(): string {
-			if (!this.transactionType) {
-				return ""
-			}
-			return {
-				stake: `Stake ${this.vault.stakeDenom.symbol}`,
-				unstake: `Unstake ${this.vault.stakeDenom.symbol}`,
-				claimRewards: `Claim ${this.vault.rewardDenom.symbol} rewards`,
-				addLiquidity: "Add Liquidity",
-			}[this.transactionType]
-		},
-		transactionDenom(): string | string[] {
-			if (!this.transactionType) {
-				return ""
-			}
-			return {
-				stake: this.vault.stakeDenom.symbol,
-				unstake: this.vault.stakeDenom.symbol,
-				claimRewards: this.vault.rewardDenom.symbol,
-				addLiquidity: "denoms" in this.vault.stakeDenom ? this.vault.stakeDenom.denoms.map(d => d.symbol) : [],
-			}[this.transactionType]
-		},
-		txLinkTemplate(): string {
-			const networks = this.$store.getters["networks/all"] as Network[]
-			const network = networks.find(n => n.chainName === this.vault.networkName)
-			return network!.txLinkTemplate
 		},
 	},
 	watch: {

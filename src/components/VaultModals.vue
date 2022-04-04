@@ -91,7 +91,7 @@ import Vue from "vue"
 import Modal from "~/components/Modal.vue"
 import MaxInput from "~/components/MaxInput.vue"
 import StatusMessage from "~/components/StatusMessage.vue"
-import { Vault } from "~/_types"
+import { Network, Vault } from "~/_types"
 
 export default Vue.extend({
 	components: {
@@ -124,15 +124,7 @@ export default Vue.extend({
 			type: [String, null] as Vue.PropType<string | null>,
 			required: true,
 		},
-		txLinkTemplate: {
-			type: String as Vue.PropType<string>,
-			required: true,
-		},
 		transactionStatus: {
-			type: String as Vue.PropType<string>,
-			required: true,
-		},
-		transactionTitle: {
 			type: String as Vue.PropType<string>,
 			required: true,
 		},
@@ -160,10 +152,6 @@ export default Vue.extend({
 			type: String as Vue.PropType<string>,
 			required: true,
 		},
-		transactionDenom: {
-			type: String as Vue.PropType<string>,
-			required: true,
-		},
 	},
 	data() {
 		return {
@@ -176,6 +164,35 @@ export default Vue.extend({
 			arrowRightIcon: require("~/assets/svg/ui/arrow-right.svg?raw"),
 			linkIcon: require("~/assets/svg/ui/link.svg?raw"),
 		}
+	},
+	computed: {
+		transactionDenom(): string | string[] | undefined {
+			if (!this.transactionType) {
+				return ""
+			}
+			return {
+				stake: this.vault.stakeDenom.symbol,
+				unstake: this.vault.stakeDenom.symbol,
+				claimRewards: this.vault.rewardDenom.symbol,
+				addLiquidity: "denoms" in this.vault.stakeDenom ? this.vault.stakeDenom.denoms.map(d => d.symbol) : [],
+			}[this.transactionType]
+		},
+		transactionTitle(): string | undefined {
+			if (!this.transactionType) {
+				return ""
+			}
+			return {
+				stake: `Stake ${this.vault.stakeDenom.symbol}`,
+				unstake: `Unstake ${this.vault.stakeDenom.symbol}`,
+				claimRewards: `Claim ${this.vault.rewardDenom.symbol} rewards`,
+				addLiquidity: "Add Liquidity",
+			}[this.transactionType]
+		},
+		txLinkTemplate(): string {
+			const networks = this.$store.getters["networks/all"] as Network[]
+			const network = networks.find(n => n.chainName === this.vault.networkName)
+			return network!.txLinkTemplate
+		},
 	},
 })
 </script>
