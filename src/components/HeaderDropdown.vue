@@ -17,18 +17,15 @@ export default Vue.extend({
 		clickOutside: vClickOutside.directive,
 	},
 	props: {
-
 		text: {
 			type: String,
 			default: "",
 		},
-
 		transition: {
 			type: String,
 			default: "",
 		},
 	},
-
 	data: () => ({
 		isFocused: false,
 	}),
@@ -44,15 +41,11 @@ export default Vue.extend({
 
 <style lang="sass">
 .header-dropdown
-	display: inline-block
 	position: relative
 
 .header-dropdown__content
 	position: absolute
-	z-index: 5
 	right: -$unit9
-	min-inline-size: 100%
+	min-width: 100%
 	margin-top: $unit2
-	@media (max-width: $breakpoint-mobile)
-		margin-top: $unit2
 </style>

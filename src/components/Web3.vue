@@ -7,7 +7,7 @@
 					.flex-column.center.space-items-horz(@click="connectWallet(wallet.id)")
 						img.img-outer(:src="wallet.icon")
 						span {{ wallet.name }}
-			.flex-column.connected(v-else)
+			.connected(v-else)
 				.flex.space-items-horz.wrap
 					img.wallet-icon(:src="connectedEVMWallet.icon")
 					span {{ account.address }}
@@ -15,9 +15,10 @@
 					button.big-padding
 						span CHANGE WALLET
 				.button.bare.space-items-horz.no-padding.disconnect(@click="disconnect")
-					.img-outer(v-html="disconnectIcon")
-					span DISCONNECT
-			.gray-line.center
+					.flex.space-items-horz-small
+						.img-outer(v-html="disconnectIcon")
+						span DISCONNECT
+			.gray-line.center.mobile
 				.buy-tnode
 					a.button(href="https://pancakeswap.finance/swap?inputCurrency=0xe9e7cea3dedca5984780bafc599bd69add087d56&outputCurrency=0x7f12a37b6921ffac11fab16338b3ae67ee0c462b" target="_blank")
 						.flex.space-items-horz-small
@@ -112,11 +113,11 @@ export default Vue.extend({
 })
 </script>
 
-<style lang="sass">
-.wrap
-	overflow-wrap: anywhere
-	text-align: left
+<style lang="sass" scoped>
 #web3
+	.wrap
+		overflow-wrap: anywhere
+		text-align: left
 	padding-bottom: $unit4
 	.message
 		padding: 0
@@ -130,18 +131,7 @@ export default Vue.extend({
 			padding-bottom: $unit1
 	.wallet-icon
 		height: $unit3
-
-#connect-modal
-	#web3
-		margin-left: -$space-big
-		margin-right: -$space-big
-
-#connect-modal, #web3
 	.space-items-big
-		width: 100%
-	.disconnect
-		margin-top: $unit1
-		display: flex
 		width: 100%
 	.connected
 		padding: 0 $unit7
@@ -169,15 +159,13 @@ export default Vue.extend({
 			&:not(:last-child)
 				margin-right: $unit10
 	.gray-line
-		width: 100%
-		height: $unit11
+		width: calc(100% + #{$space-big} * 2)
+		padding: $unit3
 		background: $bg2
-		line-height: auto
-		justify-content: center
+		margin-left: -$space-big
+		margin-right: -$space-big
 		a
 			text-decoration: none
-		@media (min-width: $breakpoint-mobile)
-			display: none
 	.buy-tnode
 		align-self: center
 		img

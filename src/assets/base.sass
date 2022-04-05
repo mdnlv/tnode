@@ -362,9 +362,8 @@
 			max-height: $unit16
 
 	.mobile
-		display: none
-		@media (max-width: $breakpoint-mobile)
-			display: initial
+		@media (min-width: $breakpoint-mobile)
+			display: none
 	.no-mobile
 		@media (max-width: $breakpoint-mobile)
 			display: none
