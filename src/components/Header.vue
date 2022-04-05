@@ -1,13 +1,13 @@
 <template lang="pug">
 #header
 	header
-		.flex.space-items-horz
+		.flex-space-between.space-items-horz
 			.flex.space-items-horz
 				Hamburger.mobile
 				.logo
 					nuxt-link.logo-link(:to="'/'" v-html="logoImage")
 			.flex.space-items-horz-big.buttons
-				.price.flex.space-items-horz(@click="addToMetamask")
+				.price.flex.space-items-horz.cursor-pointer(@click="addToMetamask")
 					.price-icon(v-if="tnodePrice !== null")
 						img(src="~/assets/img/tnode-icon-2.png")
 					LoadingValue(:value="tnodePrice" #default="{ value }")
@@ -25,27 +25,23 @@
 						template(#trigger)
 							.flex
 								.connect-wallet
-									.mobile(style="cursor: pointer")
-										.flex.space-items-horz(v-if="!account")
-											img(src="~/assets/svg/wallet.svg")
-											.flex.dropdown-icons
-												.flex.dropdown-icon-expand(v-html="dropDownIconExpand")
-												.flex.dropdown-icon-collapse(v-html="dropDownIconCollapse")
-										.flex.space-items-horz.wallet(v-else)
-											img(:src="connectedEVMWallet.icon")
+									.mobile.cursor-pointer
+										.flex.space-items-horz
+											template(v-if="!account")
+												img(src="~/assets/svg/wallet.svg")
+											template(v-else)
+												img(:src="connectedEVMWallet.icon")
 											.flex.dropdown-icons
 												.flex.dropdown-icon-expand(v-html="dropDownIconExpand")
 												.flex.dropdown-icon-collapse(v-html="dropDownIconCollapse")
 									button.no-mobile.pill
-										.flex.space-items-horz-small(v-if="!account")
-											img(src="~/assets/svg/wallet.svg")
-											span CONNECT WALLET
-											.flex.dropdown-icons
-												.flex.dropdown-icon-expand(v-html="dropDownIconExpand")
-												.flex.dropdown-icon-collapse(v-html="dropDownIconCollapse")
-										.flex.space-items-horz-small(v-else)
-											img(:src="connectedEVMWallet.icon")
-											span {{ account.address | accountAddress }}
+										.flex.space-items-horz-small
+											template(v-if="!account")
+												img(src="~/assets/svg/wallet.svg")
+												span CONNECT WALLET
+											template(v-else)
+												img(:src="connectedEVMWallet.icon")
+												span {{ account.address | accountAddress }}
 											.flex.dropdown-icons
 												.flex.dropdown-icon-expand(v-html="dropDownIconExpand")
 												.flex.dropdown-icon-collapse(v-html="dropDownIconCollapse")
@@ -104,9 +100,6 @@ export default Vue.extend({
 		this.$store.commit("web3/connectingWalletError", null)
 	},
 	methods: {
-		async connectWallet() {
-			await this.$store.dispatch("web3/connectWallet", this)
-		},
 		async addToMetamask() {
 			await this.$store.dispatch("denoms/addToMetamask")
 		},
@@ -117,7 +110,7 @@ export default Vue.extend({
 })
 </script>
 
-<style lang="sass">
+<style lang="sass" scoped>
 
 #header
 	header
@@ -126,15 +119,11 @@ export default Vue.extend({
 		background: $header-bg
 		padding: $header-padding 0
 		.buttons
-			padding-left: $unit2
 			margin-right: $unit7
 			@media (max-width: $breakpoint-mobile-small)
 					margin-right: $unit5
 					padding-left: 0
-		> .flex
-			justify-content: space-between
-			flex-wrap: wrap
-			align-items: stretch
+		> .flex-space-between
 			> *:first-child
 				padding-left: $space-big
 				@media (max-width: $breakpoint-mobile)
@@ -164,26 +153,20 @@ export default Vue.extend({
 				b
 					color: $fg2
 			.price
-				flex-direction: row
-				justify-content: center
-				cursor: pointer
+				// justify-content: center
 				@include hover-scale-opacity
-				--price-mr: #{$space-big}
-				margin-right: var(--price-mr)
+				margin-right: $space-big
 				font-size: $font-size-small
 				@media (max-width: $breakpoint-mobile-small)
 					font-size: $font-size-smaller
-				img
-					--price-img-mr: #{$unit1}
 				@media (max-width: $breakpoint-mobile)
-					--price-mr: #{$space}
+					margin-right: $space
 					flex-direction: column
-					padding-top: $unit-10
+					padding-top: $unit-8
 					.price-icon
 						margin-right: 0
 						width: $unit3
 						img
-							margin-right: 0
 							border-radius: none
 							width: $unit1
 				.price-icon
@@ -206,81 +189,57 @@ export default Vue.extend({
 				@media (max-width: $breakpoint-mobile)
 					margin-right: 0
 
-			.connect-wallet
-				.mobile
+			/deep/
+				.connect-wallet
+					@media (max-width: $breakpoint-mobile)
+						width: $unit8
 					img
-						margin-right: $unit-2
-						@media (max-width: $breakpoint-mobile-small)
-							margin-right: $unit-8
-				@media (max-width: $breakpoint-mobile)
-					width: $unit8
-				.button
-					display: flex
-					img
-						height: $unit2
-					span
-						transform: translateY(1px)
-				img
-					width: $unit3
-				.wallet
-					margin-right: $space-small
-					@media (max-width: $breakpoint-mobile-small)
-						margin-right: 0
-				button
-					width: calc(#{$unit16} - #{$unit3})
-					img
-						margin-right: $unit-3
-					.space-items-horz-small
-						justify-content: center
-						padding-left: $unit-9
+						width: $unit3
+					.mobile
+						img
+							margin-right: $unit-2
+							@media (max-width: $breakpoint-mobile-small)
+								margin-right: $unit-8
+					button.no-mobile
+						width: calc(#{$unit16} - #{$unit3})
+						img
+							margin-right: $unit-3
+						.space-items-horz-small
+							justify-content: center
+							padding-left: $unit-9
 
-			.header-dropdown__trigger
-				border: none
-				color: $white
-				font-size: $unit2
-				font-family: $font
-				font-weight: $font-weight-header
-				@media (min-width: $breakpoint-mobile)
-					padding: 0
-				.icon svg
-					width: $unit3
-				.dropdown-icon-collapse
-					display: none
-					max-height: $unit3
-			.header-dropdown__trigger[aria-expanded]
-				.trigger-text
-					text-indent: -9999px
-					line-height: 0
-				.trigger-text::after
-					content: "Select Chain"
-					text-indent: 0
-					line-height: unset
-				.icon svg
-					display: none
-				.dropdown-icon-expand
-					display: none
-				.dropdown-icon-collapse
-					display: block
-			.header-dropdown__content
-				width: $unit19
-				@include box-shadow
-				@media (max-width: $breakpoint-mobile)
-					position: fixed
-					top: $unit8
-					left: 0
-					width: 100%
-				a.buy-tnode
-					align-self: center
-					width: 100%
-			.header-dropdown
-				@media (max-width: $breakpoint-mobile)
-					display: block
-			.dropdown-title
-				padding: $unit7
-				background-color: $bg2-1
-			.dropdown-icons
-				width: $unit2
-				overflow: hidden
+				.header-dropdown__trigger
+					border: none
+					@media (min-width: $breakpoint-mobile)
+						padding: 0
+					.dropdown-icon-collapse
+						display: none
+				.header-dropdown__trigger[aria-expanded]
+					.dropdown-icon-expand
+						display: none
+					.dropdown-icon-collapse
+						display: block
+						max-height: 24px
+				.header-dropdown__content
+					width: $unit19
+					@include box-shadow
+					@media (max-width: $breakpoint-mobile)
+						position: fixed
+						top: $unit8
+						left: 0
+						width: 100%
+					a.buy-tnode
+						align-self: center
+						width: 100%
+				.header-dropdown
+					@media (max-width: $breakpoint-mobile)
+						display: block
+				.dropdown-title
+					padding: $unit7
+					background-color: $bg2-1
+				.dropdown-icons
+					width: $unit2
+					overflow: hidden
 
 //TODO: Handle tablet size
 // @media (max-width: $breakpoint-tablet)

@@ -117,6 +117,7 @@ export const state = () => ({
 			chainId: `0x${Number(250).toString(16)}`,
 			chainName: SupportedNetworks.FTM_MAINNET,
 			rpcUrls: [
+				"https://bitter-nameless-lake.fantom.quiknode.pro/28b1ccd7e0d2aba367bbb773d358cbccedcc2355/",
 				"https://rpc.ftm.tools",
 				"https://rpc.fantom.network",
 				"https://rpcapi.fantom.network",
@@ -134,8 +135,8 @@ export const state = () => ({
 				"https://ftmscan.com",
 			],
 			gasConfig: {
-				gasPrice: times10toPow(0.0000005, 18, true),
-				gasLimit: 2000000,
+				gasPrice: times10toPow(0.0000015, 18, true),
+				gasLimit: 400000,
 			},
 			txLinkTemplate: "https://ftmscan.com/tx/###",
 			swapRouterAddress: "0xF491e7B69E4244ad4002BC14e878a34207E38c29", // spookyswap

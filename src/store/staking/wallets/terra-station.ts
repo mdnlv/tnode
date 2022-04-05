@@ -91,6 +91,7 @@ export const actions: ActionTree<LocalState, RootState> = {
 		commit("_addAccount", {
 			chainId,
 			address: (await dispatch("getSigner")).terraAddress,
+			pubKey: null,
 		} as Account)
 		localStorage.setItem(`${lsKey}-${chainId}-unlocked`, "true")
 	},

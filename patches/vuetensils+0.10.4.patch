@@ -1,0 +1,35 @@
+diff --git a/node_modules/vuetensils/src/components/VTooltip/VTooltip.vue b/node_modules/vuetensils/src/components/VTooltip/VTooltip.vue
+index 2e07a0a..81123f0 100644
+--- a/node_modules/vuetensils/src/components/VTooltip/VTooltip.vue
++++ b/node_modules/vuetensils/src/components/VTooltip/VTooltip.vue
+@@ -51,17 +51,27 @@ export default {
+   },
+ 
+   data: () => ({
+-    show: false,
++    isMouseOutside: true,
++    show: false
+   }),
+ 
+   methods: {
+     onMouseenter() {
+       if (this.focus) return;
+-      this.show = true;
++        this.show = true;
++        this.isMouseOutside = false;
+     },
+     onMouseleave() {
+       if (this.focus) return;
+-      this.show = false;
++      this.isMouseOutside = true;
++
++      setTimeout(() => {
++       if(this.isMouseOutside) {
++         this.show = false
++       } else {
++          this.show = true
++       }
++      }, 200);
+     },
+   },
+ };

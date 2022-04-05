@@ -21,8 +21,9 @@
 		"eslint-plugin-promise": "^5.2.0"
 	},
 	"dependencies": {
-		"@cosmjs/stargate": "^0.26.5",
-		"@cosmjs/tendermint-rpc": "^0.26.5",
+		"@cosmjs/amino": "^0.27.1",
+		"@cosmjs/stargate": "^0.27.1",
+		"@cosmjs/tendermint-rpc": "^0.27.1",
 		"@ethersproject/contracts": "^5.5.0",
 		"@ethersproject/providers": "^5.5.0",
 		"@maticnetwork/meta": "^2.4.29",
@@ -48,9 +49,11 @@
 		"ethers": "^5.5.1",
 		"evm-chains": "^0.2.0",
 		"lodash": "^4.17.21",
+		"long": "^5.2.0",
 		"nuxt": "^2.15.8",
 		"patch-package": "^6.4.7",
 		"postinstall-postinstall": "^2.1.0",
+		"randomstring": "^1.2.2",
 		"v-click-outside": "^3.1.2",
 		"vue-js-modal": "^2.0.1",
 		"vuetensils": "^0.10.4",

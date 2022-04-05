@@ -91,9 +91,6 @@ export default Vue.extend({
 		},
 	},
 	methods: {
-		connect() {
-			this.$modal.show("connecting-web3-wallet")
-		},
 		async connectWallet(walletId: string) {
 			this.$store.commit("web3/connectingWalletId", walletId)
 			await this.$store.dispatch("web3/getAccount", {
@@ -120,10 +117,10 @@ export default Vue.extend({
 </script>
 
 <style lang="sass">
-.wrap
-	overflow-wrap: anywhere
-	text-align: left
 #web3
+	.wrap
+		overflow-wrap: anywhere
+		text-align: left
 	padding-bottom: $unit4
 	.message
 		padding: 0
@@ -137,13 +134,6 @@ export default Vue.extend({
 			padding-bottom: $unit1
 	.wallet-icon
 		height: $unit3
-
-#connect-modal
-	#web3
-		margin-left: -$space-big
-		margin-right: -$space-big
-
-#connect-modal, #web3
 	.space-items-big
 		width: 100%
 	.disconnect
@@ -181,11 +171,11 @@ export default Vue.extend({
 			&:not(:last-child)
 				margin-right: $unit10
 	.gray-line
-		width: 100%
-		height: $unit11
+		width: calc(100% + #{$space-big} * 2)
+		padding: $unit3
 		background: $bg2
-		line-height: auto
-		justify-content: center
+		margin-left: -$space-big
+		margin-right: -$space-big
 		a
 			text-decoration: none
 		@media (min-width: $breakpoint-mobile)

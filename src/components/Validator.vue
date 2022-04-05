@@ -37,10 +37,16 @@
 						span &nbsp;{{ validator.denom.symbol }}
 				#rewards
 					.label.small YOUR REWARDS
-					.flex
+					.flex.space-items-horz-small
 						LoadingValue(:value="userRewards", :loading="loadingPersonalInfo" #default="{ value }")
 							span {{ value | floorToDP(6) }}
 						span &nbsp;{{ validator.denom.symbol }}
+						Tooltip(v-if="account && validator.autoRewards")
+							template(#tooltip)
+								p  {{ validator.chainName }} rewards are automatically claimed, check your&nbsp;
+									a(:href="toLink(account.address, validator.linkTemplate)" target="_blank") balance
+									span  to see available rewards.
+							.icon-smallest.center.info-icon(v-html="infoIcon")
 				#wallet(:class="{ active }")
 					button.full.nowrap(v-if="!account" @click="connectWallet") CONNECT WALLET
 					.account.flex.space-items-horz(v-else)
@@ -90,7 +96,7 @@
 					p.status-message {{ statusMessage }}
 					button.bare.big-text(@click="delegate") STAKE
 				.redelegation-form.space-items(v-if="totalDelegation.gt(0)")
-					.h2 Redelegate assets
+					.h2 Restake assets
 					p.color-fg3
 						|You have a total of {{ totalDelegation | floorToDPorE(6) }} {{ validator.denom.symbol }} currently staked with other validator nodes
 					.buttons
@@ -205,10 +211,10 @@
 <script lang="ts">
 import Vue from "vue"
 import bn from "big.js"
-
+import Tooltip from "~/components/ToolTip.vue"
+import LoadingValue from "~/components/LoadingValue.vue"
 import { max, toLink } from "~/_utils"
 import { Validator, Account, Delegation } from "~/_types"
-import LoadingValue from "~/components/LoadingValue.vue"
 import Modal from "~/components/Modal.vue"
 import MaxInput from "~/components/MaxInput.vue"
 import StakeRow from "~/components/common/StakeRow.vue"
@@ -221,6 +227,7 @@ export default Vue.extend({
 		Modal,
 		MaxInput,
 		StakeRow,
+		Tooltip,
 	},
 	filters: {
 		realValue(amount: bn | null, price: bn | null) {
@@ -520,6 +527,7 @@ export default Vue.extend({
 				},
 			)
 			this.handleResponse("redelegate", response)
+			this.monitorDelegation()
 		},
 		async undelegate() {
 			if (!this.validate(this.amount) || this.amount === null) {
@@ -675,6 +683,9 @@ export default Vue.extend({
 		background: $bg
 		padding: $space
 		padding-right: $space-medium
+		/deep/
+			.info-icon
+				transform: scale(0.7) translateY(-1px)
 		@include rounded-big
 		@media (min-width: $breakpoint-mobile-upper)
 			border-top-left-radius: 0

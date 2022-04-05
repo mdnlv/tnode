@@ -6,9 +6,10 @@ import { BN_MILLION, BN_ZERO } from "@polkadot/util"
 import type { DeriveStakerReward, DeriveStakingQuery } from "@polkadot/api-derive/types"
 
 import {
+	Account,
+	Delegation,
 	EcosystemModule,
 	UserActionResponse,
-	Account,
 	Validator,
 } from "~/_types"
 
@@ -122,10 +123,25 @@ export const actions: ActionTree<LocalState, RootState> = {
 		const userRewards = divBy10toPow(rewardTotal.toString(), validator.denom.decimals)
 		commit("staking/userRewards", { ...validator, userRewards }, { root: true })
 	},
-	async getDelegations(_) {
-		return await null
+	async getDelegations({ dispatch }, validator: Validator): Promise<Delegation[] | null> {
+		const client = await dispatch("_getClient", validator)
+		const account: Account = await dispatch("_getAccount", validator)
+		const [bonded] = await client.derive.staking?.accounts([account.address])
+		const bondedAmount: number | undefined = bonded.stakingLedger?.active?.unwrap().toNumber()
+
+		if (bondedAmount) {
+			return bonded.nominators
+				.filter(validatorAddress => validatorAddress.toString() !== validator.address)
+				.map(validatorAddress => ({
+					address: validatorAddress.toString(),
+					amount: divBy10toPow(bondedAmount.toString(), validator.denom.decimals),
+				}))
+		}
+		else {
+			return null
+		}
 	},
-	async delegate({ dispatch }, { amount, validator }: {amount: number, validator: Validator}) {
+	async delegate({ dispatch }, { amount, validator }: {amount: string, validator: Validator}) {
 		try {
 			const account : Account = await dispatch("_getAccount", validator)
 			const injector = await this.$polkadotJsExtension.web3FromAddress(account.address)
@@ -191,7 +207,7 @@ export const actions: ActionTree<LocalState, RootState> = {
 			return dispatch("_handleError", { error, statusPrefix: "DELEGATION" })
 		}
 	},
-	async undelegate({ dispatch }, { amount, validator }: {amount: number, validator: Validator}) {
+	async undelegate({ dispatch }, { amount, validator }: {amount: string, validator: Validator}) {
 		try {
 			const account = await dispatch("_getAccount", validator)
 			const injector = await this.$polkadotJsExtension.web3FromAddress(account.address)
@@ -254,8 +270,28 @@ export const actions: ActionTree<LocalState, RootState> = {
 			return dispatch("_handleError", { error, statusPrefix: "REWARDS CLAIM" })
 		}
 	},
-	async redelegate() {
-		return await { message: "not implemented" }
+	async redelegate({ dispatch }, { validator }: { validator: Validator }) {
+		try {
+			const account: Account = await dispatch("_getAccount", validator)
+			const client = await dispatch("_getClient", validator)
+			const injector = await this.$polkadotJsExtension.web3FromAddress(account.address)
+
+			// eslint-disable-next-line promise/param-names
+			const TxHash = await new Promise((resolve, _reject) => {
+				client.tx.staking
+					.nominate([validator.address])
+					.signAndSend(account.address, { signer: injector.signer }, ({ status }) => {
+						if (status.isInBlock) { resolve(status.asInBlock.toString()) }
+					})
+			})
+			return {
+				hash: TxHash,
+				status: "REDELEGATION IN PROGRESS",
+			}
+		}
+		catch (error) {
+			return dispatch("_handleError", { error, statusPrefix: "REDELEGATION" })
+		}
 	},
 	async _getTotalDelegated({ dispatch }, validator: Validator): Promise<BN | null> {
 		const client = await dispatch("_getClient", validator)

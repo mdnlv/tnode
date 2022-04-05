@@ -70,6 +70,8 @@
 				.third
 					button.full.cta(
 						@click="openModal('stake')"
+						:class="{ disabled: vault.expired }"
+						:disabled="vault.expired"
 					) STAKE
 				.third
 					button.full(@click="openModal('unstake')") UNSTAKE
@@ -365,6 +367,9 @@ export default Vue.extend({
 			await this.$store.dispatch("vaults/setBalance", this.vault)
 		},
 		async openModal(type: TransactionType) {
+			if (type === "stake" && this.vault.expired) {
+				return
+			}
 			if (!this.account) {
 				await this.connectWallet()
 			}

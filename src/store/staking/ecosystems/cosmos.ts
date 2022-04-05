@@ -1,6 +1,7 @@
 import type { GetterTree, ActionTree, MutationTree } from "vuex"
 import bn from "big.js"
 
+import axios from "axios"
 import {
 	Coin,
 } from "cosmjs-types/cosmos/base/v1beta1/coin"
@@ -11,8 +12,6 @@ import {
 	setupDistributionExtension,
 	DistributionExtension,
 	setupStakingExtension,
-	BankExtension,
-	setupBankExtension,
 	StakingExtension,
 	calculateFee,
 	GasPrice,
@@ -22,10 +21,17 @@ import {
 	Tendermint34Client,
 } from "@cosmjs/tendermint-rpc"
 import {
-	QueryClientImpl,
+	QueryClientImpl as MintQueryClientImpl,
 } from "cosmjs-types/cosmos/mint/v1beta1/query"
-import { DelegationResponse } from "cosmjs-types/cosmos/staking/v1beta1/staking"
-import { QueryValidatorDelegationsResponse } from "cosmjs-types/cosmos/staking/v1beta1/query"
+import { PageRequest } from "cosmjs-types/cosmos/base/query/v1beta1/pagination"
+import Long from "long"
+import {
+	QueryClientImpl as StakingQueryClientImpl,
+	QueryValidatorDelegationsResponse,
+} from "cosmjs-types/cosmos/staking/v1beta1/query"
+import {
+	QueryClientImpl as BankQueryClientImpl,
+} from "cosmjs-types/cosmos/bank/v1beta1/query"
 import {
 	times10toPow,
 	divBy10toPow,
@@ -44,15 +50,15 @@ interface BalanceCoin extends Coin {
 	denom: string
 }
 
-const setupMintExtension = base => {
-	const queryService = new QueryClientImpl({
+const setupCustomMintExtension = base => {
+	const queryService = new MintQueryClientImpl({
 		request: (service, method, data) => {
 			const path = `/${service}/${method}`
 			return base.queryUnverified(path, data)
 		},
 	})
 	return {
-		mint: {
+		customMint: {
 			inflation: async () => {
 				const { inflation } = await queryService.Inflation({})
 				return inflation
@@ -61,11 +67,62 @@ const setupMintExtension = base => {
 	}
 }
 
+const setupCustomStakingExtension = base => {
+	const queryService = new StakingQueryClientImpl({
+		request: (service, method, data) => {
+			const path = `/${service}/${method}`
+			return base.queryUnverified(path, data)
+		},
+	})
+	return {
+		customStaking: {
+			validatorDelegations: async (validatorAddr, paginationKey) => {
+				const response = await queryService.ValidatorDelegations({
+					validatorAddr,
+					pagination: {
+						countTotal: false,
+						key: paginationKey,
+						offset: Long.fromNumber(0, true),
+						limit: Long.fromNumber(20, true),
+						reverse: false,
+					} as PageRequest,
+				})
+				return response
+			},
+		},
+	}
+}
+
+const setupCustomBankExtension = base => {
+	const queryService = new BankQueryClientImpl({
+		request: (service, method, data) => {
+			const path = `/${service}/${method}`
+			return base.queryUnverified(path, data)
+		},
+	})
+	return {
+		customBank: {
+			totalSupply: async paginationKey => {
+				return await queryService.TotalSupply({
+					pagination: {
+						countTotal: false,
+						key: paginationKey,
+						offset: Long.fromNumber(0, true),
+						limit: Long.fromNumber(20, true),
+						reverse: false,
+					} as PageRequest,
+				})
+			},
+		},
+	}
+}
+
 type TMClient = QueryClient
 	& DistributionExtension
 	& StakingExtension
-	& BankExtension
-	& ReturnType<typeof setupMintExtension>
+	& ReturnType<typeof setupCustomMintExtension>
+	& ReturnType<typeof setupCustomStakingExtension>
+	& ReturnType<typeof setupCustomBankExtension>
 
 const defaultState = {
 	id: "cosmos",
@@ -89,11 +146,11 @@ export const mutations: MutationTree<LocalState> = {
 export const actions: ActionTree<LocalState, RootState> = {
 	async setTotalDelegated({ dispatch, commit }, validator: Validator): Promise<void> {
 		const tmClient = await dispatch("_getTmClient", validator) as TMClient
-		const delegations: DelegationResponse[] = []
+		const delegations: QueryValidatorDelegationsResponse["delegationResponses"] = []
 		let paginationKey: Uint8Array | undefined = new Uint8Array()
 		do {
-			const { delegationResponses, pagination }: QueryValidatorDelegationsResponse
-				= await tmClient.staking.validatorDelegations(validator.address, paginationKey)
+			const { delegationResponses, pagination }
+				= await tmClient.customStaking.validatorDelegations(validator.address, paginationKey)
 			delegations.push(...delegationResponses)
 			paginationKey = pagination?.nextKey
 		}
@@ -105,20 +162,39 @@ export const actions: ActionTree<LocalState, RootState> = {
 		}, { root: true })
 	},
 	async setAPR({ dispatch, commit }, validator: Validator): Promise<void> {
+		if (validator.chainId === "juno-1") {
+			const aprRes = await axios.get("https://supply-api.hydrogenx.tk/")
+			const apr = bn(aprRes.data.apr)
+			commit("staking/setAPR", { chainId: validator.chainId, apr }, { root: true })
+			return
+		}
+		if (validator.chainId === "osmosis-1") {
+			const aprRes = await axios.get("https://osmosis-api.hydrogenx.tk/")
+			const apr = bn(aprRes.data!)
+			commit("staking/setAPR", { chainId: validator.chainId, apr }, { root: true })
+			return
+		}
 		const tmClient = await dispatch("_getTmClient", validator) as TMClient
-		const inflationRes = await tmClient.mint.inflation()
+		const inflationRes = await tmClient.customMint.inflation()
 		const inflation = divBy10toPow(new TextDecoder().decode(inflationRes), 16)
 		const poolRes = await tmClient.staking.pool()
 		const pool = poolRes.pool!
 		const totalStaked = bn(pool.bondedTokens).plus(pool.notBondedTokens)
-		const totalSupplyRes = await tmClient.bank.totalSupply()
-		const totalSupply = totalSupplyRes.find(ts => ts.denom === validator.denom.min)!.amount
-		commit("staking/setAPR", {
-			chainId: validator.chainId,
-			apr: bn(inflation)
-				.times(totalSupply)
-				.div(totalStaked),
-		}, { root: true })
+		let paginationKey: Uint8Array | undefined = new Uint8Array()
+		do {
+			const { supply, pagination } = await tmClient.customBank.totalSupply(paginationKey)
+			const totalSupply = supply.find(ts => ts.denom === validator.denom.min)?.amount
+			if (totalSupply) {
+				commit("staking/setAPR", {
+					chainId: validator.chainId,
+					apr: bn(inflation)
+						.times(totalSupply)
+						.div(totalStaked),
+				}, { root: true })
+			}
+			paginationKey = pagination?.nextKey
+		}
+		while (paginationKey?.length)
 	},
 	async getBalance({ dispatch }, validator: Validator): Promise<bn> {
 		const signer = await dispatch("_getSigner", validator) as SigningStargateClient
@@ -175,7 +251,7 @@ export const actions: ActionTree<LocalState, RootState> = {
 			return []
 		}
 	},
-	async delegate({ dispatch }, { amount, validator }: {amount: number, validator: Validator}) {
+	async delegate({ dispatch }, { amount, validator }: {amount: string, validator: Validator}) {
 		try {
 			const signer = await dispatch("_getSigner", validator)
 			const account: Account = await dispatch("_getAccount", validator)
@@ -198,7 +274,7 @@ export const actions: ActionTree<LocalState, RootState> = {
 			return dispatch("_handleError", { error, statusPrefix: "DELEGATION" })
 		}
 	},
-	async undelegate({ dispatch }, { amount, validator }: {amount: number, validator: Validator}) {
+	async undelegate({ dispatch }, { amount, validator }: {amount: string, validator: Validator}) {
 		try {
 			const signer = await dispatch("_getSigner", validator)
 			const account: Account = await dispatch("_getAccount", validator)
@@ -240,7 +316,7 @@ export const actions: ActionTree<LocalState, RootState> = {
 			return dispatch("_handleError", { error, statusPrefix: "REWARDS CLAIM" })
 		}
 	},
-	async redelegate({ dispatch }, { amount, validator, delegation }: { amount: bn, validator: Validator, delegation: Delegation }) {
+	async redelegate({ dispatch }, { amount, validator, delegation }: { amount: string, validator: Validator, delegation: Delegation }) {
 		try {
 			const signer = await dispatch("_getSigner", validator)
 			const account: Account = await dispatch("_getAccount", validator)
@@ -289,9 +365,10 @@ export const actions: ActionTree<LocalState, RootState> = {
 			await Tendermint34Client.connect(validator.rpcEndpoint),
 			setupDistributionExtension,
 			setupStakingExtension,
-			setupBankExtension,
 			// creating custom mint extension, TODO: submit PR to @cosmjs/stargate with this
-			setupMintExtension,
+			setupCustomMintExtension,
+			setupCustomStakingExtension,
+			setupCustomBankExtension,
 		)
 	},
 	_getAccount({ rootGetters }, validator: Validator): Account | undefined {

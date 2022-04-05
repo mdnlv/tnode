@@ -82,6 +82,7 @@ export const actions: ActionTree<LocalState, RootState> = {
 						networks.find(n => n.chainName === networkName),
 						[
 							"gasConfig",
+							"txLinkTemplate",
 							"swapRouterAddress",
 						],
 					),
@@ -169,10 +170,10 @@ export const actions: ActionTree<LocalState, RootState> = {
 			console.error(e)
 			const connectingWalletError = walletId === "metamask" && !window.ethereum?.isMetaMask ? "metamaskConnectionError" : "requestRejected"
 			commit("web3/connectingWalletError", connectingWalletError, { root: true })
-			window.ethereum?.on("connect", connectInfo => {
-				commit("web3/connectingWalletId", null)
-				commit("web3/connectingWalletError", null)
-			})
+			// window.ethereum?.on("connect", connectInfo => {
+			// 	commit("web3/connectingWalletId", null)
+			// 	commit("web3/connectingWalletError", null)
+			// })
 			dispatch("disconnect")
 		}
 	},

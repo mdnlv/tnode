@@ -65,7 +65,7 @@ export default Vue.extend({
 				},
 				{
 					icon: require("~/assets/svg/chains/binance-logo.svg?raw"),
-					label: "Binance Smart Chain",
+					label: "BNB Chain",
 					value: SupportedNetworks.BSC_MAINNET,
 				},
 				// {
@@ -83,7 +83,7 @@ export default Vue.extend({
 	},
 	head() {
 		return {
-			title: "Staking Rewards App",
+			title: "The Vaults",
 			meta: [
 				{ hid: "description", name: "description", content: "Instant access to the world of staking rewards." },
 			],

@@ -1,4 +1,5 @@
 import type { GetterTree, ActionTree, MutationTree } from "vuex"
+import { toBase64 } from "@cosmjs/encoding"
 import { RootState } from "~/store"
 import { Account, Validator, WalletModule } from "~/_types"
 
@@ -69,6 +70,12 @@ export const actions: ActionTree<LocalState, RootState> = {
 			commit("_addAccount", {
 				chainId,
 				address: account.address,
+				pubKey: {
+					type: {
+						secp256k1: "tendermint/PubKeySecp256k1",
+					}[account.algo],
+					value: toBase64(account.pubkey),
+				},
 			} as Account)
 			localStorage.setItem(`${lsKey}-${chainId}-unlocked`, "true")
 		}
@@ -87,5 +94,38 @@ export const actions: ActionTree<LocalState, RootState> = {
 	async getOfflineSigner(_, chainId: string) {
 		await window.keplr!.enable(chainId)
 		return window.getOfflineSigner!(chainId)
+	},
+	async signArbitrary({ getters }, { chainId, message }: {chainId: string, message: string}) {
+		const accounts = getters.accounts as Account[]
+		const account = accounts.find(a => a.chainId === chainId)!
+		try {
+			const response = await window.keplr!.signAmino(chainId, account.address, {
+				chain_id: "",
+				account_number: "0",
+				sequence: "0",
+				fee: {
+					gas: "0",
+					amount: [],
+				},
+				msgs: [
+					{
+						type: "sign/MsgSignData",
+						value: {
+							signer: account.address,
+							data: btoa(message.toLowerCase()),
+						},
+					},
+				],
+				memo: "",
+			})
+			return response
+		}
+		catch (e) {
+			// eslint-disable-next-line no-console
+			console.error(e)
+			return {
+				error: e.message,
+			}
+		}
 	},
 } as WalletModule["actions"]

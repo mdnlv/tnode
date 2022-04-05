@@ -2,6 +2,7 @@ import type { GetterTree, ActionTree, MutationTree } from "vuex"
 import { ethers, utils } from "ethers"
 import bn from "big.js"
 import { omit } from "lodash"
+import sleep from "await-sleep"
 
 import { RootState } from "~/store"
 import {
@@ -35,6 +36,7 @@ const defaultState = {
 			stakeDenomId: "tnode",
 			rewardDenomId: "tnode",
 			properties: [],
+			expired: false,
 		},
 		{
 			name: "BSC LIQUIDITY VAULT\nTNODE/BUSD",
@@ -52,6 +54,7 @@ const defaultState = {
 			stakeDenomId: "tnode-busd",
 			rewardDenomId: "tnode",
 			properties: [],
+			expired: false,
 		},
 		{
 			name: "FTM LIQUIDITY VAULT\nTNODE/USDC",
@@ -69,6 +72,7 @@ const defaultState = {
 			stakeDenomId: "tnode-usdc",
 			rewardDenomId: "ftm-tnode",
 			properties: [],
+			expired: false,
 		},
 	] as {
 		name: string
@@ -87,6 +91,7 @@ const defaultState = {
 		stakeDenomId: string
 		rewardDenomId: string
 		properties: Vault["properties"]
+		expired: boolean
 	}[],
 }
 
@@ -310,6 +315,7 @@ export const actions: ActionTree<LocalState, RootState> = {
 				)
 				// eslint-disable-next-line no-console
 				console.log({ approved })
+				await sleep(1000)
 			}
 
 			const stakingRewardsContractSigner = await stakingRewardsContract.connect(offlineSigner)

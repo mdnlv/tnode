@@ -73,6 +73,7 @@ export const actions: ActionTree<LocalState, RootState> = {
 				commit("_addAccount", {
 					chainId,
 					address: account.address,
+					pubKey: null,
 				} as Account)
 				localStorage.setItem(`${lsKey}-${chainId}-unlocked`, "true")
 			}
