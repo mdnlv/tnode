@@ -40,10 +40,17 @@ export const mutations: MutationTree<LocalState> = {
 
 export const actions: ActionTree<LocalState, RootState> = {
 	async getNotifications({ commit }) {
-		const notifications = await axios.get(`${this.app.$config.backendUrl}/notifications`)
-			.then(res => { return res.data })
-
-		commit("notifications", notifications)
+		try {
+			const notifications = await axios.get(`${this.app.$config.backendUrl}/notifications`)
+				.then(res => { return res.data })
+			commit("notifications", notifications)
+		}
+		catch (e: any) {
+			if (e.message !== "Network Error") {
+				// eslint-disable-next-line no-console
+				console.error(e)
+			}
+		}
 	},
 	getViewedNotifications({ commit }) {
 		commit("viewedNotifications", JSON.parse(localStorage.getItem("viewedNotifications") || "[]"))

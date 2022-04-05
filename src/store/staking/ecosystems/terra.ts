@@ -134,7 +134,7 @@ export const actions: ActionTree<LocalState, RootState> = {
 				),
 			}))
 	},
-	async delegate({ dispatch }, { amount, validator }: {amount: bn, validator: Validator}) {
+	async delegate({ dispatch }, { amount, validator }: {amount: string, validator: Validator}) {
 		try {
 			const account: Account = await dispatch("_getAccount", validator)
 			const delegate = new MsgDelegate(
@@ -156,7 +156,7 @@ export const actions: ActionTree<LocalState, RootState> = {
 			return dispatch("_handleError", { error, statusPrefix: "DELEGATION" })
 		}
 	},
-	async undelegate({ dispatch }, { amount, validator }: {amount: bn, validator: Validator}) {
+	async undelegate({ dispatch }, { amount, validator }: {amount: string, validator: Validator}) {
 		try {
 			const account: Account = await dispatch("_getAccount", validator)
 			const undelegate = new MsgUndelegate(
@@ -199,7 +199,7 @@ export const actions: ActionTree<LocalState, RootState> = {
 			return dispatch("_handleError", { error, statusPrefix: "REWARDS CLAIM" })
 		}
 	},
-	async redelegate({ dispatch }, { amount, validator, delegation }: { amount: bn, validator: Validator, delegation: _Delegation }) {
+	async redelegate({ dispatch }, { amount, validator, delegation }: { amount: string, validator: Validator, delegation: _Delegation }) {
 		try {
 			const account: Account = await dispatch("_getAccount", validator)
 			const redelegate = new MsgBeginRedelegate(

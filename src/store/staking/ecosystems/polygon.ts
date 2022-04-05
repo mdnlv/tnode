@@ -82,7 +82,7 @@ export const actions: ActionTree<LocalState, RootState> = {
 	async getDelegations(_) {
 		return await null
 	},
-	async delegate({ dispatch, rootGetters }, { amount, validator }: {amount: number, validator: Validator}) {
+	async delegate({ dispatch, rootGetters }, { amount, validator }: {amount: string, validator: Validator}) {
 		try {
 			const [account] = rootGetters["staking/wallets/metamask/accounts"]
 			const network = await dispatch("_getNetwork", validator)
@@ -128,7 +128,7 @@ export const actions: ActionTree<LocalState, RootState> = {
 			return await dispatch("_handleError", { error: e })
 		}
 	},
-	async undelegate({ dispatch }, { amount, validator }: {amount: bn, validator: Validator}) {
+	async undelegate({ dispatch }, { amount, validator }: {amount: string, validator: Validator}) {
 		try {
 			const validatorShareContract = await dispatch("_getValidatorShareContract", validator)
 			const unbondAmount = times10toPow(amount, validator.denom.decimals)

@@ -31,9 +31,15 @@ export type Network = {
 	swapRouterAddress: string
 }
 
+export type PubKey = {
+	type: string
+	value: string
+}
+
 export type Account = {
 	chainId: string
 	address: string
+	pubKey: PubKey | null
 }
 
 export type EVMAccount = {
@@ -88,6 +94,14 @@ export type EVMWallet = {
 	link: string
 }
 
+export type ArbitrarySignature = {
+	signature: {
+		pub_key: any
+		signature: string
+	}
+	signed: any
+}
+
 export type Validator = {
 	chainName: string
 	chainId: string
@@ -96,6 +110,7 @@ export type Validator = {
 	txLinkTemplate: string
 	address: string
 	operatorName: string
+	autoRewards: boolean,
 	totalDelegated: bn | null
 	apr: bn | null
 	denom: NativeDenom
@@ -140,6 +155,7 @@ export type Vault = {
 	stakeDenom: ERC20Denom | LPDenom
 	rewardDenom: ERC20Denom
 	properties: VaultProperty[]
+	expired: boolean
 }
 
 type AnyOtherProps<T extends object> = T & { [key: string]: any }
@@ -167,11 +183,11 @@ export type EcosystemModule = {
 		getDelegated: (ctx: any, validator: Validator) => Promise<void>
 		getRewards: (ctx: any, validator: Validator) => Promise<void>
 		getDelegations: (ctx: any, validator: Validator) => Promise<Delegation[] | null>
-		delegate: (ctx: any, { amount: number, validator: Validator }) => Promise<UserActionResponse>
-		undelegate: (ctx: any, { amount: number, validator: Validator }) => Promise<UserActionResponse>
+		delegate: (ctx: any, args: { amount: string, validator: Validator }) => Promise<UserActionResponse>
+		undelegate: (ctx: any, args: { amount: string, validator: Validator }) => Promise<UserActionResponse>
 		claimRewards: (ctx: any, validator: Validator) => Promise<UserActionResponse>
-		redelegate: (ctx: any, { amount: bn, validator: Validator, delegation: Delegation }) => Promise<UserActionResponse>
-		_handleError: (ctx: any, { error: Error, statusPrefix: string }) => UserActionResponse
+		redelegate: (ctx: any, args: { amount: string, validator: Validator, delegation: Delegation }) => Promise<UserActionResponse>
+		_handleError: (ctx: any, args: { error: Error, statusPrefix: string }) => UserActionResponse
 	}>
 }
 
@@ -180,10 +196,11 @@ export type WalletModule = {
 		id: (any) => string
 	}>
 	actions: AnyOtherProps<{
-		installed: (any) => Promise<boolean>
-		onLoad: (any) => void
-		getAccount: (any, string) => void
-		getOfflineSigner: (any, string) => any
+		installed: (ctx: any) => Promise<boolean>
+		onLoad: (ctx: any) => void
+		getAccount: (ctx: any, string) => void
+		getOfflineSigner: (ctx: any, string) => any
+		signArbitrary: (ctx: any, args: { chainId: string, message: string }) => Promise<ArbitrarySignature>
 	}>
 }
 

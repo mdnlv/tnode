@@ -99,9 +99,6 @@ export default Vue.extend({
 		this.$store.commit("web3/connectingWalletError", null)
 	},
 	methods: {
-		async connectWallet() {
-			await this.$store.dispatch("web3/connectWallet", this)
-		},
 		async addToMetamask() {
 			await this.$store.dispatch("denoms/addToMetamask")
 		},

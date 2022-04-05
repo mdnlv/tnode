@@ -88,9 +88,6 @@ export default Vue.extend({
 		},
 	},
 	methods: {
-		connect() {
-			this.$modal.show("connecting-web3-wallet")
-		},
 		async connectWallet(walletId: string) {
 			this.$store.commit("web3/connectingWalletId", walletId)
 			await this.$store.dispatch("web3/getAccount", {

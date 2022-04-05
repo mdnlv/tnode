@@ -22,6 +22,8 @@
 						SearchBox(@search="handleSearch($event)")
 	section.big-padding
 		#validators.container
+			CampaignBanner
+			.spacer
 			template(v-for="validator of matchingValidators")
 				Validator(
 					:key="validator.chainId"
@@ -43,6 +45,7 @@ import Nav from "~/components/NavMenu.vue"
 import SearchBox from "~/components/SearchBox.vue"
 import Validator from "~/components/Validator.vue"
 import ValidatorComingSoon from "~/components/ValidatorComingSoon.vue"
+import CampaignBanner from "~/components/CampaignBanner.vue"
 import {
 	Validator as tValidator,
 	ValidatorComingSoon as tValidatorComingSoon,
@@ -54,6 +57,7 @@ export default Vue.extend({
 		Validator,
 		ValidatorComingSoon,
 		SearchBox,
+		CampaignBanner,
 	},
 	scrollToTop: true,
 	data() {
@@ -64,7 +68,7 @@ export default Vue.extend({
 	},
 	head() {
 		return {
-			title: "Staking Rewards App",
+			title: "Staking Portal",
 			meta: [
 				{ hid: "description", name: "description", content: "Instant access to the world of staking rewards." },
 			],

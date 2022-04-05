@@ -79,6 +79,7 @@ export const actions: ActionTree<LocalState, RootState> = {
 						networks.find(n => n.chainName === networkName),
 						[
 							"gasConfig",
+							"txLinkTemplate",
 							"swapRouterAddress",
 						],
 					),
