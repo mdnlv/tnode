@@ -1,6 +1,6 @@
 <template lang="pug">
-	button#connected-wallet.bare(@click="copy")
-		img.wallet-icon(:src="connectedEVMWallet.icon")
+	button#connected-wallet.bare(@click="copy" v-if="account")
+		img.wallet-icon(:src="connectedEVMWallet && connectedEVMWallet.icon")
 		.flex
 			.flex-column.flex-start
 				span.green CONNECTED WALLET

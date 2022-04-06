@@ -70,8 +70,8 @@ Vue.filter(
 Vue.filter(
 	"accountAddress",
 	(address: string) => [
-		address.substr(0, 6),
-		address.substr(-6),
+		address.substring(0, 6),
+		address.substring(address.length - 6),
 	].join("..."),
 )
 
