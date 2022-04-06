@@ -26,8 +26,8 @@
 						LoadingValue(:value="vault.userRewards" #default="{ value }" size="medium")
 							span.number {{ value | floorToDPorE(1) }}&nbsp;
 						span {{ vault.rewardDenom.symbol }}
-				.field.flex#claimrewards
-					ClaimRewards(active @click="openModal('claimRewards')")
+				.field.flex#claimrewards(@click="openModal('claimRewards')")
+					ClaimRewards(active)
 				.field.flex#k
 					ConnectedWallet(no-copy)
 				.field.flex#discon
@@ -323,6 +323,7 @@ export default Vue.extend({
 			await this.$store.dispatch("vaults/setBalance", this.vault)
 		},
 		async openModal(type: TransactionType) {
+			console.log("!!++")
 			if (!this.account) {
 				await this.connectWallet()
 			}
@@ -347,6 +348,7 @@ export default Vue.extend({
 						break
 					}
 					case "claimRewards": {
+						console.log("!!+")
 						this.claimingRewards = true
 						await this.getRewards()
 						this.amount = this.vault.userRewards?.toString() ?? ""

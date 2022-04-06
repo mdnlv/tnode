@@ -23,8 +23,8 @@
 						LoadingValue(:value="userRewards", :loading="loadingPersonalInfo" #default="{ value }")
 							span {{ value | floorToDP(6) }}
 						span &nbsp;{{ validator.denom.symbol }}
-				.field.flex#claimrewards
-					ClaimRewards(:active="!!account" @click="!!account && openModal('claimRewards')")
+				.field.flex#claimrewards(@click="!!account && openModal('claimRewards')")
+					ClaimRewards(:active="!!account")
 				.field.flex#k
 					.button.bare.flex.space-items-horz.no-padding(v-if="!account" @click="connectWallet") CONNECT WALLET
 					.account.flex.space-items-horz(v-else)
