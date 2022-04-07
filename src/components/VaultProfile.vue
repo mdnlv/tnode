@@ -323,7 +323,6 @@ export default Vue.extend({
 			await this.$store.dispatch("vaults/setBalance", this.vault)
 		},
 		async openModal(type: TransactionType) {
-			console.log("!!++")
 			if (!this.account) {
 				await this.connectWallet()
 			}
@@ -348,7 +347,6 @@ export default Vue.extend({
 						break
 					}
 					case "claimRewards": {
-						console.log("!!+")
 						this.claimingRewards = true
 						await this.getRewards()
 						this.amount = this.vault.userRewards?.toString() ?? ""

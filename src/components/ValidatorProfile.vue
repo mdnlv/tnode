@@ -23,7 +23,7 @@
 						LoadingValue(:value="userRewards", :loading="loadingPersonalInfo" #default="{ value }")
 							span {{ value | floorToDP(6) }}
 						span &nbsp;{{ validator.denom.symbol }}
-				.field.flex#claimrewards(@click="!!account && openModal('claimRewards')")
+				.field.flex#claimrewards(@click="openModal('claimRewards')")
 					ClaimRewards(:active="!!account")
 				.field.flex#k
 					.button.bare.flex.space-items-horz.no-padding(v-if="!account" @click="connectWallet") CONNECT WALLET
@@ -33,28 +33,44 @@
 				.field.flex#discon(v-if="account")
 					.button.bare.flex.space-items-horz.no-padding
 						div(v-html="disconIcon")
+		ValidatorModals(
+			:loaded="loaded"
+			:modalLoaded="modalLoaded"
+			:validator="validator"
+			:openModal="openModal"
+			:closeTransactionModal="closeTransactionModal"
+			:statusMessage="statusMessage"
+			:amount="amount"
+			:balance="balance"
+			:transactionType="transactionType"
+			:transactionAmount="transactionAmount"
+			:transactionHash="transactionHash"
+			:transactionStatus="transactionStatus"
+			:totalDelegation="totalDelegation"
+			:userDelegated="userDelegated"
+			:srcDelegation="srcDelegation"
+			:delegate="delegate"
+			:undelegate="undelegate"
+			:delegations="delegations"
+		)
 </template>
 
 <script lang="ts">
 import Vue from "vue"
-import bn from "big.js"
+import bn, { Big } from "big.js"
 import { toLink } from "~/_utils"
 import { Validator, Account, Delegation } from "~/_types"
 import LoadingValue from "~/components/LoadingValue.vue"
-import Modal from "~/components/Modal.vue"
-import MaxInput from "~/components/MaxInput.vue"
-import StakeRow from "~/components/common/StakeRow.vue"
 import ClaimRewards from "~/components/common/ClaimRewards.vue"
+import ValidatorModals from "~/components/ValidatorModals.vue"
 
 type TransactionType = "delegate" | "undelegate" | "claimRewards" | "redelegate"
 
 export default Vue.extend({
 	components: {
 		LoadingValue,
-		Modal,
-		MaxInput,
-		StakeRow,
 		ClaimRewards,
+		ValidatorModals,
 	},
 	props: {
 		validator: {
@@ -70,17 +86,17 @@ export default Vue.extend({
 			optionsIcon: require("~/assets/svg/ui/options.svg?raw"),
 			active: false,
 			modalLoaded: false,
-			statusMessage: null as string | null,
-			amount: null as string | null,
-			balance: null as bn | null,
+			statusMessage: "" as string,
+			amount: "" as string,
+			balance: Big(0) as bn,
 			delegations: [] as Delegation[],
 			srcDelegation: null as Delegation | null,
 			usingMax: false,
 			claimingRewards: false,
 			transactionType: "delegate" as TransactionType | null,
-			transactionAmount: null as string | null,
-			transactionHash: null as string | null,
-			transactionStatus: null as "success" | "pending" | null,
+			transactionAmount: "" as string,
+			transactionHash: "" as string,
+			transactionStatus: "" as "success" | "pending" | "",
 			walletInstalled: false,
 			userDelegatedSetter: null as null | NodeJS.Timer,
 			userRewardsSetter: null as null | NodeJS.Timer,
@@ -108,13 +124,21 @@ export default Vue.extend({
 			return this.$store.getters["staking/connectingWalletError"]
 		},
 		userDelegated(): bn | null {
-			return this.$store.getters["staking/userDelegated"](this.validator)
+			return this.$store.getters["staking/userDelegated"](this.validator) ?? Big(0)
 		},
 		loadingPersonalInfo(): boolean {
 			return this.$store.getters["staking/loadingPersonalInfo"](this.validator)
 		},
 		userRewards(): bn | null {
 			return this.$store.getters["staking/userRewards"](this.validator)
+		},
+		totalDelegation(): bn {
+			if (this.delegations && this.delegations.length > 0) {
+				return this.delegations.reduce((acc, del) =>
+					del.amount.add(acc)
+				, bn(0))
+			}
+			return bn(0)
 		},
 	},
 	watch: {
@@ -203,8 +227,8 @@ export default Vue.extend({
 				return
 			}
 			this.usingMax = false
-			this.statusMessage = null
-			this.amount = null
+			this.statusMessage = ""
+			this.amount = ""
 			if (type !== "claimRewards") {
 				this.$modal.show(`${type}-${this.validator.chainId}`)
 			}
@@ -263,7 +287,7 @@ export default Vue.extend({
 				this.statusMessage = `please stake at least ${minAmount} ${symbol}`
 				return false
 			}
-			this.statusMessage = null
+			this.statusMessage = ""
 			return true
 		},
 		async delegate() {
@@ -272,7 +296,7 @@ export default Vue.extend({
 				return
 			}
 			if (this.balance !== null) {
-				if (this.balance.lt(this.amount)) {
+				if (this.balance?.lt(this.amount)) {
 					this.statusMessage = "insufficient funds"
 					return
 				}
@@ -355,7 +379,7 @@ export default Vue.extend({
 				error.message
 						=== "Query failed with (18): delegation does not exist: invalid request"
 			) {
-				this.statusMessage = null
+				this.statusMessage = ""
 				this.$store.commit("staking/userRewards", { chainId: this.validator.chainId, userRewards: null })
 				return
 			}
