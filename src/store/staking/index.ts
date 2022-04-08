@@ -8,6 +8,7 @@ import {
 	ValidatorComingSoon,
 	NativeDenom,
 	SupportedNetworks,
+	PrivateValidator,
 } from "~/_types"
 
 import { divBy10toPow } from "~/_utils"
@@ -424,10 +425,33 @@ const defaultState = {
 		// 	promotion: false,
 		// },
 	] as (Omit<Validator, "denom"> & { denomId: string })[],
+	privateValidators: [
+		{
+			chainName: "Metis",
+			denomName: "METIS",
+			icon: require("~/assets/img/metis-icon.png"),
+			innerHtml: "Metis verifier operated by Trusted Node<br>"
+				+ "<a class='link' target='_blank' href='https://metis-verifier-stats.metissafe.tech/nodes/'>Verifier (IP: 13.*.*.4)</a><br>"
+				+ "(Staking re-opens Q2 2022)",
+		},
+		{
+			chainName: "Nodle",
+			denomName: "NODL",
+			icon: require("~/assets/img/nodle-icon.png"),
+			innerHtml: "Nodle validator operated by Trusted Node<br>"
+				+ "<a class='link' target='_blank' href='https://telemetry.polkadot.io/#list/0xa3d114c2b8d0627c1aa9b134eafcf7d05ca561fdc19fb388bb9457f81809fb23'>Validator (ID: trustednode)</a><br>"
+				+ "(Mainnet launch coming soon)",
+		},
+		{
+			chainName: "Velas",
+			denomName: "VLX",
+			icon: require("~/assets/img/velas-icon.png"),
+			innerHtml: "Velas validator operated by Trusted Node<br>"
+				+ "<a class='link' target='_blank' href='https://velasvalidators.com/485g2MHER9KignCdLrjMrmXCg9MmHaGQYagAruy72895'>Validator details</a>",
+		},
+	] as PrivateValidator[],
 	validatorsComingSoon: [
 		{ chainName: "Fantom", denomName: "FTM", icon: require("~/assets/img/fantom-icon.png") },
-		{ chainName: "Nodle", denomName: "NODL", icon: require("~/assets/img/nodle-icon.png") },
-		{ chainName: "Velas", denomName: "VLX", icon: require("~/assets/img/velas-icon.png") },
 		{ chainName: "Centrifuge", denomName: "CFG", icon: require("~/assets/img/centrifuge-icon.png") },
 		{ chainName: "Altair", denomName: "AIR", icon: require("~/assets/img/altair-icon.png") },
 		{ chainName: "Darwinia", denomName: "RING", icon: require("~/assets/img/darwinia-icon.png") },
@@ -464,6 +488,7 @@ export const getters: GetterTree<LocalState, RootState> = {
 				denom: denoms.find(d => d.id === v.denomId)!,
 			}))
 	},
+	privateValidators: state => state.privateValidators,
 	validatorsComingSoon: state => state.validatorsComingSoon,
 	walletIds: state => uniq(state.validators.map(v => v.walletId)),
 	userDelegated: state => ({ chainId }) => state.validators.find(v => v.chainId === chainId)?.userDelegated ?? null,
