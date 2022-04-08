@@ -30,6 +30,12 @@
 					:validator="validator"
 				)
 				.spacer
+			template(v-for="privateValidator of matchingPrivateValidators")
+				PrivateValidator(
+					:key="privateValidator.chainName"
+					:privateValidator="privateValidator"
+				)
+				.spacer
 			template(v-for="validator of matchingValidatorsComingSoon")
 				ValidatorComingSoon(
 					:key="validator.chainName"
@@ -44,10 +50,12 @@ import bn from "big.js"
 import Nav from "~/components/NavMenu.vue"
 import SearchBox from "~/components/SearchBox.vue"
 import Validator from "~/components/Validator.vue"
+import PrivateValidator from "~/components/PrivateValidator.vue"
 import ValidatorComingSoon from "~/components/ValidatorComingSoon.vue"
 import CampaignBanner from "~/components/CampaignBanner.vue"
 import {
 	Validator as tValidator,
+	PrivateValidator as tPrivateValidator,
 	ValidatorComingSoon as tValidatorComingSoon,
 } from "~/_types"
 
@@ -55,6 +63,7 @@ export default Vue.extend({
 	components: {
 		Nav,
 		Validator,
+		PrivateValidator,
 		ValidatorComingSoon,
 		SearchBox,
 		CampaignBanner,
@@ -78,6 +87,9 @@ export default Vue.extend({
 		validators(): tValidator[] {
 			return this.$store.getters["staking/validators"]
 		},
+		privateValidators(): tPrivateValidator[] {
+			return this.$store.getters["staking/privateValidators"]
+		},
 		validatorsComingSoon(): tValidatorComingSoon[] {
 			return this.$store.getters["staking/validatorsComingSoon"]
 		},
@@ -85,6 +97,12 @@ export default Vue.extend({
 			return this.validators.filter(item => {
 				const regex = new RegExp(this.searchValue, "i")
 				return regex.test(item.chainName) || regex.test(item.denom.symbol)
+			})
+		},
+		matchingPrivateValidators(): tPrivateValidator[] {
+			return this.privateValidators.filter(item => {
+				const regex = new RegExp(this.searchValue, "i")
+				return regex.test(item.chainName) || regex.test(item.denomName)
 			})
 		},
 		matchingValidatorsComingSoon(): tValidatorComingSoon[] {

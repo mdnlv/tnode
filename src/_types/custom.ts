@@ -127,6 +127,13 @@ export type Validator = {
 	promotion: boolean
 }
 
+export type PrivateValidator = {
+	chainName: string
+	icon: any
+	denomName: string
+	innerHtml: string
+}
+
 export type ValidatorComingSoon = {
 	chainName: string
 	icon: any
