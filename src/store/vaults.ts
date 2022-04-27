@@ -201,37 +201,40 @@ export const actions: ActionTree<LocalState, RootState> = {
 		)
 	},
 	async setAPR({ dispatch, commit }, vault: Vault): Promise<void> {
-		if (!vault.stakeDenom.price || !vault.rewardDenom.price) {
-			return
-		}
-		const stakingRewardsContract = await dispatch("_getStakingRewardsContractView", vault) as ETHContract
-		const periodFinish = await stakingRewardsContract.periodFinish() as { toString: () => string }
-		const now = (new Date()).valueOf()
-		if (times10toPow(periodFinish.toString(), 3).lt(now)) {
+		try {
+			if (!vault.stakeDenom.price || !vault.rewardDenom.price) {
+				return
+			}
+			const stakingRewardsContract = await dispatch("_getStakingRewardsContractView", vault) as ETHContract
+			const periodFinish = await stakingRewardsContract.periodFinish() as { toString: () => string }
+			const now = (new Date()).valueOf()
+			if (times10toPow(periodFinish.toString(), 3).lt(now)) {
+				commit(
+					"apr",
+					{
+						address: vault.address,
+						apr: 0,
+					},
+				)
+				return
+			}
+			const rewardRate = await stakingRewardsContract.rewardRate() as { toString: () => string }
+			const rewardRateReal = divBy10toPow(rewardRate.toString(), vault.rewardDenom.decimals)
+			const rewardRateUSD = bn(rewardRateReal.toString()).times(vault.rewardDenom.price)
+			const totalSupply = await stakingRewardsContract.totalSupply() as { toString: () => string }
+			const totalSupplyReal = divBy10toPow(totalSupply.toString(), vault.stakeDenom.decimals)
+			const tvlUSD = totalSupplyReal.times(vault.stakeDenom.price)
+			const secondsInYear = bn(60).times(60).times(24).times(365.25)
+			const apr = rewardRateUSD
+				.times(secondsInYear)
+				.div(max(tvlUSD, 0.01))
+				.times(100)
 			commit(
 				"apr",
-				{
-					address: vault.address,
-					apr: 0,
-				},
+				{ address: vault.address, apr },
 			)
-			return
 		}
-		const rewardRate = await stakingRewardsContract.rewardRate() as { toString: () => string }
-		const rewardRateReal = divBy10toPow(rewardRate.toString(), vault.rewardDenom.decimals)
-		const rewardRateUSD = bn(rewardRateReal.toString()).times(vault.rewardDenom.price)
-		const totalSupply = await stakingRewardsContract.totalSupply() as { toString: () => string }
-		const totalSupplyReal = divBy10toPow(totalSupply.toString(), vault.stakeDenom.decimals)
-		const tvlUSD = totalSupplyReal.times(vault.stakeDenom.price)
-		const secondsInYear = bn(60).times(60).times(24).times(365.25)
-		const apr = rewardRateUSD
-			.times(secondsInYear)
-			.div(max(tvlUSD, 0.01))
-			.times(100)
-		commit(
-			"apr",
-			{ address: vault.address, apr },
-		)
+		catch (e) {}
 	},
 	async setTVL({ dispatch, commit }, vault: Vault): Promise<void> {
 		const stakingRewardsContract = await dispatch("_getStakingRewardsContractView", vault) as ETHContract

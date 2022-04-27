@@ -378,10 +378,7 @@ export const actions: ActionTree<LocalState, RootState> = {
 					this.dispatch("vaults/setAPR", vault)
 				}
 			}
-			catch (e) {
-				// eslint-disable-next-line no-console
-				console.error(e)
-			}
+			catch (e) {}
 		}
 	},
 	async addToMetamask({ state }) {
