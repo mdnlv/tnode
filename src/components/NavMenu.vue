@@ -60,10 +60,13 @@ export default Vue.extend({
 	nav
 		position: fixed
 		left: 0
-		top: calc( #{$unit12} + #{$header-padding} * 2 )
+		top: 0
 		// transition: 0.3s
 		width: $nav-width
 		white-space: pre-line
+		height: 100vh
+		background: $nav-bg
+		padding-top: calc( #{$unit12} + #{$header-padding} * 2 )
 		ul.menus
 			a,
 			div

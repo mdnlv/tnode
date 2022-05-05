@@ -1,4 +1,5 @@
 import type { GetterTree, ActionTree, MutationTree } from "vuex"
+import axios from "axios"
 import bn from "big.js"
 import { ethers } from "ethers"
 import MetaNetwork from "@maticnetwork/meta/network"
@@ -46,16 +47,20 @@ export const actions: ActionTree<LocalState, RootState> = {
 	},
 	async setAPR({ dispatch, commit }, validator: Validator) {
 		const stakeManagerContract = await dispatch("_getStakeManagerContract", validator)
-		const validatorId = await stakeManagerContract.getValidatorId(validator.address)
-		const validatorStake = await stakeManagerContract.validatorStake(validatorId)
-		const totalSupply = await stakeManagerContract.validatorStake(validatorId)
-		const inflation = 0.1
-		commit("staking/setAPR", {
-			chainId: validator.chainId,
-			apr: bn(inflation)
-				.times(totalSupply)
-				.div(validatorStake),
-		}, { root: true })
+
+		const totalStake = await stakeManagerContract.currentValidatorSetTotalStake()
+		const totalStakeValue = (divBy10toPow(totalStake, validator.denom.decimals) || bn(0)).toNumber()
+
+		const REWARD_PER_CHECKPOINT = 107163
+		const CHECKPOINT_PER_DAY = 8
+		const totalYearRewards = Math.floor(CHECKPOINT_PER_DAY * 365 * REWARD_PER_CHECKPOINT)
+
+		if (totalStakeValue !== 0) {
+			commit("staking/setAPR", {
+				chainId: validator.chainId,
+				apr: totalYearRewards / totalStakeValue * 80,
+			}, { root: true })
+		}
 	},
 	async getBalance({ dispatch, rootGetters }, validator: Validator): Promise<bn> {
 		const [account] = rootGetters["staking/wallets/metamask/accounts"]
@@ -150,11 +155,50 @@ export const actions: ActionTree<LocalState, RootState> = {
 			return await dispatch("_handleError", { error: e })
 		}
 	},
-	async claimRewards({ dispatch }, validator: Validator) {
+	async claimRewards({ dispatch, rootGetters }, validator: Validator) {
 		try {
-			const validatorShareContract = await dispatch("_getValidatorShareContract", validator)
+			const [account] = rootGetters["staking/wallets/metamask/accounts"]
+
+			const network = await dispatch("_getNetwork", validator)
+			const provider = await dispatch("_getProvider", validator)
+			const stakeManagerContract = await dispatch("_getStakeManagerContract", validator)
+			const validatorId = await stakeManagerContract.getValidatorId(validator.address)
+			const contractAddress = await stakeManagerContract.getValidatorContract(validatorId)
+			const validatorShareContract = new ethers.Contract(
+				contractAddress,
+				network.abi("ValidatorShare"),
+				provider,
+			)
+
 			const signer = await this.dispatch("staking/wallets/metamask/getOfflineSigner", validator.chainId) as ethers.providers.JsonRpcSigner
 			const validatorShareContractSigner = await validatorShareContract.connect(signer)
+
+			let { data: allUnbonds } = await axios.get(`https://sentinel.matic.network/api/v2/delegators/unbonds/${account.address}`)
+			allUnbonds = allUnbonds.success ? allUnbonds.result : []
+			const filteredBounds: any[] = []
+
+			const { data: checkPointsCount } = await axios.get("https://heimdall.api.matic.network/checkpoints/count")
+			const withdrawalDelay = await stakeManagerContract.WITHDRAWAL_DELAY()
+
+			for (let i = 0; i < allUnbonds.length; i++) {
+				const bound = allUnbonds[i]
+				if (!bound.completed && bound.validatorId === validatorId.toString()) {
+					const exitDetails = await validatorShareContractSigner.unbonds_new(account.address, bound.nonce.toString(10))
+					if (parseInt(exitDetails.withdrawEpoch) + parseInt(withdrawalDelay) + 1 - checkPointsCount.result.result <= 0) {
+						filteredBounds.push(bound)
+					}
+				}
+			}
+
+			if (filteredBounds.length > 0) {
+				const result = await validatorShareContractSigner.unstakeClaimTokens_new(filteredBounds[0].nonce.toString(10))
+
+				return {
+					hash: result.hash,
+					status: "REWARDS CLAIM SUCCESSFUL",
+				}
+			}
+
 			const result = await validatorShareContractSigner.withdrawRewards()
 			return {
 				hash: result.hash,
@@ -208,7 +252,7 @@ export const actions: ActionTree<LocalState, RootState> = {
 	},
 	_handleError(_, { error }: { error: Error, statusPrefix: string }): UserActionResponse {
 		if ((error as any).error?.code === -32603) {
-			return { message: "not enough rewards available to claim" }
+			return { message: "There are not enough rewards available to claim." }
 		}
 		// eslint-disable-next-line no-console
 		console.error(error)

@@ -69,9 +69,9 @@ Vue.filter(
 
 Vue.filter(
 	"accountAddress",
-	(address: string) => [
-		address.substr(0, 6),
-		address.substr(-6),
+	(address: string, lengthToShow: number = 6) => [
+		address.substr(0, lengthToShow),
+		address.substr(-1 * lengthToShow),
 	].join("..."),
 )
 
@@ -83,4 +83,9 @@ Vue.filter(
 Vue.filter(
 	"formatDate",
 	date => format(new Date(date), "d.M.yyyy"),
+)
+
+Vue.filter(
+	"formatDateTime",
+	date => format(new Date(date), "dd-MM-yyyy HH:MM:ss"),
 )

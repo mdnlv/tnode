@@ -63,3 +63,10 @@ export function preventSciNotation(value: BigSource) {
 export function toLink(addressOrHash: string, linkTemplate: string) {
 	return linkTemplate.replace("###", addressOrHash)
 }
+
+// Google Analytics expects an integer so we round up to the next number
+export function stakeAmountAsUSD(amount: BigSource | null, price: bn | null): number {
+	return amount === null || price === null
+		? 0
+		: Number(bn(amount).times(price).toFixed(2))
+}

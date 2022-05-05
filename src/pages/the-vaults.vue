@@ -29,7 +29,8 @@
 				.half
 					Vault(:vault="vaults[0]", :networks="networks")
 				.half
-					Vault(v-if="vaults[1]", :vault="vaults[1]", :networks="networks")
+					template(v-if="vaults[1]")
+						Vault(:vault="vaults[1]", :networks="networks")
 </template>
 
 <script lang="ts">

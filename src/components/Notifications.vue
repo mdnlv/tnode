@@ -11,7 +11,7 @@
 			.header
 				.title.flex-space-between
 					h5 {{ notification.title }}
-					img.cursor-pointer(@click="markAsRead(notification.id)", :src="closeIcon")
+					img.cursor-pointer(@click="markAsRead(notification)", :src="closeIcon")
 				p.small.light-text {{ notification.start_at | formatDate }}
 			.description.space-items
 				p {{ notification.description }}
@@ -55,8 +55,10 @@ export default Vue.extend({
 		await this.$store.dispatch("notifications/getNotifications")
 	},
 	methods: {
-		markAsRead(notificationId) {
-			this.$store.dispatch("notifications/markAsRead", notificationId)
+		markAsRead(notification: Notification) {
+			this.$store.dispatch("notifications/markAsRead", notification.id)
+			this.$analytics("read_notifications", { event_category: "notifications", value: notification.title })
+			this.$amplitude("readNotification", { notificationName: notification.title })
 		},
 		toggle(show?: boolean) {
 			this.show = show ?? !this.show
@@ -65,6 +67,7 @@ export default Vue.extend({
 			}
 		},
 		markAllUnviewed() {
+			this.$analytics("see_read_notifications", { event_category: "notifications" })
 			this.$store.dispatch("notifications/markAllUnviewed")
 			this.markReadIfOpen()
 		},

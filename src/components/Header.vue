@@ -2,7 +2,7 @@
 #header
 	header
 		.flex-space-between.space-items-horz
-			.flex.space-items-horz.first-child
+			.flex.space-items-horz
 				Hamburger.mobile
 				.logo
 					nuxt-link.logo-link(:to="'/'" v-html="logoImage")
@@ -129,8 +129,6 @@ export default Vue.extend({
 					padding-left: $space-medium
 				@media (max-width: $breakpoint-mobile-small)
 					padding-left: $space-small
-				@media (max-width: $breakpoint-mobile-mini)
-					margin-right: $space-small
 			> *:last-child
 				padding-right: $space-big
 				@media (max-width: $breakpoint-mobile)
@@ -170,9 +168,6 @@ export default Vue.extend({
 						img
 							border-radius: none
 							width: $unit1
-				@media (max-width: $breakpoint-mobile-mini)
-					font-size: $font-size-mini
-					margin-right: $space-small
 				.price-icon
 					img
 						border-radius: $unit10
@@ -216,8 +211,6 @@ export default Vue.extend({
 					border: none
 					@media (min-width: $breakpoint-mobile)
 						padding: 0
-					@media (max-width: $breakpoint-mobile-mini)
-						padding-left: $space-small
 					.dropdown-icon-collapse
 						display: none
 				.header-dropdown__trigger[aria-expanded]

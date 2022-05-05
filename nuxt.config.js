@@ -14,10 +14,15 @@ export default {
 	plugins: [
 		"~/plugins/extend.client.ts",
 		"~/plugins/modal.client.js",
+		"~/plugins/amplitude.client.ts",
 		"~/plugins/filters.ts",
 		"~/plugins/wallets.client.ts",
 		"~/plugins/polkadot.client.ts",
+		"~/plugins/firebase.client.ts",
 	],
+	microsoftClarity: {
+		id: "bewt45gb9j",
+	},
 	buildModules: [
 		"@nuxtjs/style-resources",
 		"@nuxt/typescript-build",
@@ -109,5 +114,19 @@ export default {
 	},
 	publicRuntimeConfig: {
 		backendUrl: process.env.BACKEND_URL || "http://localhost:8080/api",
+	},
+	modules: [
+		"@nuxtjs/sentry",
+		"nuxtjs-microsoft-clarity",
+		"vue-toastification/nuxt",
+	],
+	sentry: {
+		dsn: "https://22e979e4fdfc4ef2a76db7e9eff157db@o1185018.ingest.sentry.io/6303565", // Enter your project's DSN here
+		// Additional Module Options go here
+		// https://sentry.nuxtjs.org/sentry/options
+		config: {
+		// Add native Sentry config here
+		// https://docs.sentry.io/platforms/javascript/guides/vue/configuration/options/
+		},
 	},
 }

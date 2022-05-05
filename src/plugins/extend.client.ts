@@ -16,7 +16,7 @@ export default function ({ app }) {
 					this.$store.dispatch("denoms/getLPPrices")
 				}
 				getPrices()
-				this.priceSetter = setInterval(getPrices, 10 * 1000)
+				this.priceSetter = setInterval(getPrices, 300 * 1000)
 
 				// trigger wallet onLoad handlers
 				;(async () => {

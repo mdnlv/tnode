@@ -126,7 +126,7 @@
 			v-if="loaded"
 			:name="`claimRewards-${vault.address}`"
 			:loading="!modalLoaded"
-			title="Error claiming rewards"
+			title="Not enough rewards"
 			:height="300"
 		)
 			#claim-rewards-error
@@ -178,7 +178,7 @@ import cn from "comma-number"
 import bn from "big.js"
 import { isEqual } from "lodash"
 import { Vault, EVMAccount, Network, DropdownOption } from "~/_types"
-import { toLink } from "~/_utils"
+import { toLink, stakeAmountAsUSD } from "~/_utils"
 import LoadingValue from "~/components/LoadingValue.vue"
 import Modal from "~/components/Modal.vue"
 import MaxInput from "~/components/MaxInput.vue"
@@ -492,14 +492,63 @@ export default Vue.extend({
 			try {
 				switch (type) {
 					case "stake": {
+						this.$analytics("selected_action", {
+							blockchain: this.vault.name,
+							action: "stake",
+						})
+
+						this.$analytics("select_item", {
+							item_list_id: "vaults",
+							item_list_name: "The Vaults",
+							items: [
+								{
+									item_id: `v_${this.vault.stakeDenom.symbol}`,
+									item_name: this.vault.name,
+									item_category: "stake",
+								},
+							],
+						})
+
 						await this.setBalance()
 						break
 					}
 					case "unstake": {
+						this.$analytics("select_item", {
+							item_list_id: "vaults",
+							item_list_name: "The Vaults",
+							items: [
+								{
+									item_id: `v_${this.vault.stakeDenom.symbol}`,
+									item_name: this.vault.name,
+									item_category: "unstake",
+								},
+							],
+						})
+
+						this.$analytics("selected_action", {
+							blockchain: this.vault.name,
+							action: "unstake",
+						})
 						await this.setStaked()
 						break
 					}
 					case "claimRewards": {
+						this.$analytics("selected_action", {
+							blockchain: this.vault.name,
+							action: "claim_rewards",
+						})
+
+						this.$analytics("select_item", {
+							item_list_id: "vaults",
+							item_list_name: "The Vaults",
+							items: [
+								{
+									item_id: `v_${this.vault.stakeDenom.symbol}`,
+									item_name: this.vault.name,
+									item_category: "claim_rewards",
+								},
+							],
+						})
 						this.claimingRewards = true
 						await this.getRewards()
 						this.amount = this.vault.userRewards?.toString() ?? null
@@ -537,6 +586,25 @@ export default Vue.extend({
 			if (!this.validate(this.amount)) {
 				return
 			}
+
+			this.$analytics("purchase", {
+				value: stakeAmountAsUSD(this.amount, this.vault.stakeDenom.price),
+
+				currency: "USD",
+				items: [
+					{
+						price: this.vault.stakeDenom.price,
+						quantity: this.amount,
+						currency: "USD",
+						list_name: "The Vaults",
+						item_name: this.vault.name,
+						brand: this.vault.networkName,
+						item_category: "stake",
+						item_list_id: "staking_portal",
+						item_list_name: "Staking Portal",
+					}],
+			})
+
 			// check against balance
 			this.statusMessage = "Confirming transaction..."
 			const response = await this.$store.dispatch("vaults/stake", {
@@ -550,6 +618,24 @@ export default Vue.extend({
 			if (!this.validate(this.amount)) {
 				return
 			}
+
+			this.$analytics("refund", {
+				value: stakeAmountAsUSD(this.amount, this.vault.stakeDenom.price),
+				currency: "USD",
+				items: [
+					{
+						price: this.vault.stakeDenom.price,
+						quantity: this.amount,
+						currency: "USD",
+						list_name: "The Vaults",
+						item_name: this.vault.name,
+						brand: this.vault.networkName,
+						item_category: "stake",
+						item_list_id: "staking_portal",
+						item_list_name: "Staking Portal",
+					}],
+			})
+
 			const response = await this.$store.dispatch("vaults/unstake", {
 				vault: this.vault,
 				amount: this.amount,
@@ -558,6 +644,13 @@ export default Vue.extend({
 			this.monitorStake()
 		},
 		async claimRewards() {
+			this.$analytics("claim_rewards", {
+				reward_amount: this.amount,
+				token_price: this.vault.stakeDenom.price,
+				reward_total_usd: stakeAmountAsUSD(this.amount, this.vault.stakeDenom.price),
+				token: this.vault.stakeDenom.id,
+				ecosysyem: this.vault.networkName,
+			})
 			const response = await this.$store.dispatch("vaults/claimRewards", this.vault)
 			this.claimingRewards = false
 			this.handleResponse("claimRewards", response)
@@ -577,6 +670,18 @@ export default Vue.extend({
 				this.transactionHash = hash
 				this.transactionStatus = status
 				this.$modal.show(`transaction-${this.vault.address}`)
+
+				this.$analytics(
+					"complete_transaction",
+					{
+						hash,
+						blockchain: this.vault.stakeDenom.symbol,
+						transaction_type: {
+							claimRewards: "claim_rewards",
+						}[type] ?? type,
+						stake_location: "The Vaults",
+					},
+				)
 			}
 		},
 		transactionClosed() {

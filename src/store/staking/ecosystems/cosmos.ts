@@ -217,16 +217,21 @@ export const actions: ActionTree<LocalState, RootState> = {
 		commit("staking/userDelegated", { ...validator, userDelegated }, { root: true })
 	},
 	async getRewards({ dispatch, commit }, validator: Validator) {
-		const tmClient = await dispatch("_getTmClient", validator) as TMClient
-		const account: Account = await dispatch("_getAccount", validator)
-		const { rewards } = await tmClient!.distribution.delegationRewards(
-			account.address,
-			validator.address,
-		)
-		const userRewards = rewards.length
-			? divBy10toPow(rewards[0].amount, 18 + validator.denom.decimals)
-			: null
-		commit("staking/userRewards", { ...validator, userRewards }, { root: true })
+		try {
+			const tmClient = await dispatch("_getTmClient", validator) as TMClient
+			const account: Account = await dispatch("_getAccount", validator)
+			const { rewards } = await tmClient!.distribution.delegationRewards(
+				account.address,
+				validator.address,
+			)
+			const userRewards = rewards.length && rewards[0].amount !== null
+				? divBy10toPow(rewards[0].amount, 18 + validator.denom.decimals)
+				: null
+			commit("staking/userRewards", { ...validator, userRewards }, { root: true })
+		}
+		catch (e) {
+			commit("staking/userRewards", { ...validator, userRewards: bn(0) }, { root: true })
+		}
 	},
 	async getDelegations({ dispatch }, validator: Validator): Promise<Delegation[] | null> {
 		const tmClient = await dispatch("_getTmClient", validator) as TMClient
@@ -297,7 +302,11 @@ export const actions: ActionTree<LocalState, RootState> = {
 			return dispatch("_handleError", { error, statusPrefix: "UNDELEGATION" })
 		}
 	},
-	async claimRewards({ dispatch }, validator: Validator) {
+	async claimRewards({ dispatch, rootGetters }, validator: Validator) {
+		const userRewards = rootGetters["staking/userRewards"](validator)
+		if (!userRewards || bn(userRewards).eq(0)) {
+			return { message: "No rewards available" }
+		}
 		try {
 			const signer = await dispatch("_getSigner", validator)
 			const account: Account = await dispatch("_getAccount", validator)

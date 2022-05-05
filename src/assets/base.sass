@@ -17,7 +17,6 @@
 			max-height: calc(100vh - #{$header-height})
 			overflow-x: auto
 			overflow-y: overlay
-			margin-top: $header-height
 			// @include transition(margin-left)
 			// @media not all and (min-resolution:.001dpcm) 
 			// 	@supports (-webkit-appearance:none) and (display:flow-root) 
@@ -467,6 +466,14 @@
 		display: block
 		max-width: 100%
 		max-height: 100%
+		margin-left: $nav-width
+		margin-top: $header-height
+		padding: $unit6 $unit2
+		@media (max-width: $breakpoint-mobile)
+			width: 100vw
+			&.folded
+				margin-left: 0
+
 	img
 		display: block
 		max-width: 100%

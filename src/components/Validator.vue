@@ -130,7 +130,7 @@
 			v-if="loaded"
 			:name="`claimRewards-${validator.chainId}`"
 			:loading="!modalLoaded"
-			title="Error claiming rewards"
+			title="Not enough rewards"
 			:height="300"
 		)
 			#claim-rewards-error.center
@@ -213,7 +213,7 @@ import Vue from "vue"
 import bn from "big.js"
 import Tooltip from "~/components/ToolTip.vue"
 import LoadingValue from "~/components/LoadingValue.vue"
-import { max, toLink } from "~/_utils"
+import { max, toLink, stakeAmountAsUSD } from "~/_utils"
 import { Validator, Account, Delegation } from "~/_types"
 import Modal from "~/components/Modal.vue"
 import MaxInput from "~/components/MaxInput.vue"
@@ -417,18 +417,72 @@ export default Vue.extend({
 			try {
 				switch (type) {
 					case "delegate": {
-						this.$modal.hide(`redelegate-${this.validator.chainId}`)
 						this.balance = await this.$store.dispatch(`staking/ecosystems/${this.validator.ecosystemId}/getBalance`, this.validator) as bn
+
+						this.$analytics("select_item", {
+							item_list_id: "staking_portal",
+							item_list_name: "Staking Portal",
+							items: [
+								{
+									item_id: this.validator.denom.symbol,
+									item_name: this.validator.chainName,
+									index: this.getValidatorIndex(this.validator.chainName),
+									item_category: "stake",
+								},
+							],
+						})
+
+						this.$analytics("selected_action", {
+							blockchain: this.validator.chainName,
+							action: "stake",
+						})
+
+						this.$modal.hide(`redelegate-${this.validator.chainId}`)
 						this.delegations = await this.$store.dispatch(`staking/ecosystems/${this.validator.ecosystemId}/getDelegations`, this.validator) as Delegation[]
 						break
 					}
 					case "undelegate": {
+						this.$analytics("selected_action", {
+							blockchain: this.validator.chainName,
+							action: "unstake",
+						})
+
+						this.$analytics("select_item", {
+							item_list_id: "staking_portal",
+							item_list_name: "Staking Portal",
+							items: [
+								{
+									item_id: this.validator.denom.symbol,
+									item_name: this.validator.chainName,
+									index: this.getValidatorIndex(this.validator.chainName),
+									item_category: "unstake",
+								},
+							],
+						})
 						this.$store.commit("staking/loadingPersonalInfo", { chainId: this.validator.chainId, loadingPersonalInfo: true })
 						this.$store.commit("staking/userDelegated", { chainId: this.validator.chainId, userDelegated: null })
 						await this.$store.dispatch(`staking/ecosystems/${this.validator.ecosystemId}/getDelegated`, this.validator)
 						break
 					}
 					case "claimRewards": {
+						this.$analytics("selected_action", {
+							blockchain: this.validator.chainName,
+							action: "claim_rewards",
+						})
+
+						this.$analytics("select_item", {
+							item_list_id: "staking_portal",
+							item_list_name: "Staking Portal",
+							items: [
+								{
+									item_id: this.validator.denom.symbol,
+									item_name: this.validator.chainName,
+									index: this.getValidatorIndex(this.validator.chainName),
+									item_category: "claim_rewards",
+								},
+							],
+						})
+
 						this.claimingRewards = true
 						await this.$store.dispatch(`staking/ecosystems/${this.validator.ecosystemId}/getRewards`, this.validator)
 						const userRewards = this.$store.getters["staking/userRewards"](this.validator)
@@ -439,6 +493,11 @@ export default Vue.extend({
 						break
 					}
 					case "redelegate": {
+						this.$analytics("selected_action", {
+							blockchain: this.validator.chainName,
+							action: "restake",
+						})
+
 						this.srcDelegation = null
 						this.$modal.hide(`delegate-${this.validator.chainId}`)
 						break
@@ -477,11 +536,30 @@ export default Vue.extend({
 			this.statusMessage = null
 			return true
 		},
-		async delegate() {
+		async delegate(): Promise<void> {
 			const minAmount = this.validator.minimumStakingAmount
 			if (!this.validate(this.amount, minAmount) || this.amount === null) {
 				return
 			}
+			this.$analytics("purchase", {
+				value: stakeAmountAsUSD(this.amount, this.validator.denom.price),
+				currency: "USD",
+				items: [
+					{
+						price: this.validator.denom.price,
+						currency: "USD",
+						quantity: this.amount,
+						index: this.getValidatorIndex(this.validator.chainName),
+						list_name: "Staking Portal",
+						item_name: this.validator.chainName,
+						brand: this.validator.ecosystemId,
+						item_category: "stake",
+						...(this.validator.promotion) && { variant: "tiger" },
+						item_list_id: "staking_portal",
+						item_list_name: "Staking Portal",
+					}],
+			})
+
 			if (this.balance !== null) {
 				if (this.balance.lt(this.amount)) {
 					this.statusMessage = "insufficient funds"
@@ -507,6 +585,26 @@ export default Vue.extend({
 			if (!this.validate(this.amount) || this.amount === null || this.srcDelegation === null) {
 				return
 			}
+
+			this.$analytics("purchase", {
+				value: stakeAmountAsUSD(this.amount, this.validator.denom.price),
+				currency: "USD",
+				items: [
+					{
+						price: this.validator.denom.price,
+						quantity: this.amount,
+						index: this.getValidatorIndex(this.validator.chainName),
+						list_name: "Staking Portal",
+						currency: "USD",
+						item_name: this.validator.chainName,
+						brand: this.validator.ecosystemId,
+						item_category: "restake",
+						...(this.validator.promotion) && { variant: "tiger" },
+						item_list_id: "staking_portal",
+						item_list_name: "Staking Portal",
+					}],
+			})
+
 			if (this.balance !== null) {
 				if (this.srcDelegation!.amount.lt(this.amount)) {
 					this.statusMessage = "insufficient delegation"
@@ -533,6 +631,26 @@ export default Vue.extend({
 			if (!this.validate(this.amount) || this.amount === null) {
 				return
 			}
+
+			this.$analytics("refund", {
+				value: stakeAmountAsUSD(this.amount, this.validator.denom.price),
+				currency: "USD",
+				items: [
+					{
+						price: this.validator.denom.price,
+						quantity: this.amount,
+						currency: "USD",
+						index: this.getValidatorIndex(this.validator.chainName),
+						list_name: "Staking Portal",
+						item_name: this.validator.chainName,
+						brand: this.validator.ecosystemId,
+						item_category: "unstake",
+						...(this.validator.promotion) && { variant: "tiger" },
+						item_list_id: "staking_portal",
+						item_list_name: "Staking Portal",
+					}],
+			})
+
 			if (bn(this.userDelegated || 0).lt(this.amount)) {
 				this.statusMessage = "insufficient funds"
 				return
@@ -549,6 +667,14 @@ export default Vue.extend({
 			this.monitorDelegation()
 		},
 		async claimRewards() {
+			this.$analytics("claim_rewards", {
+				reward_amount: this.amount,
+				token_price: this.validator.denom.price,
+				reward_total_usd: stakeAmountAsUSD(this.amount, this.validator.denom.price),
+				token: this.validator.chainName,
+				ecosysyem: this.validator.ecosystemId,
+			})
+
 			this.statusMessage = "claiming rewards..."
 			const response = await this.$store.dispatch(
 				`staking/ecosystems/${this.validator.ecosystemId}/claimRewards`,
@@ -576,7 +702,7 @@ export default Vue.extend({
 			// eslint-disable-next-line no-console
 			console.error({ message: error.message })
 		},
-		handleResponse(type: TransactionType, response) {
+		handleResponse(type: TransactionType, response): void {
 			// eslint-disable-next-line no-console
 			console.log({ response })
 			const { message, hash, status } = response
@@ -591,6 +717,25 @@ export default Vue.extend({
 				this.transactionHash = hash
 				this.transactionStatus = status
 				this.$modal.show(`transaction-${this.validator.chainId}`)
+
+				let GATransactionType
+				switch (type) {
+					case "delegate":
+						GATransactionType = "stake"
+						break
+					case "redelegate":
+						GATransactionType = "restake"
+						break
+					case "undelegate":
+						GATransactionType = "unstake"
+						break
+					case "claimRewards":
+						GATransactionType = "claim_rewards"
+						break
+				}
+
+				this.$analytics("complete_transaction",
+					{ hash, blockchain: this.validator.chainName, transaction_type: GATransactionType, stake_location: "Staking Portal" })
 			}
 		},
 		transactionClosed() {
@@ -601,6 +746,9 @@ export default Vue.extend({
 		},
 		closeTransactionModal() {
 			this.$modal.hide(`transaction-${this.validator.chainId}`)
+		},
+		getValidatorIndex(chainName: string): number {
+			return this.$store.getters["staking/validators"].findIndex(v => v.chainName === chainName)
 		},
 		monitorDelegation() {
 			if (this.userDelegatedSetter !== null) {
@@ -620,7 +768,7 @@ export default Vue.extend({
 			}
 			this.userRewardsSetter = setInterval(
 				() => this.setUserRewards(),
-				5 * 1000,
+				300 * 1000,
 			)
 		},
 		async setUserRewards() {

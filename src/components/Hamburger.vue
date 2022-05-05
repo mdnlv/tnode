@@ -26,6 +26,7 @@ export default Vue.extend({
 </script>
 
 <style lang="sass" scoped>
+
 #hamburger
 	@include hover-opacity
 	.icon
@@ -42,7 +43,5 @@ export default Vue.extend({
 				opacity: 0
 			#bottom
 				transform: translate(14px, 11px) rotate(135deg)
-	@media (max-width: $breakpoint-mobile-mini)
-		margin-right: $space-small
 
 </style>
