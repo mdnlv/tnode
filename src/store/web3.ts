@@ -25,6 +25,12 @@ const defaultState = {
 			icon: require("~/assets/img/walletconnect-icon.png"),
 			link: "https://walletconnect.com/",
 		},
+		{
+			id: "onto",
+			name: "Onto",
+			icon: require("~/assets/img/onto.png"),
+			link: "https://onto.app/",
+		},
 	] as EVMWallet[],
 }
 
