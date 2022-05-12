@@ -3,10 +3,10 @@ import { RootState } from "~/store"
 import { Account, WalletModule, Validator } from "~/_types"
 
 const defaultState = {
-	id: "metamask",
-	name: "Metamask",
-	icon: require("~/assets/img/metamask-icon.png"),
-	link: "https://metamask.io/download.html",
+	id: "onto",
+	name: "Onto",
+	icon: require("~/assets/img/onto.png"),
+	link: "https://onto.app/",
 	accounts: [] as Account[],
 }
 
