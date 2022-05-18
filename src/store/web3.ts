@@ -3,10 +3,10 @@ import { ethers } from "ethers"
 import Web3Modal from "web3modal"
 import * as evmChains from "evm-chains"
 import { omit } from "lodash"
+import Web3 from "web3"
 
 import { RootState } from "~/store"
 import { EVMAccount, EVMWallet, Network } from "~/_types"
-import Web3 from "web3"
 
 const defaultState = {
 	// TODO: add firefox link
@@ -158,12 +158,13 @@ export const actions: ActionTree<LocalState, RootState> = {
 		}
 
 		try {
-			if(this.getters["web3/connectingWalletId"] === "onto") {
+			if (this.getters["web3/connectingWalletId"] === "onto") {
 				const web3 = new Web3(window.onto)
-				web3.eth.requestAccounts().then((res) => {
+				web3.eth.requestAccounts().then(res => {
 					console.log(res[0])
 				})
-			} else {
+			}
+			else {
 				await commitAccount()
 			}
 
@@ -176,9 +177,9 @@ export const actions: ActionTree<LocalState, RootState> = {
 					dispatch("disconnect")
 				}
 			})
-			window.onto.on("accountsChanged", (e) => {
-				console.log(e.accounts[0]);
-			});
+			window.onto.on("accountsChanged", e => {
+				console.log(e.accounts[0])
+			})
 		}
 		catch (e) {
 			// eslint-disable-next-line no-console
@@ -211,7 +212,7 @@ export const actions: ActionTree<LocalState, RootState> = {
 					},
 					network: "binance",
 				},
-			}
+			},
 		}
 		const web3Modal = new Web3Modal({
 			network: networkName,
