@@ -16,6 +16,7 @@ export type Notification = {
 export type Network = {
 	chainId: string
 	chainName: string
+	privateRpcUrls: string[]
 	rpcUrls: string[]
 	nativeCurrency: {
 		name: string

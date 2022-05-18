@@ -627,7 +627,8 @@ export default Vue.extend({
 		_getViewProvider(networkName: string): ETHProvider {
 			const networks = this.$store.getters["networks/all"] as Network[]
 			const network = networks.find(n => n.chainName === networkName)!
-			for (const rpcUrl of network.rpcUrls) {
+			const rpcUrls = [...network.privateRpcUrls, ...network.rpcUrls]
+			for (const rpcUrl of rpcUrls) {
 				try {
 					return new ethers.providers.JsonRpcProvider(rpcUrl)
 				}

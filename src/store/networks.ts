@@ -11,9 +11,11 @@ export const state = () => ({
 		{
 			chainId: `0x${Number(56).toString(16)}`,
 			chainName: SupportedNetworks.BSC_MAINNET,
-			rpcUrls: [
+			privateRpcUrls: [
 				// "https://bsc-node.hydrogenx.tk/",
 				"https://withered-delicate-glade.bsc.quiknode.pro/04e9d09f53688b9dbb9e94c9aebb926e981bcc88/",
+			],
+			rpcUrls: [
 				"https://bsc-dataseed.binance.org",
 				"https://bsc-dataseed1.defibit.io/",
 				"https://bsc-dataseed1.ninicoin.io/",
@@ -46,6 +48,7 @@ export const state = () => ({
 		{
 			chainId: `0x${Number(97).toString(16)}`,
 			chainName: SupportedNetworks.BSC_TESTNET,
+			privateRpcUrls: [],
 			rpcUrls: [
 				"https://data-seed-prebsc-2-s3.binance.org:8545/",
 				"https://data-seed-prebsc-1-s3.binance.org:8545/",
@@ -72,6 +75,7 @@ export const state = () => ({
 		{
 			chainId: `0x${Number(4).toString(16)}`,
 			chainName: SupportedNetworks.ETH_RINKEBY,
+			privateRpcUrls: [],
 			rpcUrls: [
 				"https://rinkeby-light.eth.linkpool.io/",
 			],
@@ -93,6 +97,7 @@ export const state = () => ({
 		{
 			chainId: `0x${Number(5).toString(16)}`,
 			chainName: SupportedNetworks.ETH_GOERLI,
+			privateRpcUrls: [],
 			rpcUrls: [
 				"https://rpc.goerli.mudit.blog/",
 				"https://rpc.slock.it/goerli ",
@@ -116,8 +121,10 @@ export const state = () => ({
 		{
 			chainId: `0x${Number(250).toString(16)}`,
 			chainName: SupportedNetworks.FTM_MAINNET,
-			rpcUrls: [
+			privateRpcUrls: [
 				"https://bitter-nameless-lake.fantom.quiknode.pro/28b1ccd7e0d2aba367bbb773d358cbccedcc2355/",
+			],
+			rpcUrls: [
 				"https://rpc.ftm.tools",
 				"https://rpc.fantom.network",
 				"https://rpcapi.fantom.network",

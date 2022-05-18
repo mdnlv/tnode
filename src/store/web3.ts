@@ -85,6 +85,7 @@ export const actions: ActionTree<LocalState, RootState> = {
 					omit(
 						networks.find(n => n.chainName === networkName),
 						[
+							"privateRpcUrls",
 							"gasConfig",
 							"txLinkTemplate",
 							"swapRouterAddress",

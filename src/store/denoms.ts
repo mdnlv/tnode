@@ -325,54 +325,73 @@ export const actions: ActionTree<LocalState, RootState> = {
 	async getLPPrices({ getters, commit, rootGetters }) {
 		const denoms = getters.all as Denom[]
 		const lpDenoms = denoms.filter(d => "denoms" in d) as LPDenom[]
+		const validatorInfoURL = `${this.app.$config.backendUrl}/denom-prices`
+		const { data } = await axios.get(validatorInfoURL)
+
 		for (const lpDenom of lpDenoms) {
 			try {
-				const provider = await this.dispatch("vaults/_getViewProvider", lpDenom.networkName) as ETHProvider
-				const contract = new ethers.Contract(lpDenom.contractAddress, [
-					"function getReserves() external view returns (uint112 reserve0, uint112 reserve1, uint32 blockTimestampLast)",
-					"function token0() external view returns (address)",
-					"function token1() external view returns (address)",
-					"function totalSupply() view returns (uint256)",
-				], provider)
-				const tokenAddresses = await Promise.all([
-					contract.token0(),
-					contract.token1(),
-				]) as string[]
-				const baseToken = lpDenom.denoms.find(d => d.stable)!
 				const otherToken = lpDenom.denoms.find(d => !d.stable)!
-				const baseTokenIndex = tokenAddresses.findIndex(ta => ta.toLowerCase() === baseToken.contractAddress.toLowerCase())
-				const otherTokenIndex = tokenAddresses.findIndex(ta => ta.toLowerCase() === otherToken.contractAddress.toLowerCase())
+				const lpData = data.find(d => d.denom_id === lpDenom.id)
+				const ercData = data.find(d => d.denom_id === otherToken.id)
 
-				const reserves = await contract.getReserves() as { toString: () => string }[]
-				const baseTokenReserves = reserves[baseTokenIndex]
-				const otherTokenReserves = reserves[otherTokenIndex]
-				if (!baseToken.price) {
-					return
+				if (lpData && ercData) {
+					commit("erc20Price", {
+						erc20DenomId: otherToken.id,
+						price: bn(ercData.price),
+					})
+					commit("lpPrice", {
+						lpDenomId: lpDenom.id,
+						price: bn(lpData.price),
+					})
 				}
-				const allReservesValue = divBy10toPow(
-					bn(baseTokenReserves.toString()).times(baseToken.price).times(2),
-					baseToken.decimals,
-				)
-				const totalSupplyResponse = await contract.totalSupply() as { toString: () => string }
-				const totalSupply = divBy10toPow(
-					totalSupplyResponse.toString(),
-					lpDenom.decimals,
-				)
-				const lpPrice = allReservesValue.div(totalSupply)
+				else {
+					const provider = await this.dispatch("vaults/_getViewProvider", lpDenom.networkName) as ETHProvider
+					const contract = new ethers.Contract(lpDenom.contractAddress, [
+						"function getReserves() external view returns (uint112 reserve0, uint112 reserve1, uint32 blockTimestampLast)",
+						"function token0() external view returns (address)",
+						"function token1() external view returns (address)",
+						"function totalSupply() view returns (uint256)",
+					], provider)
+					const tokenAddresses = await Promise.all([
+						contract.token0(),
+						contract.token1(),
+					]) as string[]
+					const baseToken = lpDenom.denoms.find(d => d.stable)!
+					const baseTokenIndex = tokenAddresses.findIndex(ta => ta.toLowerCase() === baseToken.contractAddress.toLowerCase())
+					const otherTokenIndex = tokenAddresses.findIndex(ta => ta.toLowerCase() === otherToken.contractAddress.toLowerCase())
 
-				commit("erc20Price", {
-					erc20DenomId: otherToken.id,
-					price: allReservesValue.div(2).div(
-						divBy10toPow(
-							otherTokenReserves.toString(),
-							otherToken.decimals,
+					const reserves = await contract.getReserves() as { toString: () => string }[]
+					const baseTokenReserves = reserves[baseTokenIndex]
+					const otherTokenReserves = reserves[otherTokenIndex]
+					if (!baseToken.price) {
+						return
+					}
+
+					const allReservesValue = divBy10toPow(
+						bn(baseTokenReserves.toString()).times(baseToken.price).times(2),
+						baseToken.decimals,
+					)
+					const totalSupplyResponse = await contract.totalSupply() as { toString: () => string }
+					const totalSupply = divBy10toPow(
+						totalSupplyResponse.toString(),
+						lpDenom.decimals,
+					)
+					const lpPrice = allReservesValue.div(totalSupply)
+
+					commit("erc20Price", {
+						erc20DenomId: otherToken.id,
+						price: allReservesValue.div(2).div(
+							divBy10toPow(
+								otherTokenReserves.toString(),
+								otherToken.decimals,
+							),
 						),
-					),
-				})
-				commit("lpPrice", {
-					lpDenomId: lpDenom.id,
-					price: lpPrice,
-				})
+					})
+					commit("lpPrice", {
+						lpDenomId: lpDenom.id,
+						price: lpPrice,
+					})
+				}
 				const vault = rootGetters["vaults/all"].find(v => v.stakeDenom.id === lpDenom.id)
 				if (vault) {
 					this.dispatch("vaults/setAPR", vault)

@@ -155,8 +155,8 @@ export const actions: ActionTree<LocalState, RootState> = {
 	_getViewProvider({ rootGetters }, networkName: string): ETHProvider {
 		const networks = rootGetters["networks/all"] as Network[]
 		const network = networks.find(n => n.chainName === networkName)!
-		// TODO: use working and up to date rpcUrl
-		for (const rpcUrl of network.rpcUrls) {
+		const rpcUrls = [...network.privateRpcUrls, ...network.rpcUrls]
+		for (const rpcUrl of rpcUrls) {
 			try {
 				return new ethers.providers.JsonRpcProvider(rpcUrl)
 			}
