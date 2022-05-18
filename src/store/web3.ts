@@ -6,6 +6,7 @@ import { omit } from "lodash"
 
 import { RootState } from "~/store"
 import { EVMAccount, EVMWallet, Network } from "~/_types"
+import Web3 from "web3"
 
 const defaultState = {
 	// TODO: add firefox link
@@ -157,7 +158,15 @@ export const actions: ActionTree<LocalState, RootState> = {
 		}
 
 		try {
-			await commitAccount()
+			if(this.getters["web3/connectingWalletId"] === "onto") {
+				const web3 = new Web3(window.onto)
+				web3.eth.requestAccounts().then((res) => {
+					console.log(res[0])
+				})
+			} else {
+				await commitAccount()
+			}
+
 			localStorage.setItem(`${lsKey}-${walletId}-unlocked`, "true")
 			window.ethereum?.on("accountsChanged", accounts => {
 				if (accounts.length) {
@@ -167,6 +176,9 @@ export const actions: ActionTree<LocalState, RootState> = {
 					dispatch("disconnect")
 				}
 			})
+			window.onto.on("accountsChanged", (e) => {
+				console.log(e.accounts[0]);
+			});
 		}
 		catch (e) {
 			// eslint-disable-next-line no-console
@@ -191,6 +203,15 @@ export const actions: ActionTree<LocalState, RootState> = {
 					network: "binance",
 				},
 			},
+			onto: {
+				package: this.$wallets.onto,
+				options: {
+					rpc: {
+						56: "https://withered-delicate-glade.bsc.quiknode.pro/04e9d09f53688b9dbb9e94c9aebb926e981bcc88/",
+					},
+					network: "binance",
+				},
+			}
 		}
 		const web3Modal = new Web3Modal({
 			network: networkName,

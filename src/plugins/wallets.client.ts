@@ -1,9 +1,11 @@
 import { Plugin } from "@nuxt/types"
 
 import WalletConnectProvider from "@walletconnect/web3-provider"
+import { client, provider, ExtensionType } from "@ont-dev/ontology-dapi"
 
 const wallets = {
 	walletconnect: WalletConnectProvider,
+	onto: provider,
 }
 
 declare module "vue/types/vue" {

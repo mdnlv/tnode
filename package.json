@@ -63,6 +63,7 @@
 		"vue-js-modal": "^2.0.1",
 		"vue-toastification": "^1.7.14",
 		"vuetensils": "^0.10.4",
+		"web3": "^1.7.3",
 		"web3modal": "^1.9.4"
 	},
 	"devDependencies": {
