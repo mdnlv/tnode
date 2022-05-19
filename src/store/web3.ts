@@ -3,7 +3,6 @@ import { ethers } from "ethers"
 import Web3Modal from "web3modal"
 import * as evmChains from "evm-chains"
 import { omit } from "lodash"
-import Web3 from "web3"
 
 import { RootState } from "~/store"
 import { EVMAccount, EVMWallet, Network } from "~/_types"
@@ -160,10 +159,10 @@ export const actions: ActionTree<LocalState, RootState> = {
 
 		try {
 			if (this.getters["web3/connectingWalletId"] === "onto") {
-				const web3 = new Web3(window.onto)
-				web3.eth.requestAccounts().then(res => {
-					console.log(res[0])
+				const result = await window.onto.request({
+					method: "eth_requestAccounts",
 				})
+				console.log(result)
 			}
 			else {
 				await commitAccount()
