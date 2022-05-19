@@ -31,5 +31,6 @@ export interface Ethereumish {
 declare global {
 	interface Window extends KeplrWindow {
 		ethereum: Ethereumish | undefined
+		onto: any
 	}
 }
